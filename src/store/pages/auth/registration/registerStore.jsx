@@ -17,4 +17,20 @@ export const useRegisterStore = create((set) => ({
       return { success: false, error: error.response || error.message || error }; 
     }
   },
+  addLogin: async (newUser) => {
+  try {
+    const result = await axios.post(`${API}/Account/login`, newUser);
+    const token = result.data.access_token;
+
+    set((state) => ({
+      users: [...state.users, result.data],
+    }));
+
+    console.log("User logged in:", result.data);
+    return { success: true, token, data: result.data }; 
+  } catch (error) {
+    console.error("Login failed:", error.response || error.message || error);
+    return { success: false, error: error.response || error.message || error }; 
+  }
+}
 }));
