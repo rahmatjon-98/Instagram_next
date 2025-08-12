@@ -135,7 +135,7 @@ const MiniSideBar = ({ children }) => {
 										<Image
 											className={`${
 												router.pathname === '/profile'
-													? 'border-[2px] border-[solid] border-[black] rounded-[50%]'
+													? 'border-[2px]  border-[black] rounded-[50%]'
 													: 'font-[400]'
 											} text-[16px] block w-[25px] h-[25px]`}
 											src={Profile}
