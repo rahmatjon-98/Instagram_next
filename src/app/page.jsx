@@ -15,7 +15,11 @@ export default function Main() {
 			getUserStories()
 		}
 	}, [])
-	let { getUserStories, data, isLoading } = useHome()
+	let { getUserStories, data, isLoading,posts,getUserPosts } = useHome()
+  useEffect(() => {
+    getUserPosts()
+  }, [])
+  console.log(posts,1)
 	const scrollRef = useRef(null)
 	let isDown = false
 	let startX
@@ -57,7 +61,7 @@ export default function Main() {
 					{(isLoading &&
 						Array.from({ length: 9 }).map((_, i) => (
 							<div key={`skeleton-${i}`} className='flex flex-col items-center px-[3px]'>
-								<Skeleton variant='circular' width={66} height={66} />
+								<Skeleton variant='circular' width={66} className='mx-[6px]' height={66} />
 								<Skeleton variant='text' sx={{ fontSize: '12px' }} width={66} />
 							</div>
 						))) || (
@@ -77,13 +81,15 @@ export default function Main() {
 										>
 											{(e.userImage == '' && (
 												<Image
-													className='size-[66px] bg-white rounded-full p-[2.5px]'
+                        draggable={false}
+													className='size-[66px] object-cover bg-white rounded-full p-[2.5px]'
 													src={userIMG}
 													alt=''
 												/>
 											)) || (
 												<Image
-													className='size-[66px]'
+                        draggable={false}
+													className='size-[66px] object-cover'
 													src={`https://instagram-api.softclub.tj/images/${e.userImage}`}
 													alt=''
 												/>
@@ -98,6 +104,9 @@ export default function Main() {
 						</div>
 					)}
 				</div>
+        <div className='w-[100%] flex flex-col'>
+          
+        </div>
 			</div>
 			<div className='w-[30%] h-[100vh] right-0 py-[28px] flex flex-col gap-[20px] sticky bg-amber-700 top-0'></div>
 		</div>
