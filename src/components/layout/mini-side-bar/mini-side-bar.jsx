@@ -27,6 +27,7 @@ import {
 	video,
 	videoActive,
 } from '@/assets/icon/layout/svg'
+import Modal from '../Modal'
 
 const LightTooltip = styled(({ className, ...props }) => (
 	<Tooltip {...props} classes={{ popper: className }} />
@@ -56,6 +57,8 @@ const MiniSideBar = ({ children }) => {
 		return pathname === path ? inactiveIcon : activeIcon
 	}
 
+	const [openModal, setOpenModal] = useState(null)
+
 	return (
 		<div className='flex'>
 			<section className='flex justify-center w-[50px] border-r-[2px] border-[#eee] h-[100vh]'>
@@ -75,13 +78,13 @@ const MiniSideBar = ({ children }) => {
 							</LightTooltip>
 
 							{/* Search Icon */}
-							<LightTooltip title={t('layout.search')} placement='right' arrow>
-								<Link href='/search' passHref>
+							<button onClick={() => setOpenModal(!openModal)}>
+								<LightTooltip title={t('layout.search')} placement='right' arrow>
 									<div className='flex items-center super-svg gap-4 w-[90%] rounded-[8px] h-[52px] px-0 justify-center'>
 										{renderIcon('/search', searchIconActive, searchIcon)}
 									</div>
-								</Link>
-							</LightTooltip>
+								</LightTooltip>
+							</button>
 
 							{/* Explore Icon */}
 							<LightTooltip title={t('layout.explore')} placement='right' arrow>
@@ -133,11 +136,10 @@ const MiniSideBar = ({ children }) => {
 								<Link href='/profile' passHref>
 									<div className='flex items-center super-svg gap-4 w-[90%] rounded-[8px] h-[52px] px-0 justify-center'>
 										<Image
-											className={`${
-												router.pathname === '/profile'
-													? 'border-[2px] border-[solid] border-[black] rounded-[50%]'
-													: 'font-[400]'
-											} text-[16px] block w-[25px] h-[25px]`}
+											className={`${router.pathname === '/profile'
+												? 'border-[2px] border-[solid] border-[black] rounded-[50%]'
+												: 'font-[400]'
+												} text-[16px] block w-[25px] h-[25px]`}
 											src={Profile}
 											alt='Profile'
 										/>
@@ -148,8 +150,12 @@ const MiniSideBar = ({ children }) => {
 					</div>
 				</div>
 			</section>
-
-			<div className='ml-[0px]'>{children}</div>
+			{openModal && (
+				<Modal />
+			)}
+			<div className='ml-[0px]'>
+				{children}
+			</div>
 		</div>
 	)
 }

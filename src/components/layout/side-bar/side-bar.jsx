@@ -25,6 +25,7 @@ import {
   problemIcon,
   threads,
 } from "@/assets/icon/layout/svg";
+import Modal from "../Modal";
 
 const NavLink = ({ href, icon, activeIcon, label, isActive }) => (
   <Link
@@ -52,9 +53,8 @@ export default function SideBar({ children }) {
     setAnchorEl(null);
   };
 
-  const isActive = (path) => (pathname === path ? "font-bold" : "font-normal")
-
-  let [openModal, setOpenModal] = useState(null)
+  const isActive = (path) => (pathname === path ? "font-bold" : "font-normal");
+  const [openModal, setOpenModal] = useState(null)
 
   return (
     <div>
@@ -72,9 +72,12 @@ export default function SideBar({ children }) {
                 label={t("layout.home")}
                 isActive={isActive}
               />
-              <button onClick={() => (!openModal)}>
+              <button onClick={() => {
+                setOpenModal(!openModal)
+                setAnchorEl(null)
+              }}>
                 <NavLink
-                  href="/search"
+                  href="#"
                   icon={searchIcon}
                   activeIcon={searchIconActive}
                   label={t("layout.search")}
@@ -131,14 +134,6 @@ export default function SideBar({ children }) {
                 isActive={isActive}
               />
             </div>
-            <div>
-              {openModal && (
-                <div className="p-4 rounded-r-[16px] fixed shadow-xl h-screen w-[400px]">
-                  <h1 className="font-medium text-[28px]">Search</h1>
-                  <input type="text" placeholder="Seach" className="py-3 search mt-9 w-full rounded bg-[rgb(239,239,239)] px-4" />
-                </div>
-              )}
-            </div>
 
             <div className="flex items-center gap-4 w-[90%] m-auto rounded-md h-[52px] px-4 hover:bg-gray-100">
               {threads}
@@ -163,7 +158,9 @@ export default function SideBar({ children }) {
           </div>
         </div>
       </section>
-
+      {openModal && (
+        <Modal />
+      )}
       <div className="ml-[320px]">{children}</div>
     </div>
   );
