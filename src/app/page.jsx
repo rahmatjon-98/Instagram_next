@@ -15,11 +15,12 @@ export default function Main() {
 			getUserStories()
 		}
 	}, [])
-	let { getUserStories, data, isLoading,posts,getUserPosts } = useHome()
-  useEffect(() => {
-    getUserPosts()
-  }, [])
-  console.log(posts,1)
+	let { getUserStories, data, isLoading, posts, getUserPosts, isLoading2 } =
+		useHome()
+	useEffect(() => {
+		getUserPosts()
+	}, [])
+	console.log(posts, 1)
 	const scrollRef = useRef(null)
 	let isDown = false
 	let startX
@@ -27,7 +28,6 @@ export default function Main() {
 	useEffect(() => {
 		getUserStories()
 	}, [])
-	console.log(data)
 
 	const onMouseDown = e => {
 		isDown = true
@@ -60,16 +60,24 @@ export default function Main() {
 				>
 					{(isLoading &&
 						Array.from({ length: 9 }).map((_, i) => (
-							<div key={`skeleton-${i}`} className='flex flex-col items-center px-[3px]'>
-								<Skeleton variant='circular' width={66} className='mx-[6px]' height={66} />
+							<div
+								key={`skeleton-${i}`}
+								className='flex flex-col items-center px-[3px]'
+							>
+								<Skeleton
+									variant='circular'
+									width={66}
+									className='mx-[6px]'
+									height={66}
+								/>
 								<Skeleton variant='text' sx={{ fontSize: '12px' }} width={66} />
 							</div>
 						))) || (
 						<div className='flex gap-[14px]'>
-							{data?.map((e,i) => {
+							{data?.map((e, i) => {
 								return (
 									<div
-                  key={e.id || `story-${i}`}
+										key={e.id || `story-${i}`}
 										className='size-[80px] flex flex-col items-center'
 									>
 										<div
@@ -81,17 +89,19 @@ export default function Main() {
 										>
 											{(e.userImage == '' && (
 												<Image
-                        draggable={false}
+													draggable={false}
 													className='size-[66px] object-cover bg-white rounded-full p-[2.5px]'
 													src={userIMG}
 													alt=''
+                          width={66}
 												/>
 											)) || (
 												<Image
-                        draggable={false}
+													draggable={false}
 													className='size-[66px] object-cover'
 													src={`https://instagram-api.softclub.tj/images/${e.userImage}`}
 													alt=''
+                          width={66}
 												/>
 											)}
 										</div>
@@ -99,14 +109,87 @@ export default function Main() {
 											{e.userName}
 										</p>
 									</div>
+                    
 								)
 							})}
 						</div>
 					)}
 				</div>
-        <div className='w-[100%] flex flex-col'>
-          
-        </div>
+				<div className='w-[100%] flex flex-col'>
+					{isLoading2 && (
+            Array.from({ length: 9 }).map((_, i) => (
+							<div key={`skeleton-${i}`} className='flex flex-col px-[3px]'>
+                <div className='flex items-center justify-between'>
+                  <div className='flex w-[100%] py-[12px] gap-[8px] items-center'>
+								    <Skeleton	variant='circular'	width={42}	className=''	height={42}/>
+                    <div>
+								      <Skeleton variant='text' sx={{ fontSize: '14px' }} width={75} />
+                    </div>
+                  </div>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 13.5C12.8284 13.5 13.5 12.8284 13.5 12C13.5 11.1716 12.8284 10.5 12 10.5C11.1716 10.5 10.5 11.1716 10.5 12C10.5 12.8284 11.1716 13.5 12 13.5Z" fill="#262626"/>
+                    <path d="M6.5 13.5C7.32843 13.5 8 12.8284 8 12C8 11.1716 7.32843 10.5 6.5 10.5C5.67157 10.5 5 11.1716 5 12C5 12.8284 5.67157 13.5 6.5 13.5Z" fill="#262626"/>
+                    <path d="M17.5 13.5C18.3284 13.5 19 12.8284 19 12C19 11.1716 18.3284 10.5 17.5 10.5C16.6716 10.5 16 11.1716 16 12C16 12.8284 16.6716 13.5 17.5 13.5Z" fill="#262626"/>
+                  </svg>
+                </div>
+								<Skeleton variant='rectangular' className='rounded-2xl' height={400} width={'100%'} />
+							</div>
+            ))
+          ) || (
+						<>
+							{posts?.data?.map((e,i) => {
+								return (
+									<div className='flex flex-col' key={e.id || i}>
+										<div className='flex items-center justify-between py-[12px]'>
+											<div className='flex items-center gap-[8px]'>
+												<div
+													className='rounded-full size-[42px] p-[0.1px] flex items-center justify-center'
+													style={{
+														background:
+															'linear-gradient(180deg, #DE0046 0%, #F7A34B 100%)',
+													}}
+												>
+													{(e.userImage == '' && (
+														<Image
+															draggable={false}
+															className='size-[36px] object-cover bg-white rounded-full p-[2px]'
+															src={userIMG}
+															alt=''
+                              width={37}
+                              height={37}
+														/>
+													)) || (
+														<Image
+															draggable={false}
+															className='size-[37px] rounded-full bg-white p-[2px] object-cover'
+															src={`http://37.27.29.18:8003/images/${e.userImage}`}
+															alt=''
+                              width={37}
+                              height={37}
+														/>
+													)}
+												</div>
+                        <div className='flex flex-col'>
+                          <p className='text-[#1E293B] font-[600] text-[14px]'>
+                            {e.userName}
+                          </p>
+                        </div>
+											</div>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 13.5C12.8284 13.5 13.5 12.8284 13.5 12C13.5 11.1716 12.8284 10.5 12 10.5C11.1716 10.5 10.5 11.1716 10.5 12C10.5 12.8284 11.1716 13.5 12 13.5Z" fill="#262626"/>
+                        <path d="M6.5 13.5C7.32843 13.5 8 12.8284 8 12C8 11.1716 7.32843 10.5 6.5 10.5C5.67157 10.5 5 11.1716 5 12C5 12.8284 5.67157 13.5 6.5 13.5Z" fill="#262626"/>
+                        <path d="M17.5 13.5C18.3284 13.5 19 12.8284 19 12C19 11.1716 18.3284 10.5 17.5 10.5C16.6716 10.5 16 11.1716 16 12C16 12.8284 16.6716 13.5 17.5 13.5Z" fill="#262626"/>
+                      </svg>
+                      {e.images.map(image => {
+
+                      })}
+										</div>
+									</div>
+								)
+							})}
+						</>
+					)}
+				</div>
 			</div>
 			<div className='w-[30%] h-[100vh] right-0 py-[28px] flex flex-col gap-[20px] sticky bg-amber-700 top-0'></div>
 		</div>

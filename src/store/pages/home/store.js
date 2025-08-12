@@ -23,8 +23,7 @@ export const useHome = create((set, get) => ({
 		try {
 			set({ isLoading2: true })
 			let { data: data3 } = await axiosRequest('Post/get-posts')
-			console.log(await data3);
-			set(state => ({ posts: [...state.posts, ...data3] }))
+			set({ posts: data3 })
 		} catch (error) {
 			console.error(error)
 			set({ isLoading2: true })
