@@ -4,7 +4,9 @@ import { create } from 'zustand'
 
 export const useHome = create((set, get) => ({
 	data: [],
+	posts:[],
 	isLoading: false,
+	isLoading2: false,
 	getUserStories: async () => {
 		try {
 			set({ isLoading: true })
@@ -12,12 +14,22 @@ export const useHome = create((set, get) => ({
 			set(state => ({ data: [...state.data, ...data2] }))
 		} catch (error) {
 			console.error(error)
-			get().getUserStories()
 			set({ isLoading: true })
 		} finally {
 			set({ isLoading: false })
 		}
 	},
-	removeAllBears: () => set({ bears: 0 }),
-	updateBears: newBears => set({ bears: newBears }),
+	getUserPosts: async () => {
+		try {
+			set({ isLoading2: true })
+			let { data: data3 } = await axiosRequest('Post/get-posts')
+			console.log(await data3);
+			set(state => ({ posts: [...state.posts, ...data3] }))
+		} catch (error) {
+			console.error(error)
+			set({ isLoading2: true })
+		} finally {
+			set({ isLoading2: false })
+		}
+	},
 }))
