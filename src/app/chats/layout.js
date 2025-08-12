@@ -58,7 +58,7 @@ export default function Layout({ children }) {
                     className="w-14 h-14 rounded-full"
                   />
                 ) : (
-                  <Image src={img} className="w-14 h-14 rounded-full" />
+                  <Image src={img} width={500} height={500} className="w-14 h-14 rounded-full" />
                 )}
                 <Link href={`/chats/${e.chatId}`}>{e.receiveUserName}</Link>
               </div>
