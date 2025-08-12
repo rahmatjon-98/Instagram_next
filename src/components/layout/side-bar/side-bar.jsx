@@ -52,7 +52,9 @@ export default function SideBar({ children }) {
     setAnchorEl(null);
   };
 
-  const isActive = (path) => (pathname === path ? "font-bold" : "font-normal");
+  const isActive = (path) => (pathname === path ? "font-bold" : "font-normal")
+
+  let [openModal, setOpenModal] = useState(null)
 
   return (
     <div>
@@ -70,13 +72,15 @@ export default function SideBar({ children }) {
                 label={t("layout.home")}
                 isActive={isActive}
               />
-              <NavLink
-                href="/search"
-                icon={searchIcon}
-                activeIcon={searchIconActive}
-                label={t("layout.search")}
-                isActive={isActive}
-              />
+              <button onClick={() => (!openModal)}>
+                <NavLink
+                  href="/search"
+                  icon={searchIcon}
+                  activeIcon={searchIconActive}
+                  label={t("layout.search")}
+                  isActive={isActive}
+                />
+              </button>
               <NavLink
                 href="/explore"
                 icon={compas}
@@ -115,11 +119,10 @@ export default function SideBar({ children }) {
                 href="/profile"
                 icon={
                   <Image
-                    className={`${
-                      pathname === "/profile"
-                        ? "border-2 border-black rounded-full"
-                        : ""
-                    } h-10 w-10`}
+                    className={`${pathname === "/profile"
+                      ? "border-2 border-black rounded-full"
+                      : ""
+                      } h-10 w-10`}
                     src={Profile}
                     alt="Profile"
                   />
@@ -127,6 +130,14 @@ export default function SideBar({ children }) {
                 label={t("layout.profile")}
                 isActive={isActive}
               />
+            </div>
+            <div>
+              {openModal && (
+                <div className="p-4 rounded-r-[16px] fixed shadow-xl h-screen w-[400px]">
+                  <h1 className="font-medium text-[28px]">Search</h1>
+                  <input type="text" placeholder="Seach" className="py-3 search mt-9 w-full rounded bg-[rgb(239,239,239)] px-4" />
+                </div>
+              )}
             </div>
 
             <div className="flex items-center gap-4 w-[90%] m-auto rounded-md h-[52px] px-4 hover:bg-gray-100">
