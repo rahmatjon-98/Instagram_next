@@ -91,7 +91,7 @@ export default function Explore() {
               const mediaUrl = `http://37.27.29.18:8003/images/${item}`
               
               return (
-                <div key={index} style={mediaStyle} onClick={() => handleOpen(item.id)} >
+                <div key={index} style={mediaStyle} onClick={() => handleOpen(item.postId)} >
                   {item.endsWith('.mp4') ? (
                     <video  src={mediaUrl} style={mediaStyle} controls/>
                   ) : (
