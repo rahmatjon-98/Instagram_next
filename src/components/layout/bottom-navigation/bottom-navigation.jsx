@@ -73,7 +73,7 @@ export default function BottomNavigation({children}) {
           <Link href="/profile">
             <div className={iconClass}>
               <Image
-                className={`${pathname === '/profile' ? 'border-[2px] border-[solid] border-[black]' : ''} ${profileClass}`}
+                className={`${pathname === '/profile' ? 'border-[2px]  border-[black]' : ''} ${profileClass}`}
                 src={Profile}
                 alt="Profile"
               />
