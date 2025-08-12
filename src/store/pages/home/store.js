@@ -1,21 +1,35 @@
 import axiosRequest from '@/lib/axiosRequest'
+import { useEffect } from 'react'
 import { create } from 'zustand'
 
-export const useHome = create(set => ({
+export const useHome = create((set, get) => ({
 	data: [],
+	posts:[],
+	isLoading: false,
+	isLoading2: false,
 	getUserStories: async () => {
 		try {
-			let { data: data2 } = await axiosRequest('Story/get-stories', {
-				headers: {
-					Authorization: `Bearer ${localStorage.getItem('acces_token')}`, // токен подставляем динамически
-					'Content-Type': 'application/json',
-				},
-			})
+			set({ isLoading: true })
+			let { data: data2 } = await axiosRequest('Story/get-stories')
 			set(state => ({ data: [...state.data, ...data2] }))
 		} catch (error) {
 			console.error(error)
+			set({ isLoading: true })
+		} finally {
+			set({ isLoading: false })
 		}
 	},
-	removeAllBears: () => set({ bears: 0 }),
-	updateBears: newBears => set({ bears: newBears }),
+	getUserPosts: async () => {
+		try {
+			set({ isLoading2: true })
+			let { data: data3 } = await axiosRequest('Post/get-posts')
+			console.log(await data3);
+			set(state => ({ posts: [...state.posts, ...data3] }))
+		} catch (error) {
+			console.error(error)
+			set({ isLoading2: true })
+		} finally {
+			set({ isLoading2: false })
+		}
+	},
 }))
