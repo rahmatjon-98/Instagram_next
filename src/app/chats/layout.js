@@ -4,8 +4,8 @@ import { ChevronDown } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-const { useDefaultChat } = require("@/api/pages/chat/pages/default-chat/store");
-import img from '../../assets/img/pages/chat/pages/default-chat/userFoto.jpg'
+import img from "../../assets/img/pages/chat/pages/default-chat/userFoto.jpg";
+import { useDefaultChat } from "@/store/pages/chat/pages/default-chat/store";
 
 export default function Layout({ children }) {
   let { chats, get } = useDefaultChat();
@@ -52,13 +52,20 @@ export default function Layout({ children }) {
               <div key={i} className="flex items-center gap-1">
                 {e.receiveUserImage ? (
                   <Image
+                    alt=""
                     src={e.receiveUserImage}
                     width={1000}
                     height={1000}
                     className="w-14 h-14 rounded-full"
                   />
                 ) : (
-                  <Image src={img} width={500} height={500} className="w-14 h-14 rounded-full" />
+                  <Image
+                    alt=""
+                    src={img}
+                    width={500}
+                    height={500}
+                    className="w-14 h-14 rounded-full"
+                  />
                 )}
                 <Link href={`/chats/${e.chatId}`}>{e.receiveUserName}</Link>
               </div>

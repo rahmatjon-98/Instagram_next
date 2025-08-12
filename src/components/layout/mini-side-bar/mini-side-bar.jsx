@@ -136,10 +136,11 @@ const MiniSideBar = ({ children }) => {
 								<Link href='/profile' passHref>
 									<div className='flex items-center super-svg gap-4 w-[90%] rounded-[8px] h-[52px] px-0 justify-center'>
 										<Image
-											className={`${router.pathname === '/profile'
-												? 'border-[2px] border-[solid] border-[black] rounded-[50%]'
-												: 'font-[400]'
-												} text-[16px] block w-[25px] h-[25px]`}
+											className={`${
+												router.pathname === '/profile'
+													? 'border-[2px] border-[solid] border-[black] rounded-[50%]'
+													: 'font-[400]'
+											} text-[16px] block w-[25px] h-[25px]`}
 											src={Profile}
 											alt='Profile'
 										/>
