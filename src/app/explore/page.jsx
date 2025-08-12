@@ -30,7 +30,7 @@ const mediaStyle = {
 }
 
 export default function Explore() {
-  let { user, fechUser } = useUserStore()
+  let { user, fechUser ,postById,getPostById} = useUserStore()
   const [open, setOpen] = React.useState(false)
   const [selectedMedia, setSelectedMedia] = React.useState(null)
 
@@ -38,8 +38,9 @@ export default function Explore() {
     fechUser()
   }, [])
 
-  const handleOpen = (mediaUrl) => {
-    setSelectedMedia(mediaUrl)
+  const handleOpen = (id) => {
+    getPostById(id)
+
     setOpen(true)
   }
 
@@ -90,7 +91,7 @@ export default function Explore() {
               const mediaUrl = `http://37.27.29.18:8003/images/${item}`
               
               return (
-                <div key={index} style={mediaStyle} onClick={() => handleOpen(mediaUrl)} >
+                <div key={index} style={mediaStyle} onClick={() => handleOpen(item.id)} >
                   {item.endsWith('.mp4') ? (
                     <video  src={mediaUrl} style={mediaStyle} controls/>
                   ) : (
