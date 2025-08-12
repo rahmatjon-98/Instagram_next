@@ -31,8 +31,8 @@ export default function ChatById() {
                   : "bg-[#F8FAFC] text-[#475569] self-start rounded-tl-none"
               }`}
             >
+              {e.file && <Image width={500} height={500} alt="image" src={`http://37.27.29.18:8003/images/${e.file}`} />}
               <p>{e.messageText}</p>
-              {/* {e.file && <Image src={`${e.file}`} />} */}
               <span className="text-xs mt-1 text-gray-300 self-end">
                 {new Date(e.sendMassageDate).toLocaleTimeString([], {
                   hour: "2-digit",
