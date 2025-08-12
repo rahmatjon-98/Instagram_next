@@ -6,15 +6,7 @@ import userIMG from '../assets/img/pages/home/userDefault.png'
 import Image from 'next/image'
 
 export default function Main() {
-	useEffect(() => {
-		if (typeof window !== 'undefined') {
-			localStorage.setItem(
-				'access_token',
-				'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaWQiOiI2OWYxMmJlMy05NWQwLTQwYTYtOGM3ZC03NTkxNGZhODY0ZjciLCJuYW1lIjoic3RyaW5nIiwiZW1haWwiOiJzdHJpbmciLCJzdWIiOiIiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJVc2VyIiwiZXhwIjoxNzU1MDc2Nzc1LCJpc3MiOiJpbnN0YWdyYW0tZ3JvdXAiLCJhdWQiOiJpbnN0YWdyYW0tYXBpIn0.9C8AWm9TUbMFHQjdQPPQLhPPzVBTf1gjjgvENHUQFs8'
-			)
-			getUserStories()
-		}
-	}, [])
+	
 	let { getUserStories, data, isLoading, posts, getUserPosts, isLoading2 } =
 		useHome()
 	useEffect(() => {
