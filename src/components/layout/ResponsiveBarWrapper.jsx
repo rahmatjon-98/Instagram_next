@@ -12,7 +12,7 @@ export default function ResponsiveBarWrapper({ children }) {
 
   let router = useRouter();
 
-  let token = localStorage.getItem("access_token");
+  let token = typeof window !== "undefined" ? localStorage.getItem("access_token") : ""
   
   useEffect(() => {
     if (!token) {

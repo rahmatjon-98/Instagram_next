@@ -1,12 +1,12 @@
+import axiosRequest from "@/lib/axiosRequest";
 import axios from "axios";
 import { create } from "zustand";
 
-const API = "http://37.27.29.18:8003";
 export const useRegisterStore = create((set) => ({
   users: [],
   addUser: async (newUser) => {
     try {
-      const res = await axios.post(`${API}/Account/register`, newUser);
+      const res = await axiosRequest.post(`/Account/register`, newUser);
       set((state) => ({
         users: [...state.users, res.data],
       }));
@@ -19,7 +19,7 @@ export const useRegisterStore = create((set) => ({
   },
   addLogin: async (newUser) => {
   try {
-    const result = await axios.post(`${API}/Account/login`, newUser);
+    const result = await axiosRequest.post(`/Account/login`, newUser);
     const token = await result.data.token;
     
     set((state) => ({
