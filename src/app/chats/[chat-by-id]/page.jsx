@@ -63,9 +63,8 @@ export default function ChatById() {
   useEffect(() => {
     get();
     if (id) {
-      setInterval(() => {
-        getChatById(id);
-      }, 3000);
+      // setInterval(() => {}, 3000);
+      getChatById(id);
     }
   }, [id, getChatById]);
 
