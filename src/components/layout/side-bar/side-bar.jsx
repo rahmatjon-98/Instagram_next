@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import Profile from "@/assets/icon/layout/instagramDefaultProfile.jpg";
 import { Divider, Menu, MenuItem } from "@mui/material";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import {
   homeIcon,
@@ -25,7 +25,7 @@ import {
   problemIcon,
   threads,
 } from "@/assets/icon/layout/svg";
-import { Settings } from "lucide-react";
+import { Bookmark, CircleUserRound, LogOut, Settings } from "lucide-react";
 
 const NavLink = ({ href, icon, activeIcon, label, isActive }) => (
   <Link
@@ -44,6 +44,7 @@ export default function SideBar({ children }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const { t } = useTranslation();
+  const router = useRouter();
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -52,6 +53,11 @@ export default function SideBar({ children }) {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  function logOut() {
+    localStorage.removeItem('access_token')
+    router.push('/login')
+  }
 
   const isActive = (path) => (pathname === path ? "font-bold" : "font-normal")
 
@@ -178,15 +184,15 @@ export default function SideBar({ children }) {
                   },
                 }}
               >
-                <MenuItem onClick={handleClose}> <div className="flex gap-[20px]"><Settings /> Settings</div></MenuItem>
-                <MenuItem onClick={handleClose}>Saved</MenuItem>
-                <MenuItem onClick={handleClose}>Switch account</MenuItem>
+                <Link href={'/setting'}><MenuItem onClick={handleClose}> <div className="flex gap-[20px]"><Settings /> Settings</div></MenuItem></Link>
+                <MenuItem onClick={handleClose}> <div className="flex gap-[20px]"><Bookmark /> Saved</div></MenuItem>
+                <MenuItem onClick={handleClose}> <div className="flex gap-[20px]"><CircleUserRound /> Switch account</div></MenuItem>
                 <Divider />
                 <MenuItem
                   onClick={handleClose}
                   sx={{ color: "#ed4956", fontWeight: 600 }}
                 >
-                  🚪 Log out
+                  <div onClick={() => logOut()} className="flex gap-[20px]"><LogOut /> Log out</div>
                 </MenuItem>
               </Menu>
             </div>
