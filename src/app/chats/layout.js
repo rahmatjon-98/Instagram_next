@@ -100,23 +100,24 @@ export default function Layout({ children }) {
                       : e.receiveUserName}
                   </Link>{" "}
                 </div>
-
-                <button
-                  onClick={() => openDelModal(e.chatId)}
-                  className="hidden group-hover:block"
-                >
-                  <EllipsisVertical />
-                </button>
-
-                {delMesModal == e.chatId && (
-                  <button
-                    onClick={() => handleDelMessage(e.chatId)}
-                    className="text-red-500 bg-red-100 p-2 rounded
+                <div className="flex gap-2">
+                  {delMesModal == e.chatId && (
+                    <button
+                      onClick={() => handleDelMessage(e.chatId)}
+                      className="text-red-500 bg-red-100 p-2 rounded
                     "
+                    >
+                      <Trash size={18} />
+                    </button>
+                  )}
+
+                  <button
+                    onClick={() => openDelModal(e.chatId)}
+                    className="hidden group-hover:block"
                   >
-                    <Trash size={18} />
+                    <EllipsisVertical />
                   </button>
-                )}
+                </div>
               </div>
             ))}
         </section>
