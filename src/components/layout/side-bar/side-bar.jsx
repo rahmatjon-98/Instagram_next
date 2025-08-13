@@ -27,6 +27,7 @@ import {
 } from "@/assets/icon/layout/svg";
 import { usegetUserStore } from '@/store/pages/search/store'
 import { Settings } from 'lucide-react'
+import Modal from "../Modal";
 
 const NavLink = ({ href, icon, activeIcon, label, isActive }) => (
   <Link
