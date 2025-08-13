@@ -1,6 +1,7 @@
 'use client'
 
 import { useTodoAsyncStore } from '@/store/pages/notification/store'
+import Image from 'next/image'
 import { useEffect, useState } from 'react'
 
 export default function UsersList() {
@@ -25,9 +26,14 @@ export default function UsersList() {
   if (error) return <p>Ошибка: {error}</p>
 
   return (
-    <div>
+    <div className='p-10'>
+		<h1 className='text-4xl font-bold mb-10 '>На этой неделе</h1>
       {users.map(user => (
-        <p key={user.id}>{user.fullName}</p>
+        <div className="" key={user.id}>
+			<div className="">
+				<h3 className='font-medium my-5 '> {user.fullName}</h3>
+			</div>
+		  </div>
       ))}
     </div>
   )
