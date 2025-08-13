@@ -3,8 +3,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import Profile from "@/assets/icon/layout/instagramDefaultProfile.jpg";
-import { Menu, MenuItem } from "@mui/material";
-import { usePathname } from "next/navigation";
+import { Divider, Menu, MenuItem } from "@mui/material";
+import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import {
   homeIcon,
@@ -25,6 +25,7 @@ import {
   problemIcon,
   threads,
 } from "@/assets/icon/layout/svg";
+import { Bookmark, CircleUserRound, LogOut, Settings } from "lucide-react";
 
 const NavLink = ({ href, icon, activeIcon, label, isActive }) => (
   <Link
@@ -43,6 +44,7 @@ export default function SideBar({ children }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const { t } = useTranslation();
+  const router = useRouter();
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -51,6 +53,11 @@ export default function SideBar({ children }) {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  function logOut() {
+    localStorage.removeItem('access_token')
+    router.push('/login')
+  }
 
   const isActive = (path) => (pathname === path ? "font-bold" : "font-normal")
 
@@ -72,9 +79,12 @@ export default function SideBar({ children }) {
                 label={t("layout.home")}
                 isActive={isActive}
               />
-              <button onClick={() => (!openModal)}>
+              <button onClick={() => {
+                setOpenModal(!openModal)
+                setAnchorEl(null)
+              }}>
                 <NavLink
-                  href="/search"
+                  href="#"
                   icon={searchIcon}
                   activeIcon={searchIconActive}
                   label={t("layout.search")}
@@ -131,14 +141,6 @@ export default function SideBar({ children }) {
                 isActive={isActive}
               />
             </div>
-            <div>
-              {openModal && (
-                <div className="p-4 rounded-r-[16px] fixed shadow-xl h-screen w-[400px]">
-                  <h1 className="font-medium text-[28px]">Search</h1>
-                  <input type="text" placeholder="Seach" className="py-3 search mt-9 w-full rounded bg-[rgb(239,239,239)] px-4" />
-                </div>
-              )}
-            </div>
 
             <div className="flex items-center gap-4 w-[90%] m-auto rounded-md h-[52px] px-4 hover:bg-gray-100">
               {threads}
@@ -156,14 +158,45 @@ export default function SideBar({ children }) {
                 onClose={handleClose}
                 anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
                 transformOrigin={{ vertical: "top", horizontal: "center" }}
+                PaperProps={{
+                  elevation: 0,
+                  sx: {
+                    overflow: "visible",
+                    mt: 1.5,
+                    borderRadius: "12px",
+                    boxShadow: "0px 4px 16px rgba(0,0,0,0.15)",
+                    minWidth: 200,
+                    "& .MuiMenuItem-root": {
+                      fontSize: "14px",
+                      fontWeight: 500,
+                      padding: "10px 16px",
+                      color: "#262626",
+                      fontFamily: "'Segoe UI', Arial, sans-serif",
+                    },
+                    "& .MuiMenuItem-root:hover": {
+                      backgroundColor: "#fafafa",
+                    },
+                  },
+                }}
               >
-                {/* Your menu items */}
+                <Link href={'/setting'}><MenuItem onClick={handleClose}> <div className="flex gap-[20px]"><Settings /> Settings</div></MenuItem></Link>
+                <MenuItem onClick={handleClose}> <div className="flex gap-[20px]"><Bookmark /> Saved</div></MenuItem>
+                <MenuItem onClick={handleClose}> <div className="flex gap-[20px]"><CircleUserRound /> Switch account</div></MenuItem>
+                <Divider />
+                <MenuItem
+                  onClick={handleClose}
+                  sx={{ color: "#ed4956", fontWeight: 600 }}
+                >
+                  <div onClick={() => logOut()} className="flex gap-[20px]"><LogOut /> Log out</div>
+                </MenuItem>
               </Menu>
             </div>
           </div>
         </div>
       </section>
-
+      {openModal && (
+        <Modal />
+      )}
       <div className="ml-[320px]">{children}</div>
     </div>
   );

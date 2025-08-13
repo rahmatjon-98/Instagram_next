@@ -1,1 +1,49 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+
+@keyframes flyAnimation {
+	0% {
+		transform: translate(0, 0) rotate(0deg);
+		position: sticky;
+		opacity: 1;
+	}
+	10% {
+		transform: translate(100px, -80px) rotate(0deg);
+		position: sticky;
+		opacity: 1;
+	}
+	20% {
+		transform: translate(200px, -70px) rotate(15deg);
+		position: sticky;
+		opacity: 0.8;
+	}
+	30% {
+		transform: translate(400px, 100px) rotate(95deg);
+		position: sticky;
+		opacity: 0.8;
+	}
+	40% {
+		transform: translate(300px, 300px) rotate(180deg);
+		position: sticky;
+		opacity: 0.8;
+	}
+	50% {
+		transform: translate(150px, 430px) rotate(180deg);
+		position: sticky;
+		opacity: 0.8;
+	}
+	60% {
+		transform: translate(50px, 400px) rotate(200deg);
+		position: sticky;
+		opacity: 0.8;
+	}
+	70% {
+		transform: translate(-100px, 330px) rotate(220deg);
+		position: sticky;
+		opacity: 0.8;
+	}
+	100% {
+		transform: translate(-300px, 200px) rotate(242deg);
+		position: relative;
+		opacity: 0;
+	}
+}

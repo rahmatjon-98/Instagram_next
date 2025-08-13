@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
-
 import frame168 from "../../../assets/img/pages/auth/registration/Frame 168.png";
 import image71 from "../../../assets/img/pages/auth/registration/image 71.png";
 import image72 from "../../../assets/img/pages/auth/registration/image 72.png";
@@ -15,17 +14,11 @@ import Link from "next/link";
 import { useRegisterStore } from "@/store/pages/auth/registration/registerStore";
 
 export default function Login() {
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm();
-
+  const { register, handleSubmit, reset, formState: { errors } } = useForm();
   const [showPassword, setShowPassword] = useState(false);
   const addLogin = useRegisterStore((state) => state.addLogin);
+  const isLoading = useRegisterStore((state) => state.isLoading);
   const router = useRouter();
-
 
   const onSubmit = async (data) => {
     const result = await addLogin({
@@ -36,14 +29,15 @@ export default function Login() {
     if (result?.success) {
       reset();
       toast.success("Login successful!");
-      localStorage.setItem('access_token', result?.data?.data); 
-      console.log('Login result:', result);
-
+      if (typeof window != "undefined") {
+        localStorage.setItem('access_token', result?.data?.data); 
+      }
       router.push("/");
     } else {
       toast.error("Login failed. Please try again.");
     }
   };
+
 
   return (
     <div className="flex justify-around w-[80%] m-auto items-center">
@@ -74,7 +68,6 @@ export default function Login() {
               <p className="text-red-500 text-xs">{errors.userName.message}</p>
             )}
 
-
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
@@ -93,15 +86,22 @@ export default function Login() {
               <p className="text-red-500 text-xs">{errors.password.message}</p>
             )}
 
-
             <button
               type="submit"
-              className="w-full bg-blue-500 text-white font-semibold py-2 rounded-md hover:bg-blue-600 transition"
+              disabled={isLoading}
+              className={`w-full text-white font-semibold py-2 rounded-md transition ${
+                isLoading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600"
+              }`}
             >
-              Log in
+              {isLoading ? "Logging in..." : "Log in"}
             </button>
-            <Link href={'/registration'}><p className="text-[#3B82F6] text-center">Forgot password?</p></Link>
+
+            <Link href={'/registration'}>
+              <p className="text-[#3B82F6] text-center">Forgot password?</p>
+            </Link>
           </form>
+
+
 
           <div className="mt-6 border-t pt-4 text-center">
             <p className="text-sm">
