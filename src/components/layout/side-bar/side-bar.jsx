@@ -3,7 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import Profile from "@/assets/icon/layout/instagramDefaultProfile.jpg";
-import { Menu, MenuItem } from "@mui/material";
+import { Divider, Menu, MenuItem } from "@mui/material";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import {
@@ -25,8 +25,6 @@ import {
   problemIcon,
   threads,
 } from "@/assets/icon/layout/svg";
-import Modal from "../Modal";
-import { usegetUserStore } from "@/store/pages/search/store";
 
 const NavLink = ({ href, icon, activeIcon, label, isActive }) => (
   <Link
@@ -152,8 +150,37 @@ export default function SideBar({ children }) {
                 onClose={handleClose}
                 anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
                 transformOrigin={{ vertical: "top", horizontal: "center" }}
+                PaperProps={{
+                  elevation: 0,
+                  sx: {
+                    overflow: "visible",
+                    mt: 1.5,
+                    borderRadius: "12px",
+                    boxShadow: "0px 4px 16px rgba(0,0,0,0.15)",
+                    minWidth: 200,
+                    "& .MuiMenuItem-root": {
+                      fontSize: "14px",
+                      fontWeight: 500,
+                      padding: "10px 16px",
+                      color: "#262626",
+                      fontFamily: "'Segoe UI', Arial, sans-serif",
+                    },
+                    "& .MuiMenuItem-root:hover": {
+                      backgroundColor: "#fafafa",
+                    },
+                  },
+                }}
               >
-                {/* Your menu items */}
+                <MenuItem onClick={handleClose}> <div className="flex gap-[20px]"><Settings /> Settings</div></MenuItem>
+                <MenuItem onClick={handleClose}>Saved</MenuItem>
+                <MenuItem onClick={handleClose}>Switch account</MenuItem>
+                <Divider />
+                <MenuItem
+                  onClick={handleClose}
+                  sx={{ color: "#ed4956", fontWeight: 600 }}
+                >
+                  🚪 Log out
+                </MenuItem>
               </Menu>
             </div>
           </div>
