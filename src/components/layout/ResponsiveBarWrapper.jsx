@@ -5,16 +5,20 @@ import BottomNavigation from "@/components/layout/bottom-navigation/bottom-navig
 import MiniSideBar from "@/components/layout/mini-side-bar/mini-side-bar";
 import SideBar from "@/components/layout/side-bar/side-bar";
 import { usePathname, useRouter } from "next/navigation";
+import { usegetUserStore } from "@/store/pages/search/store";
 
 export default function ResponsiveBarWrapper({ children }) {
   const [windowWidth, setWindowWidth] = useState(0);
   const pathname = usePathname();
+  const { openModal } = usegetUserStore()
+
 
   let router = useRouter();
 
   let token = typeof window !== "undefined" ? localStorage.getItem("access_token") : ""
-  
+
   useEffect(() => {
+    
     if (!token) {
       router.push("/login");
     }
@@ -35,14 +39,14 @@ export default function ResponsiveBarWrapper({ children }) {
     if (windowWidth <= 767) return "bottom";
     if (
       windowWidth <= 1279 ||
-      pathname === "/search" ||
+      openModal ||
       pathname.includes("chat")
     )
       return "minibar";
     return "bar";
-  }, [windowWidth, pathname]);
+  }, [windowWidth, pathname,openModal]);
 
-  // Пути, где не показывать сайдбар
+
   const noSidebarPaths = ["/login", "/registration"];
 
   const shouldShowSidebar = !noSidebarPaths.includes(pathname);

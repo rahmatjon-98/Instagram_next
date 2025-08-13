@@ -27,6 +27,8 @@ import {
 	video,
 	videoActive,
 } from '@/assets/icon/layout/svg'
+import Modal from '../Modal'
+import { usegetUserStore } from '@/store/pages/search/store'
 
 const LightTooltip = styled(({ className, ...props }) => (
 	<Tooltip {...props} classes={{ popper: className }} />
@@ -45,16 +47,18 @@ const LightTooltip = styled(({ className, ...props }) => (
 const MiniSideBar = ({ children }) => {
 	const router = useRouter()
 	const pathname = usePathname()
+	const { openModal, setOpenModal } = usegetUserStore()
 	// const [anchorEl, setAnchorEl] = (useState < null) | (HTMLElement > null)
 	// const open = Boolean(anchorEl)
 	const { t } = useTranslation()
-
+	 
 	// const handleClick = event => setAnchorEl(event.currentTarget)
 	// const handleClose = () => setAnchorEl(null)
 
 	const renderIcon = (path, activeIcon, inactiveIcon) => {
 		return pathname === path ? inactiveIcon : activeIcon
 	}
+
 
 	return (
 		<div className='flex'>
@@ -75,13 +79,13 @@ const MiniSideBar = ({ children }) => {
 							</LightTooltip>
 
 							{/* Search Icon */}
-							<LightTooltip title={t('layout.search')} placement='right' arrow>
-								<Link href='/search' passHref>
+							<button onClick={setOpenModal}>
+								<LightTooltip title={t('layout.search')} placement='right' arrow>
 									<div className='flex items-center super-svg gap-4 w-[90%] rounded-[8px] h-[52px] px-0 justify-center'>
 										{renderIcon('/search', searchIconActive, searchIcon)}
 									</div>
-								</Link>
-							</LightTooltip>
+								</LightTooltip>
+							</button>
 
 							{/* Explore Icon */}
 							<LightTooltip title={t('layout.explore')} placement='right' arrow>
@@ -133,11 +137,10 @@ const MiniSideBar = ({ children }) => {
 								<Link href='/profile' passHref>
 									<div className='flex items-center super-svg gap-4 w-[90%] rounded-[8px] h-[52px] px-0 justify-center'>
 										<Image
-											className={`${
-												router.pathname === '/profile'
-													? 'border-[2px] border-[solid] border-[black] rounded-[50%]'
+											className={`${router.pathname === '/profile'
+													? 'border-[2px] border-[black] rounded-[50%]'
 													: 'font-[400]'
-											} text-[16px] block w-[25px] h-[25px]`}
+												} text-[16px] block w-[25px] h-[25px]`}
 											src={Profile}
 											alt='Profile'
 										/>
@@ -148,8 +151,12 @@ const MiniSideBar = ({ children }) => {
 					</div>
 				</div>
 			</section>
-
-			<div className='ml-[0px]'>{children}</div>
+			{openModal && (
+				<Modal />
+			)}
+			<div className='ml-[0px] w-full'>
+				{children}
+			</div>
 		</div>
 	)
 }
