@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { useEffect } from 'react'
 import defaultUser from '../../assets/img/pages/profile/profile/instauser (2).jpg'
 import { RxHamburgerMenu } from 'react-icons/rx'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { MdOutlineGridOn } from 'react-icons/md'
 import { FaRegBookmark } from 'react-icons/fa'
 import { MdOutlinePhotoCameraFront } from 'react-icons/md'
@@ -14,10 +14,12 @@ const Layout = ({ children }) => {
 	let { user, getProfileData } = useProfileStore()
 
 	let router = useRouter()
+	let pathname = usePathname()
 
 	useEffect(() => {
 		getProfileData()
 		// console.log(decodeToken);
+		console.log(pathname)
 		console.log(user ? user : 'error')
 	}, [])
 	return (
@@ -115,21 +117,42 @@ const Layout = ({ children }) => {
 				</div>
 			</section>
 			<section className='h-[70px] md:h-[100px] w-[95%] md:w-[80%] overflow-x-hidden'></section>
-			<div className='border-t-[#E2E8F0] border-t w-[95%] md:w-[80%] flex justify-center gap-[10px] md:gap-[50px] py-[10px]'>
-				<button className='flex items-center gap-[10px]' onClick={() => router.push('/profile')}>
+			<div className='border-t-[#E2E8F0] border-t w-[95%] md:w-[80%] flex justify-center gap-[10px] md:gap-[50px]'>
+				<button
+					className='flex items-center gap-[10px] py-[10px]'
+					style={{
+						color: pathname === '/profile' ? '#2563EB' : '#64748B',
+						borderTop: pathname === '/profile' ? '2px solid #2563EB' : 'none',
+					}}
+					onClick={() => router.push('/profile')}
+				>
 					<MdOutlineGridOn size={25} />
-					<p className='text-[16px] md:text-[22px]' style={{}}>
-						Posts
-					</p>
+					<p className='text-[16px] md:text-[22px]'>Posts</p>
 				</button>
-				<div className='flex items-center gap-[10px]'>
-					<FaRegBookmark size={25} />
+				<button
+					className='flex items-center gap-[10px] py-[10px]'
+					style={{
+						color: pathname === '/profile/saved' ? '#2563EB' : '#64748B',
+						borderTop:
+							pathname === '/profile/saved' ? '2px solid #2563EB' : 'none',
+					}}
+					onClick={() => router.push('/profile/saved')}
+				>
+					<FaRegBookmark size={25} />	
 					<p className='text-[16px] md:text-[22px]'>Saved</p>
-				</div>
-				<div className='flex items-center gap-[10px]'>
+				</button>
+				<button
+					className='flex items-center gap-[10px] py-[10px]'
+					style={{
+						color: pathname === '/profile/tagged' ? '#2563EB' : '#64748B',
+						borderTop:
+							pathname === '/profile/tagged' ? '2px solid #2563EB' : 'none',
+					}}
+					onClick={() => router.push('/profile/tagged')}
+				>
 					<MdOutlinePhotoCameraFront size={25} />
 					<p className='text-[16px] md:text-[22px]'>Tagged</p>
-				</div>
+				</button>
 			</div>
 			<section className='w-[95%] md:w-[80%]'>{children}</section>
 		</div>
