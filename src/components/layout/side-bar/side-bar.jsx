@@ -1,4 +1,5 @@
 "use client";
+import Modal from "../Modal";
 import { useState } from "react";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
