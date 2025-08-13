@@ -9,21 +9,6 @@ const Modal = () => {
     const [focused, setFocused] = useState(false)
     const [search, setSearch] = useState('')
 
-    // let [users, setUsers] = useState([
-    //     {
-    //         userName: "Abdulloh",
-    //         fullName: "aba",
-    //         avatar: "./cr7.png",
-    //         id: 1,
-    //     },
-    //     {
-    //         userName: "Abubakr",
-    //         fullName: "abu",
-    //         avatar: "",
-    //         id: 1,
-    //     },
-    // ])
-
 
     let { users, getUsers, searchHistories, getSearchHistories, deleteUserHistory, addUserHistory, clearUserHistory } = usegetUserStore()
     const { t } = useTransition();
