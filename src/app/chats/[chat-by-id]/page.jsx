@@ -2,28 +2,11 @@
 import { useUserId } from "@/hook/useUserId";
 import { useChatById } from "@/store/pages/chat/pages/chat-by-id/store";
 import { useDefaultChat } from "@/store/pages/chat/pages/default-chat/store";
-import {
-  Box,
-  Button,
-  Divider,
-  Drawer,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
-} from "@mui/material";
-import {
-  EllipsisVertical,
-  InboxIcon,
-  MailIcon,
-  Mic,
-  SendHorizontal,
-  Trash,
-  X,
-} from "lucide-react";
+import { Box, Button, Drawer } from "@mui/material";
+import { EllipsisVertical, Mic, SendHorizontal, Trash, X } from "lucide-react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 
 export default function ChatById() {
   const [state, setState] = useState({
@@ -35,13 +18,13 @@ export default function ChatById() {
 
   const toggleDrawer = (anchor, open) => (event) => {
     if (
+      event &&
       event.type === "keydown" &&
       (event.key === "Tab" || event.key === "Shift")
     ) {
       return;
     }
-
-    setState({ ...state, [anchor]: open });
+    setState((s) => ({ ...s, [anchor]: open }));
   };
 
   let { "chat-by-id": id } = useParams();
@@ -50,63 +33,134 @@ export default function ChatById() {
   let { messages, getChatById, sendMessage, deleteMessage } = useChatById();
   let { chats, get } = useDefaultChat();
 
-  let [profilId, setprofilId] = useState(null);
+  const [profilId, setprofilId] = useState(null);
 
-  chats?.data?.map((e) => {
-    if (e.id == id) {
-      setprofilId(e.receiveUserId);
-      console.log(e.receiveUserId);
-      return e.receiveUserId;
-    }
-  });
+  // set profilId from chats when chats or id changes (avoid setState in render)
+  useEffect(() => {
+    if (!chats?.data || !id) return;
+    const found = chats.data.find((c) => String(c.id) === String(id));
+    if (found) setprofilId(found.receiveUserId);
+  }, [chats, id]);
 
   useEffect(() => {
     get();
-    if (id) {
-      // setInterval(() => {}, 3000);
+    if (!id) return;
+
+    // poll chat every 2s, cleanup on unmount / id change
+    const interval = setInterval(() => {
       getChatById(id);
-    }
-  }, [id, getChatById]);
+    }, 2000);
+
+    // initial fetch
+    getChatById(id);
+
+    return () => clearInterval(interval);
+  }, [id, getChatById, get]);
 
   let [inpMessage, setinpMessage] = useState("");
   let [inpFile, setinpFile] = useState(null);
   let [openImg, setOpenImg] = useState(null);
+  let [openIsVideo, setOpenIsVideo] = useState(false);
+  let [delMesModal, setdelMesModal] = useState(null);
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    setinpFile(file);
-    setOpenImg(URL.createObjectURL(file));
+  const videoRef = useRef(null);
+
+  const isVideoFileName = (name) => {
+    return /\.(mp4|webm|ogg|mov)$/i.test(String(name || ""));
   };
 
-  const handleSend = async (e) => {
-    e.preventDefault();
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-    let formData = new FormData();
-    formData.append("ChatId", id);
-    formData.append("MessageText", inpMessage);
-
-    if (inpFile) {
-      formData.append("File", inpFile);
+    // revoke prev blob only when replacing (we will revoke on close too)
+    if (openImg && openImg.startsWith("blob:")) {
+      try {
+        URL.revokeObjectURL(openImg);
+      } catch {}
     }
 
-    await sendMessage(formData);
-    getChatById(id);
-    setinpMessage("");
-    setinpFile(null);
-    setOpenImg(null);
+    setinpFile(file);
+    const objectUrl = URL.createObjectURL(file);
+    setOpenImg(objectUrl);
+
+    const isVideo =
+      file.type?.startsWith("video/") || isVideoFileName(file.name);
+    setOpenIsVideo(!!isVideo);
+  };
+
+  // try to play video only after canplay, catch interruption
+  useEffect(() => {
+    if (!openImg || !openIsVideo) return;
+    const v = videoRef.current;
+    if (!v) return;
+
+    const onCanPlay = () => {
+      v.play?.().catch((err) => {
+        // play may be blocked or interrupted — log and continue
+        console.warn("video play interrupted or blocked:", err);
+      });
+    };
+
+    v.addEventListener("canplay", onCanPlay, { once: true });
+
+    return () => {
+      v.removeEventListener("canplay", onCanPlay);
+    };
+  }, [openImg, openIsVideo]);
+
+  const handleSend = async (e) => {
+    if (e?.preventDefault) e.preventDefault();
+
+    if (!inpMessage && !inpFile) return;
+
+    const formData = new FormData();
+    formData.append("ChatId", id);
+    formData.append("MessageText", inpMessage || "");
+
+    if (inpFile) formData.append("File", inpFile);
+
+    try {
+      await sendMessage(formData);
+      await getChatById(id);
+    } catch (err) {
+      console.error("sendMessage error:", err);
+    } finally {
+      // cleanup blob only here if it's a blob (we'll close preview)
+      if (openImg && openImg.startsWith("blob:")) {
+        try {
+          URL.revokeObjectURL(openImg);
+        } catch {}
+      }
+      setinpMessage("");
+      setinpFile(null);
+      setOpenImg(null);
+      setOpenIsVideo(false);
+    }
   };
 
   async function handleDelMessage(mesId) {
     await deleteMessage(mesId);
-    getChatById(id);
+    await getChatById(id);
+    setdelMesModal(null);
   }
 
-  let [delMesModal, setdelMesModal] = useState(null);
+  // toggle using functional update to avoid stale closure
+  const toggleDelModal = useCallback((mesId) => {
+    setdelMesModal((prev) => (prev === mesId ? null : mesId));
+  }, []);
 
-  function openDelModal(id) {
-    setdelMesModal(delMesModal == id ? null : id);
-  }
+  // close preview helper
+  const closePreview = useCallback(() => {
+    if (openImg && openImg.startsWith("blob:")) {
+      try {
+        URL.revokeObjectURL(openImg);
+      } catch {}
+    }
+    setinpFile(null);
+    setOpenImg(null);
+    setOpenIsVideo(false);
+  }, [openImg]);
 
   return (
     <div>
@@ -153,17 +207,30 @@ export default function ChatById() {
                 }`}
               >
                 <div className={`flex flex-col `}>
-                  {e.file && (
-                    <Image
-                      className="pb-2 rounded-xl"
-                      width={500}
-                      height={500}
-                      alt="image"
-                      src={`http://37.27.29.18:8003/images/${e.file}`}
-                      style={{ width: "100%", height: "auto" }}
-                      priority
-                    />
-                  )}
+                  {e.file &&
+                    (isVideoFileName(e.file) ? (
+                      <video
+                        className="pb-2 rounded-xl max-w-full"
+                        width={500}
+                        style={{ height: "auto" }}
+                        controls
+                        preload="metadata"
+                        src={`http://37.27.29.18:8003/images/${e.file}`}
+                        onError={(ev) =>
+                          console.error("video load error:", ev, e.file)
+                        }
+                      />
+                    ) : (
+                      <Image
+                        className="pb-2 rounded-xl"
+                        width={500}
+                        height={500}
+                        alt="image"
+                        src={`http://37.27.29.18:8003/images/${e.file}`}
+                        style={{ width: "100%", height: "auto" }}
+                        priority
+                      />
+                    ))}
 
                   <div
                     className={` rounded-lg ${
@@ -187,20 +254,30 @@ export default function ChatById() {
                 </div>
 
                 <button
-                  onClick={() => openDelModal(e.messageId)}
+                  type="button"
+                  onClick={() => toggleDelModal(e.messageId)}
                   className="hidden group-hover:block"
                 >
                   <EllipsisVertical />
                 </button>
 
-                {delMesModal == e.messageId && (
-                  <button
-                    onClick={() => handleDelMessage(e.messageId)}
-                    className="text-red-500 bg-red-100 p-2 rounded
-                    "
-                  >
-                    <Trash size={18} />
-                  </button>
+                {delMesModal === e.messageId && (
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleDelMessage(e.messageId)}
+                      className="text-red-500 bg-red-100 p-2 rounded"
+                    >
+                      <Trash size={18} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setdelMesModal(null)}
+                      className="p-2"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
                 )}
               </div>
             );
@@ -208,7 +285,7 @@ export default function ChatById() {
       </div>
 
       <div className="border-2 min-h-12 max-h-12 m-4 p-2 rounded-xl border-[#E2E8F0] flex justify-between gap-1 items-center">
-        <button>
+        <button type="button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -243,6 +320,7 @@ export default function ChatById() {
                   type="file"
                   className="hidden"
                   name="inpImage"
+                  accept="image/*,video/*"
                   onChange={handleFileChange}
                 />
 
@@ -279,31 +357,57 @@ export default function ChatById() {
             style={{ backdropFilter: "blur(6px)" }}
             className="fixed inset-0 flex items-center justify-center bg-[rgba(255,255,255,0.3)]"
           >
-            <form
-              onSubmit={handleSend}
-              className="w-[400px] bg-white rounded-xl shadow p-5"
-            >
-              <img
-                src={openImg}
-                alt="preview"
-                className="max-h-64 mx-auto mb-4"
-              />
+            {/* modal is NOT a form to avoid nested forms */}
+            <div className="w-[400px] bg-white rounded-xl shadow p-5">
+              {openIsVideo ? (
+                <video
+                  ref={videoRef}
+                  src={openImg}
+                  controls
+                  preload="metadata"
+                  className="max-h-64 mx-auto mb-4"
+                  style={{ width: "100%", height: "auto" }}
+                  onError={(ev) => console.error("preview video error:", ev)}
+                />
+              ) : (
+                <img
+                  src={openImg}
+                  alt="preview"
+                  className="max-h-64 mx-auto mb-4"
+                  style={{ width: "auto", height: "auto", maxWidth: "100%" }}
+                />
+              )}
+
               <div className="flex justify-between">
                 <button
-                  onClick={() => {
-                    setinpFile(null);
-                    setOpenImg(null);
-                  }}
+                  type="button"
+                  onClick={closePreview}
                   className=" text-red-500 px-4 py-2 rounded"
                 >
                   <X />
                 </button>
 
-                <button type="submit" className=" px-4 py-2 rounded mr-2">
-                  <SendHorizontal />
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      // send and close preview after
+                      handleSend();
+                    }}
+                    className=" px-4 py-2 rounded mr-2"
+                  >
+                    <SendHorizontal />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={closePreview}
+                    className=" px-4 py-2 rounded"
+                  >
+                    Close
+                  </button>
+                </div>
               </div>
-            </form>
+            </div>
           </div>
         )}
       </div>
