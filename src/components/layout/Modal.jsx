@@ -18,9 +18,6 @@ const Modal = () => {
         getSearchHistories();
     }, [])
 
-    // console.log(searchHistories?.data?.users.map(e => e.userName))
-
-
     return (
         <div className="p-4 ml-13 z-10 h-full overflow-y-auto rounded-r-[16px] bg-white fixed shadow-xl w-[400px]">
             <h1 className="font-medium text-[28px]">Search</h1>
