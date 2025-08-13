@@ -21,6 +21,10 @@ export const useChatById = create((set) => ({
   deleteMessage: async (id) => {
     await axiosRequest.delete(`/Chat/delete-message?massageId=${id}`);
   },
+
+  deleteChat: async (id) => {
+    await axiosRequest.delete(`/Chat/delete-chat?chatId=${id}`);
+  },
 }));
 
       // <div className="border-2 min-h-12 max-h-12 m-4 p-2 rounded-xl border-[#E2E8F0] flex justify-between gap-1 items-center">

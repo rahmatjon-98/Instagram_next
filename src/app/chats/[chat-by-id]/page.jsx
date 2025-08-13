@@ -2,12 +2,48 @@
 import { useUserId } from "@/hook/useUserId";
 import { useChatById } from "@/store/pages/chat/pages/chat-by-id/store";
 import { useDefaultChat } from "@/store/pages/chat/pages/default-chat/store";
-import { EllipsisVertical, Mic, SendHorizontal, Trash, X } from "lucide-react";
+import {
+  Box,
+  Button,
+  Divider,
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+} from "@mui/material";
+import {
+  EllipsisVertical,
+  InboxIcon,
+  MailIcon,
+  Mic,
+  SendHorizontal,
+  Trash,
+  X,
+} from "lucide-react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 export default function ChatById() {
+  const [state, setState] = useState({
+    top: false,
+    left: false,
+    bottom: false,
+    right: false,
+  });
+
+  const toggleDrawer = (anchor, open) => (event) => {
+    if (
+      event.type === "keydown" &&
+      (event.key === "Tab" || event.key === "Shift")
+    ) {
+      return;
+    }
+
+    setState({ ...state, [anchor]: open });
+  };
+
   let { "chat-by-id": id } = useParams();
   const userId = useUserId();
 
@@ -27,7 +63,9 @@ export default function ChatById() {
   useEffect(() => {
     get();
     if (id) {
-      getChatById(id);
+      setInterval(() => {
+        getChatById(id);
+      }, 3000);
     }
   }, [id, getChatById]);
 
@@ -73,9 +111,35 @@ export default function ChatById() {
 
   return (
     <div>
-      <div>{}</div>
+      <div>
+        {["left", "right", "top", "bottom"].map((anchor) => (
+          <React.Fragment key={anchor}>
+            <Button onClick={toggleDrawer(anchor, true)}>{anchor}</Button>
+            <Drawer
+              anchor={anchor}
+              open={state[anchor]}
+              onClose={toggleDrawer(anchor, false)}
+            >
+              <Box
+                sx={{
+                  width: anchor === "top" || anchor === "bottom" ? "auto" : 250,
+                }}
+                role="presentation"
+                onClick={toggleDrawer(anchor, false)}
+                onKeyDown={toggleDrawer(anchor, false)}
+                className=" flex flex-col justify-between"
+              >
+                <div>
+                  <p>wdknca w</p>
+                  <p>wdknca w</p>
+                </div>
+              </Box>
+            </Drawer>
+          </React.Fragment>
+        ))}
+      </div>
 
-      <div className="w-[1020px] mx-auto p-4 h-[85vh] overflow-y-auto flex flex-col-reverse gap-2">
+      <div className="w-[1020px] mx-auto p-4 h-[80vh] overflow-y-auto flex flex-col-reverse gap-2">
         {messages &&
           messages.map((e) => {
             const isCurrentUser = e.userId === userId;
@@ -92,9 +156,9 @@ export default function ChatById() {
                 <div className={`flex flex-col `}>
                   {e.file && (
                     <Image
-                      className="pb-2"
-                      width={300}
-                      height={300}
+                      className="pb-2 rounded-xl"
+                      width={500}
+                      height={500}
                       alt="image"
                       src={`http://37.27.29.18:8003/images/${e.file}`}
                       style={{ width: "100%", height: "auto" }}
@@ -109,9 +173,9 @@ export default function ChatById() {
                         : "bg-[#F8FAFC] text-[#475569] self-start rounded-tl-none  p-1.5 px-3"
                     }`}
                   >
-                    <p>{e.messageText}</p>
+                    <p className="leading-3">{e.messageText}</p>
                     <span
-                      className={`text-xs mt-1  self-end ${
+                      className={`text-[10px] leading-0  self-end ${
                         isCurrentUser ? "text-gray-200" : "text-gray-700"
                       }`}
                     >
