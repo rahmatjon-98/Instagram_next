@@ -1,5 +1,5 @@
 'use client'
-import { useRealsStore } from "@/api/pages/reels/store";
+import { useRealsStore } from "@/api/layout/pages/reels/store";
 import React, { useEffect } from "react";
 
 
