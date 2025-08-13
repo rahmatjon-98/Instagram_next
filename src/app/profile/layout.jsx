@@ -29,18 +29,18 @@ const Layout = ({ children }) => {
 					<Image
 						src={`http://37.27.29.18:8003/images/${user.image}`}
 						alt='profile picture'
-						width={10}
-						height={10}
+						width={500}
+						height={500}
 						className={`${
 							user.image ? 'flex' : 'hidden'
-						} w-[160px] rounded-[50%] overflow-hidden`}
+						} w-[160px] h-[160px] rounded-[50%] overflow-hidden`}
 					/>
 					<Image
 						src={defaultUser}
 						alt='default user'
 						className={`${
 							user.image ? 'hidden' : 'flex'
-						} w-[160px] rounded-[50%]`}
+						} w-[160px] h-[160px] rounded-[50%]`}
 					/>
 				</div>
 				<div className='flex flex-col gap-[20px]'>
@@ -68,11 +68,11 @@ const Layout = ({ children }) => {
 							<Image
 								src={`http://37.27.29.18:8003/images/${user.image}`}
 								alt='profile picture'
-								width={10}
-								height={10}
+								width={500}
+								height={500}
 								className={`${
 									user.image ? 'flex' : 'hidden'
-								} w-[70px] rounded-[50%]`}
+								} w-[70px] h-[70px] rounded-[50%]`}
 							/>
 							<Image
 								src={defaultUser}
@@ -126,7 +126,7 @@ const Layout = ({ children }) => {
 					}}
 					onClick={() => router.push('/profile')}
 				>
-					<MdOutlineGridOn size={25} />
+					<MdOutlineGridOn size={20} />
 					<p className='text-[16px] md:text-[22px]'>Posts</p>
 				</button>
 				<button
@@ -138,7 +138,7 @@ const Layout = ({ children }) => {
 					}}
 					onClick={() => router.push('/profile/saved')}
 				>
-					<FaRegBookmark size={25} />
+					<FaRegBookmark size={20} />
 					<p className='text-[16px] md:text-[22px]'>Saved</p>
 				</button>
 				<button
@@ -150,7 +150,7 @@ const Layout = ({ children }) => {
 					}}
 					onClick={() => router.push('/profile/tagged')}
 				>
-					<MdOutlinePhotoCameraFront size={25} />
+					<MdOutlinePhotoCameraFront size={20} />
 					<p className='text-[16px] md:text-[22px]'>Tagged</p>
 				</button>
 			</div>
