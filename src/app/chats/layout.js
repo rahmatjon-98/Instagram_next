@@ -6,12 +6,18 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import img from "../../assets/img/pages/chat/pages/default-chat/userFoto.jpg";
 import { useDefaultChat } from "@/store/pages/chat/pages/default-chat/store";
+import { useMyProfile } from "@/store/pages/chat/layout/store";
+import { useUserId } from "@/hook/useUserId";
 
 export default function Layout({ children }) {
+  const userId = useUserId();
   let { chats, get } = useDefaultChat();
+
+  let { myProfile, getChatById } = useMyProfile();
 
   useEffect(() => {
     get();
+    getChatById(userId);
   }, []);
 
   return (
@@ -19,7 +25,7 @@ export default function Layout({ children }) {
       <div className="p-5 border-r-2 h-[100vh] border-gray-300 w-[300px]">
         <section className="flex items-center justify-between gap-5 ">
           <div className="flex items-center gap-2 text-xl font-bold">
-            tom2211
+            {myProfile?.userName}
             <ChevronDown />
           </div>
 
@@ -53,10 +59,10 @@ export default function Layout({ children }) {
                 {e.receiveUserImage ? (
                   <Image
                     alt=""
-                    src={e.receiveUserImage}
+                    src={`http://37.27.29.18:8003/images/${e.receiveUserImage}`}
                     width={1000}
                     height={1000}
-                    className="w-14 h-14 rounded-full"
+                    className="w-14 h-14 rounded-full object-cover object-center"
                   />
                 ) : (
                   <Image

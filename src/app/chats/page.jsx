@@ -5,12 +5,11 @@ import img from "../../assets/img/pages/chat/pages/chat-by-id/icon.png";
 import { useDefaultChat } from "@/store/pages/chat/pages/default-chat/store";
 
 export default function DefaultChat() {
-  let { chats, get } = useDefaultChat();
-  console.log(chats);
+  // let { chats, get } = useDefaultChat();
 
-  useEffect(() => {
-    get();
-  }, []);
+  // useEffect(() => {
+  //   get();
+  // }, []);
 
   return (
     <div className="w-[1000px] flex items-center justify-center">
