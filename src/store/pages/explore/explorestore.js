@@ -1,7 +1,6 @@
 import axiosRequest from "@/lib/axiosRequest";
 import { create } from "zustand";
 
-
 // import axios from "axios";
 // let api = "http://37.27.29.18:8003";
 // headers: {
@@ -9,28 +8,49 @@ import { create } from "zustand";
 // },
 // const token = localStorage.getItem("accessToken")
 
-
-
 export const useUserStore = create((set, get) => ({
   user: [],
-  postById:{},
+  postById: {},
   fechUser: async () => {
     try {
-      let res = await axiosRequest.get(`/Post/get-posts?PageSize=10000`, {
-      });
+      let res = await axiosRequest.get(`/Post/get-posts?PageSize=10000`, {});
       set({ user: res.data });
     } catch (error) {
       console.error(error);
     }
   },
-  getPostById:async(id)=>{
+  getPostById: async (id) => {
     try {
-     let {data}= await axiosRequest.get(`Post/get-post-by-id?id=${id}`)
-      set({postById:data})
+      let { data } = await axiosRequest.get(`Post/get-post-by-id?id=${id}`);
+      set({ postById: data });
     } catch (error) {
       console.error(error);
-      
     }
-  }
+  },
+  deletComit: async (id) => {
+    try {
+      await axiosRequest.delete(`/Post/delete-comment?commentId=${id}`);
 
+      // Берём текущие данные поста
+      const currentPost = get().postById;
+
+      // Фильтруем комментарии
+      const updatedComments = currentPost.data.comments.filter(
+        (c) => c.id !== id
+      );
+
+      // Обновляем состояние
+      set({
+        postById: {
+          ...currentPost,
+          data: {
+            ...currentPost.data,
+            comments: updatedComments,
+          },
+        },
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  },
 }));
