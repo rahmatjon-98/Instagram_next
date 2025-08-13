@@ -1,5 +1,4 @@
 "use client";
-import Modal from "../Modal";
 import { useState } from "react";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
@@ -26,6 +25,8 @@ import {
   problemIcon,
   threads,
 } from "@/assets/icon/layout/svg";
+import { usegetUserStore } from '@/store/pages/search/store'
+import Modal from "../Modal";
 import { Bookmark, CircleUserRound, LogOut, Settings } from "lucide-react";
 
 const NavLink = ({ href, icon, activeIcon, label, isActive }) => (
@@ -62,7 +63,7 @@ export default function SideBar({ children }) {
 
   const isActive = (path) => (pathname === path ? "font-bold" : "font-normal")
 
-  let [openModal, setOpenModal] = useState(null)
+  let { openModal, setOpenModal } = usegetUserStore()
 
   return (
     <div>
