@@ -11,7 +11,7 @@ export const useHome = create((set, get) => ({
 		try {
 			set({ isLoading: true })
 			let { data: data2 } = await axiosRequest('Story/get-stories')
-			set(state => ({ data: [...state.data, ...data2] }))
+			set(state => ({ data: data2 }))
 		} catch (error) {
 			console.error(error)
 			set({ isLoading: true })
