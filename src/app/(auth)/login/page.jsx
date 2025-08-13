@@ -36,7 +36,9 @@ export default function Login() {
     if (result?.success) {
       reset();
       toast.success("Login successful!");
-      localStorage.setItem('access_token', result.token); 
+      localStorage.setItem('access_token', result?.data?.data); 
+      console.log('Login result:', result);
+
       router.push("/");
     } else {
       toast.error("Login failed. Please try again.");

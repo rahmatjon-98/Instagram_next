@@ -4,11 +4,21 @@ import { useEffect, useState, useMemo } from "react";
 import BottomNavigation from "@/components/layout/bottom-navigation/bottom-navigation";
 import MiniSideBar from "@/components/layout/mini-side-bar/mini-side-bar";
 import SideBar from "@/components/layout/side-bar/side-bar";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export default function ResponsiveBarWrapper({ children }) {
   const [windowWidth, setWindowWidth] = useState(0);
   const pathname = usePathname();
+
+  let router = useRouter();
+
+  let token = typeof window !== "undefined" ? localStorage.getItem("access_token") : ""
+  
+  useEffect(() => {
+    if (!token) {
+      router.push("/login");
+    }
+  }, [router]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
