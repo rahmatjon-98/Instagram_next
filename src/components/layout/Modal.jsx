@@ -14,12 +14,12 @@ const Modal = () => {
     const { t } = useTransition();
 
     useEffect(() => {
-        getUsers(search)
+        getUsers()
         getSearchHistories();
     }, [])
 
     return (
-        <div className="p-4 ml-13 z-10 h-full overflow-y-auto rounded-r-[16px] bg-white fixed shadow-xl w-[400px]">
+        <div className="p-4 ml-13 z-30 h-full overflow-y-auto rounded-r-[16px] bg-white fixed shadow-xl w-[400px]">
             <h1 className="font-medium text-[28px]">Search</h1>
             <div className="relative mt-9">
                 {!focused && (
@@ -69,13 +69,13 @@ const Modal = () => {
                         )))
                 }
                 {!search && (
-                    searchHistories?.data?.map(e => (
+                    searchHistories?.data?.users?.map(e => (
                         <div key={e.id} className="flex items-center cursor-pointer hover:bg-[#eeeeee] rounded p-3 w-full justify-between">
                             <div className='flex items-center gap-5'>
-                                {e?.users?.avatar == '' ? <User size={44} /> : <Image src={`http://37.27.29.18:8003/images/${e?.users?.avatar}`} width={44} height={44} alt="avatar" />}
+                                {e?.avatar == '' ? <User size={44} /> : <Image src={`http://37.27.29.18:8003/images/${e?.avatar}`} width={44} height={44} alt="avatar" />}
                                 <div>
-                                    <p>{e?.users?.userName}</p>
-                                    <p>{e?.users?.fullName}</p>
+                                    <p>{e?.userName}</p>
+                                    <p>{e?.fullName}</p>
                                 </div>
                             </div>
                             <button onClick={() => deleteUserHistory(e.id)} className='cursor-pointer'>
