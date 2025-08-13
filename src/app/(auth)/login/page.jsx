@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { useState } from 'react'
 import Image from 'next/image'
@@ -74,23 +74,23 @@ export default function Login() {
 							<p className='text-red-500 text-xs'>{errors.userName.message}</p>
 						)}
 
-						<div className='relative'>
-							<input
-								type={showPassword ? 'text' : 'password'}
-								placeholder='Password'
-								{...register('password', { required: 'Password is required' })}
-								className='w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:border-gray-400'
-							/>
-							<span
-								onClick={() => setShowPassword(!showPassword)}
-								className='absolute inset-y-0 right-3 flex items-center text-gray-500 cursor-pointer select-none'
-							>
-								{showPassword ? <Eye /> : <EyeOff />}
-							</span>
-						</div>
-						{errors.password && (
-							<p className='text-red-500 text-xs'>{errors.password.message}</p>
-						)}
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                {...register("password", { required: "Password is required" })}
+                className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:border-gray-400"
+              />
+              <span
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-3 flex items-center text-gray-500 cursor-pointer select-none"
+              >
+                {showPassword ? <Eye /> : <EyeOff />}
+              </span>
+            </div>
+            {errors.password && (
+              <p className="text-red-500 text-xs">{errors.password.message}</p>
+            )}
 
 						<button
 							type='submit'
