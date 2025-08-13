@@ -15,6 +15,7 @@ export default function ResponsiveBarWrapper({ children }) {
   let token = typeof window !== "undefined" ? localStorage.getItem("access_token") : ""
   
   useEffect(() => {
+    
     if (!token) {
       router.push("/login");
     }
@@ -42,7 +43,7 @@ export default function ResponsiveBarWrapper({ children }) {
     return "bar";
   }, [windowWidth, pathname]);
 
-  // Пути, где не показывать сайдбар
+
   const noSidebarPaths = ["/login", "/registration"];
 
   const shouldShowSidebar = !noSidebarPaths.includes(pathname);
