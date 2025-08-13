@@ -45,7 +45,7 @@ export default function Main() {
 	}
 	return (
 		<div className='flex w-full items-start'>
-			{stories && (
+			{!stories && (
 				<section className='fixed w-[100%] z-[2000000000] h-[100vh] bg-amber-500'></section>
 			)}
 			<div className='px-[40px] pt-[40px] w-[100%] md:w-[70%]'>
