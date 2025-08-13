@@ -138,7 +138,7 @@ const Layout = ({ children }) => {
 					}}
 					onClick={() => router.push('/profile/saved')}
 				>
-					<FaRegBookmark size={25} />	
+					<FaRegBookmark size={25} />
 					<p className='text-[16px] md:text-[22px]'>Saved</p>
 				</button>
 				<button
