@@ -15,6 +15,7 @@ export default function ResponsiveBarWrapper({ children }) {
   let token = typeof window !== "undefined" ? localStorage.getItem("access_token") : ""
   
   useEffect(() => {
+    
     if (!token) {
       router.push("/login");
     }

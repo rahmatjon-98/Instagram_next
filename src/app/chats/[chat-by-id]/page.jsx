@@ -92,9 +92,9 @@ export default function ChatById() {
                 <div className={`flex flex-col `}>
                   {e.file && (
                     <Image
-                      className="pb-2"
-                      width={300}
-                      height={300}
+                      className="pb-2 rounded-xl"
+                      width={500}
+                      height={500}
                       alt="image"
                       src={`http://37.27.29.18:8003/images/${e.file}`}
                       style={{ width: "100%", height: "auto" }}
@@ -109,9 +109,9 @@ export default function ChatById() {
                         : "bg-[#F8FAFC] text-[#475569] self-start rounded-tl-none  p-1.5 px-3"
                     }`}
                   >
-                    <p>{e.messageText}</p>
+                    <p className="leading-3">{e.messageText}</p>
                     <span
-                      className={`text-xs mt-1  self-end ${
+                      className={`text-[10px] leading-0  self-end ${
                         isCurrentUser ? "text-gray-200" : "text-gray-700"
                       }`}
                     >
@@ -150,6 +150,7 @@ export default function ChatById() {
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
+            
             strokeWidth={1.5}
             stroke="currentColor"
             className="size-6 text-[#475569]"

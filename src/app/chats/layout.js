@@ -1,6 +1,6 @@
-'use client'
+"use client";
 
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, EllipsisVertical, Trash } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -8,17 +8,29 @@ import img from "../../assets/img/pages/chat/pages/default-chat/userFoto.jpg";
 import { useDefaultChat } from "@/store/pages/chat/pages/default-chat/store";
 import { useMyProfile } from "@/store/pages/chat/layout/store";
 import { useUserId } from "@/hook/useUserId";
+import { useChatById } from "@/store/pages/chat/pages/chat-by-id/store";
 
 export default function Layout({ children }) {
   const userId = useUserId();
   let { chats, get } = useDefaultChat();
-
   let { myProfile, getChatById } = useMyProfile();
+  let { deleteChat } = useChatById();
 
   useEffect(() => {
     get();
     getChatById(userId);
   }, []);
+
+  async function handleDelMessage(mesId) {
+    await deleteChat(mesId);
+    getChatById(id);
+  }
+
+  let [delMesModal, setdelMesModal] = useState(null);
+
+  function openDelModal(id) {
+    setdelMesModal(delMesModal == id ? null : id);
+  }
 
   return (
     <div className="flex w-[]">
@@ -29,57 +41,88 @@ export default function Layout({ children }) {
             <ChevronDown />
           </div>
 
-					<span>
-						<svg
-							xmlns='http://www.w3.org/2000/svg'
-							fill='none'
-							viewBox='0 0 24 24'
-							strokeWidth={1.5}
-							stroke='currentColor'
-							className='size-6 text-[#2563EB]'
-						>
-							<path
-								strokeLinecap='round'
-								strokeLinejoin='round'
-								d='m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10'
-							/>
-						</svg>
-					</span>
-				</section>
+          <span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="size-6 text-[#2563EB]"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
+              />
+            </svg>
+          </span>
+        </section>
 
-				<section className='flex items-center justify-between font-medium text-sm py-5'>
-					<p className='text-[#64748B]'>Messages</p>
-					<button className='text-[#1780C2]'>Requests</button>
-				</section>
+        <section className="flex items-center justify-between font-medium text-sm py-5">
+          <p className="text-[#64748B]">Messages</p>
+          <button className="text-[#1780C2]">Requests</button>
+        </section>
 
-        <section>
+        <section className="space-y-2.5">
           {chats &&
             chats?.data?.map((e, i) => (
-              <div key={i} className="flex items-center gap-1">
-                {e.receiveUserImage ? (
-                  <Image
-                    alt=""
-                    src={`http://37.27.29.18:8003/images/${e.receiveUserImage}`}
-                    width={1000}
-                    height={1000}
-                    className="w-14 h-14 rounded-full object-cover object-center"
-                  />
-                ) : (
-                  <Image
-                    alt=""
-                    src={img}
-                    width={500}
-                    height={500}
-                    className="w-14 h-14 rounded-full"
-                  />
+              <div key={i} className="flex items-center justify-between group">
+                <div className="flex items-center gap-1">
+                  {(
+                    e.receiveUserId == useUserId()
+                      ? e.sendUserImage
+                      : e.receiveUserImage
+                  ) ? (
+                    <Image
+                      alt=""
+                      src={`http://37.27.29.18:8003/images/${
+                        e.receiveUserId == useUserId()
+                          ? e.sendUserImage
+                          : e.receiveUserImage
+                      }`}
+                      width={1000}
+                      height={1000}
+                      className="w-10 h-10 rounded-full object-cover object-center"
+                    />
+                  ) : (
+                    <Image
+                      alt=""
+                      src={img}
+                      width={500}
+                      height={500}
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                  )}
+                  <Link href={`/chats/${e.chatId}`}>
+                    {e.receiveUserId == useUserId()
+                      ? e.sendUserName
+                      : e.receiveUserName}
+                  </Link>{" "}
+                </div>
+
+                <button
+                  onClick={() => openDelModal(e.chatId)}
+                  className="hidden group-hover:block"
+                >
+                  <EllipsisVertical />
+                </button>
+
+                {delMesModal == e.chatId && (
+                  <button
+                    onClick={() => handleDelMessage(e.chatId)}
+                    className="text-red-500 bg-red-100 p-2 rounded
+                    "
+                  >
+                    <Trash size={18} />
+                  </button>
                 )}
-                <Link href={`/chats/${e.chatId}`}>{e.receiveUserName}</Link>
               </div>
             ))}
         </section>
       </div>
 
-			{children}
-		</div>
-	)
+      {children}
+    </div>
+  );
 }
