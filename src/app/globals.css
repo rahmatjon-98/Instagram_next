@@ -37,12 +37,12 @@
 		opacity: 0.8;
 	}
 	70% {
-		transform: translate(-100px, 330px) rotate(180deg);
+		transform: translate(-100px, 330px) rotate(220deg);
 		position: sticky;
 		opacity: 0.8;
 	}
 	100% {
-		transform: translate(-300px, 300px) rotate(242deg);
+		transform: translate(-300px, 200px) rotate(242deg);
 		position: relative;
 		opacity: 0;
 	}

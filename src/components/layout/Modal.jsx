@@ -19,7 +19,7 @@ const Modal = () => {
     }, [])
 
     return (
-        <div className="p-4 ml-13 z-30 h-full overflow-y-auto rounded-r-[16px] bg-white fixed shadow-xl w-[400px]">
+        <div className="p-4 ml-10 z-30 h-full overflow-y-auto rounded-r-[16px] bg-white fixed shadow-xl w-[400px]">
             <h1 className="font-medium text-[28px]">Search</h1>
             <div className="relative mt-9">
                 {!focused && (

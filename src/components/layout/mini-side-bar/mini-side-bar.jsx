@@ -51,7 +51,7 @@ const MiniSideBar = ({ children }) => {
 	// const [anchorEl, setAnchorEl] = (useState < null) | (HTMLElement > null)
 	// const open = Boolean(anchorEl)
 	const { t } = useTranslation()
-	 
+
 	// const handleClick = event => setAnchorEl(event.currentTarget)
 	// const handleClose = () => setAnchorEl(null)
 
@@ -138,8 +138,8 @@ const MiniSideBar = ({ children }) => {
 									<div className='flex items-center super-svg gap-4 w-[90%] rounded-[8px] h-[52px] px-0 justify-center'>
 										<Image
 											className={`${router.pathname === '/profile'
-													? 'border-[2px] border-[black] rounded-[50%]'
-													: 'font-[400]'
+												? 'border-[2px] border-[black] rounded-[50%]'
+												: 'font-[400]'
 												} text-[16px] block w-[25px] h-[25px]`}
 											src={Profile}
 											alt='Profile'
@@ -163,60 +163,60 @@ const MiniSideBar = ({ children }) => {
 
 export default MiniSideBar
 
-// <Menu
-// id="fade-button"
-// sx={{
-// 	padding: 0,
-// 	borderRadius: '10px',
-// 	'.MuiPaper-root': {
-// 		borderRadius: '16px',
-// 		width: '300px',
-// 		height: '475px',
-// 		boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-// 	},
-// }}
-// anchorEl={anchorEl}
-// open={open}
-// onClose={handleClose}
-// anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-// transformOrigin={{ vertical: 'top', horizontal: 'center' }}
-// >
-// <div className="pb-[10px] bg-[#fff] dark:text-white dark:bg-[#262626] rounded-[16px] shadow-lg p-[10px] border-[1px] w-[300px] h-[475px]">
-// 	<div className="flex flex-col gap-[7px]">
-// 		<Link href="/setting" passHref>
-// 			<MenuItem
-// 				sx={{
-// 					padding: '16px',
-// 					display: 'flex',
-// 					gap: '10px',
-// 					borderRadius: '8px',
-// 				}}
-// 			>
-// 				{setting}
-// 				<p>{t('layout.mores.setting')}</p>
-// 			</MenuItem>
-// 		</Link>
-// 		{/* Add more MenuItems here */}
-// 	</div>
-// </div>
-// </Menu>
-{
-	/* Threads and More */
-}
+// // <Menu
+// // id="fade-button"
+// // sx={{
+// // 	padding: 0,
+// // 	borderRadius: '10px',
+// // 	'.MuiPaper-root': {
+// // 		borderRadius: '16px',
+// // 		width: '300px',
+// // 		height: '475px',
+// // 		boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+// // 	},
+// // }}
+// // anchorEl={anchorEl}
+// // open={open}
+// // onClose={handleClose}
+// // anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+// // transformOrigin={{ vertical: 'top', horizontal: 'center' }}
+// // >
+// // <div className="pb-[10px] bg-[#fff] dark:text-white dark:bg-[#262626] rounded-[16px] shadow-lg p-[10px] border-[1px] w-[300px] h-[475px]">
+// // 	<div className="flex flex-col gap-[7px]">
+// // 		<Link href="/setting" passHref>
+// // 			<MenuItem
+// // 				sx={{
+// // 					padding: '16px',
+// // 					display: 'flex',
+// // 					gap: '10px',
+// // 					borderRadius: '8px',
+// // 				}}
+// // 			>
+// // 				{setting}
+// // 				<p>{t('layout.mores.setting')}</p>
+// // 			</MenuItem>
+// // 		</Link>
+// // 		{/* Add more MenuItems here */}
+// // 	</div>
+// // </div>
+// // </Menu>
+// {
+// 	/* Threads and More */
+// }
 
-{
-	/* <div className="flex flex-col items-center super-svg gap-4 w-[90%] rounded-[8px] h-[52px] px-0 justify-center">
-<LightTooltip title={t('layout.threads')} placement="right" arrow>
-	<button onClick={handleClick} className="flex gap-5">
-		{threads}
-	</button>
-</LightTooltip>
-<LightTooltip title={t('layout.more')} placement="right" arrow>
-	<button onClick={handleClick} className="flex gap-5">
-		{settings}
-	</button>
-</LightTooltip>
+// {
+// 	/* <div className="flex flex-col items-center super-svg gap-4 w-[90%] rounded-[8px] h-[52px] px-0 justify-center">
+// <LightTooltip title={t('layout.threads')} placement="right" arrow>
+// 	<button onClick={handleClick} className="flex gap-5">
+// 		{threads}
+// 	</button>
+// </LightTooltip>
+// <LightTooltip title={t('layout.more')} placement="right" arrow>
+// 	<button onClick={handleClick} className="flex gap-5">
+// 		{settings}
+// 	</button>
+// </LightTooltip>
 
 
-</div> */
-}
+// </div> */
+// }
