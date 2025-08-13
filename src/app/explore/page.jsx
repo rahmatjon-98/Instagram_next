@@ -15,9 +15,9 @@ const style = {
 	top: '50%',
 	left: '50%',
 	transform: 'translate(-50%, -50%)',
-	width: 800,
-	p: 4,
-	backgroundColor: "#000",
+	width: 1100,
+	// height: "50vh",
+	// backgroundColor: "#272727",
 	color: "white"
 
 }
@@ -70,79 +70,79 @@ export default function Explore() {
 				aria-describedby="modal-modal-description"
 			>
 				<Box sx={style}>
-					<div className="flex gap-[40px] bg-black text-white ">
+					<div className="flex gap-[40px] h-[80vh] bg-[#272727]">
 						{postById ? (
-							<div>
-							<div className="flex justify-between gap-[20px]">
-								<div className="w-[45%]">
-									{postById.data?.images.map(el => {
-										const mediaUrl = `http://37.27.29.18:8003/images/${el}`
-										return (
-											<div key={el.id}>
-												{el.endsWith('.mp4') ? (
-													<video src={mediaUrl} style={{ width: "500px", height: '500px' }} onClick={() => setMuted(!muted)}
-														playsInline
-														autoPlay
-														muted={muted}
-														loop />
-												) : (
-													<img src={mediaUrl} alt={`Post by ${el.userName}`}  style={mediaStyleModal} />
-												)}
-											</div>
-										)
-									})}
-								</div>
-								<div className="w-[50%]">
-									<div className="flex justify-between  items-center">
-										<div className="flex gap-[20px]">
-										<img src={`http://37.27.29.18:8003/images/${postById.data?.userImage}`} className="w-[40px] h-[40px] rounded-full" alt="test" />
-										<p className="font-bold text-2xl">{postById.data?.userName}</p>
-										</div>
-										<button className="font-bold text-2xl text-blue-500 cursor-pointer hover:duration-500 hover:scale-120 ">Follow</button>
-
-									</div>
-									<div className="mt-4 space-y-2">
-										{postById.data?.comments?.length > 0 ? (
-											postById.data.comments.map(c => (
-												<div className="flex items-center justify-between">
-													<div className="flex items-center gap-3">
-													{c.userImage
-														? (
-															<img src={`http://37.27.29.18:8003/images/${c.userImage}`} alt="" className="w-[40px] h-[40px] rounded-full border-2" />
-														)
-														: (
-															<CircleUserRound size={40} color="#ffffff" />
-														)
-													}
-													<p>{c.comment}</p>
-													</div>
-													<button onClick={() => deletComit(c.id)}>
-														<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-															<path strokeLinecap="round" strokeLinejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-														</svg>
-													</button>
+							
+								<div className="flex w-full gap-[20px]">
+									<div className="w-[30%] ">
+										{postById.data?.images.map(el => {
+											const mediaUrl = `http://37.27.29.18:8003/images/${el}`
+											return (
+												<div key={el.id}>
+													{el.endsWith('.mp4') ? (
+														<video src={mediaUrl} style={{ width: "full%", height: '70vh' }} onClick={() => setMuted(!muted)}
+															playsInline
+															autoPlay
+															muted={muted}
+															loop />
+													) : (
+														<img src={mediaUrl} alt={`Post by ${el.userName}`} style={mediaStyleModal} />
+													)}
 												</div>
-											))
-										) : (
-											<p className="text-gray-400">Нет комментариев</p>
-										)}
+											)
+										})}
 									</div>
-							<div>
-								<div>
-									<button>
-										<Heart size={34} color="#ffffff" />
-									</button>
-									<button>
-										<MessageCircle size={34} color="#ffffff" />
-									</button>
-									<button>
-										<Send size={34} color="#ffffff" />
-									</button>
+									<div className="w-[68%] p-[20px]">
+										<div className="flex  w-full justify-between  items-center">
+											<div className="flex gap-[20px]">
+												<img src={`http://37.27.29.18:8003/images/${postById.data?.userImage}`} className="w-[40px] h-[40px] rounded-full" alt="test" />
+												<p className="font-bold text-2xl">{postById.data?.userName}</p>
+											</div>
+											<button className="font-bold text-2xl text-blue-500 cursor-pointer hover:duration-500 hover:scale-120 ">Follow</button>
+
+										</div>
+										<div className="mt-4 space-y-2">
+											{postById.data?.comments?.length > 0 ? (
+												postById.data.comments.map(c => (
+													<div className="flex items-center justify-between">
+														<div className="flex items-center gap-3">
+															{c.userImage
+																? (
+																	<img src={`http://37.27.29.18:8003/images/${c.userImage}`} alt="" className="w-[40px] h-[40px] rounded-full border-2" />
+																)
+																: (
+																	<CircleUserRound size={40} color="#ffffff" />
+																)
+															}
+															<p>{c.comment}</p>
+														</div>
+														<button onClick={() => deletComit(c.id)}>
+															<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+																<path strokeLinecap="round" strokeLinejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+															</svg>
+														</button>
+													</div>
+												))
+											) : (
+												<p className="text-gray-400">Нет комментариев</p>
+											)}
+										</div>
+										<div>
+											<div className="">
+												<button>
+													<Heart size={34} color="#ffffff" />
+												</button>
+												<button>
+													<MessageCircle size={34} color="#ffffff" />
+												</button>
+												<button>
+													<Send size={34} color="#ffffff" />
+												</button>
+											</div>
+										</div>
+									</div>
 								</div>
-							</div>
-								</div>
-							</div>
-							</div>
+							
 						) : (
 							<div>
 								<p>Загрузка...</p>
