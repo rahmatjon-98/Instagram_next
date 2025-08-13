@@ -26,6 +26,7 @@ import {
   threads,
 } from "@/assets/icon/layout/svg";
 import Modal from "../Modal";
+import { usegetUserStore } from "@/store/pages/search/store";
 
 const NavLink = ({ href, icon, activeIcon, label, isActive }) => (
   <Link
@@ -54,7 +55,7 @@ export default function SideBar({ children }) {
   };
 
   const isActive = (path) => (pathname === path ? "font-bold" : "font-normal");
-  const [openModal, setOpenModal] = useState(null)
+  const { openModal, setOpenModal } = usegetUserStore()
 
   return (
     <div>
