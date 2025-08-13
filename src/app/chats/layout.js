@@ -1,25 +1,43 @@
 "use client";
 
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, EllipsisVertical, Trash } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import img from "../../assets/img/pages/chat/pages/default-chat/userFoto.jpg";
 import { useDefaultChat } from "@/store/pages/chat/pages/default-chat/store";
+import { useMyProfile } from "@/store/pages/chat/layout/store";
+import { useUserId } from "@/hook/useUserId";
+import { useChatById } from "@/store/pages/chat/pages/chat-by-id/store";
 
 export default function Layout({ children }) {
+  const userId = useUserId();
   let { chats, get } = useDefaultChat();
+  let { myProfile, getChatById } = useMyProfile();
+  let { deleteChat } = useChatById();
 
   useEffect(() => {
     get();
+    getChatById(userId);
   }, []);
+
+  async function handleDelMessage(mesId) {
+    await deleteChat(mesId);
+    getChatById(id);
+  }
+
+  let [delMesModal, setdelMesModal] = useState(null);
+
+  function openDelModal(id) {
+    setdelMesModal(delMesModal == id ? null : id);
+  }
 
   return (
     <div className="flex w-[]">
       <div className="p-5 border-r-2 h-[100vh] border-gray-300 w-[300px]">
         <section className="flex items-center justify-between gap-5 ">
           <div className="flex items-center gap-2 text-xl font-bold">
-            tom2211
+            {myProfile?.userName}
             <ChevronDown />
           </div>
 
@@ -46,28 +64,60 @@ export default function Layout({ children }) {
           <button className="text-[#1780C2]">Requests</button>
         </section>
 
-        <section>
+        <section className="space-y-2.5">
           {chats &&
             chats?.data?.map((e, i) => (
-              <div key={i} className="flex items-center gap-1">
-                {e.receiveUserImage ? (
-                  <Image
-                    alt=""
-                    src={e.receiveUserImage}
-                    width={1000}
-                    height={1000}
-                    className="w-14 h-14 rounded-full"
-                  />
-                ) : (
-                  <Image
-                    alt=""
-                    src={img}
-                    width={500}
-                    height={500}
-                    className="w-14 h-14 rounded-full"
-                  />
-                )}
-                <Link href={`/chats/${e.chatId}`}>{e.receiveUserName}</Link>
+              <div key={i} className="flex items-center justify-between group">
+                <div className="flex items-center gap-1">
+                  {(
+                    e.receiveUserId == useUserId()
+                      ? e.sendUserImage
+                      : e.receiveUserImage
+                  ) ? (
+                    <Image
+                      alt=""
+                      src={`http://37.27.29.18:8003/images/${
+                        e.receiveUserId == useUserId()
+                          ? e.sendUserImage
+                          : e.receiveUserImage
+                      }`}
+                      width={1000}
+                      height={1000}
+                      className="w-10 h-10 rounded-full object-cover object-center"
+                    />
+                  ) : (
+                    <Image
+                      alt=""
+                      src={img}
+                      width={500}
+                      height={500}
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                  )}
+                  <Link href={`/chats/${e.chatId}`}>
+                    {e.receiveUserId == useUserId()
+                      ? e.sendUserName
+                      : e.receiveUserName}
+                  </Link>{" "}
+                </div>
+                <div className="flex gap-2">
+                  {delMesModal == e.chatId && (
+                    <button
+                      onClick={() => handleDelMessage(e.chatId)}
+                      className="text-red-500 bg-red-100 p-2 rounded
+                    "
+                    >
+                      <Trash size={18} />
+                    </button>
+                  )}
+
+                  <button
+                    onClick={() => openDelModal(e.chatId)}
+                    className="hidden group-hover:block"
+                  >
+                    <EllipsisVertical />
+                  </button>
+                </div>
               </div>
             ))}
         </section>

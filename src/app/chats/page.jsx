@@ -1,17 +1,10 @@
 "use client";
-import Image from "next/image";
-import { useEffect, useState } from "react";
-import img from "../../assets/img/pages/chat/pages/chat-by-id/icon.png";
 import { useDefaultChat } from "@/store/pages/chat/pages/default-chat/store";
+import Image from "next/image";
+import { useEffect } from "react";
+import img from "../../assets/img/pages/chat/pages/chat-by-id/icon.png";
 
 export default function DefaultChat() {
-  let { chats, get } = useDefaultChat();
-  console.log(chats);
-
-  useEffect(() => {
-    get();
-  }, []);
-
   return (
     <div className="w-[1000px] flex items-center justify-center">
       <div className="w-[400px] text-center flex flex-col items-center justify-center">
