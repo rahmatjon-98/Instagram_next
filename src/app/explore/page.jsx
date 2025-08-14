@@ -36,7 +36,7 @@ const mediaStyle = {
 }
 const mediaStyleModal = {
 	width: '100%',
-	height: '506px',
+	height: '80vh',
 	objectFit: 'cover',
 	borderRadius: '2px',
 	cursor: 'pointer',
@@ -50,6 +50,10 @@ export default function Explore() {
 	const [open, setOpen] = React.useState(false)
 	let cnt = 3
 
+	async function RemoveComit(postCommentId) {
+		await deletComit(postCommentId)
+		fechUser()
+	}
 
 	useEffect(() => {
 		fechUser()
@@ -95,7 +99,7 @@ export default function Explore() {
 
 							<div className="flex w-full gap-[20px]">
 								<div className="w-[40%] ">
-									{postById.data?.images.map(el => {
+									{/* {postById.data?.images.map(el => {
 										const mediaUrl = `http://37.27.29.18:8003/images/${el}`
 										return (
 											<div key={el.id}>
@@ -107,14 +111,47 @@ export default function Explore() {
 														</button>
 													</div>
 												) : (
-													<img src={mediaUrl} alt={`Post by ${el.userName}`} style={mediaStyleModal} />
+													<img src={mediaUrl} alt={`Post by ${el.userName}`}  style={mediaStyleModal} />
 												)}
 												<button className="absolute z-10 mt-[-40px] ml-[30px] text-white">
 													<CircleUserRound size={30} />
 												</button>
 											</div>
 										)
-									})}
+									})} */}
+									{postById.data?.images?.[0] && (() => {
+										const el = postById.data.images[0];
+										const mediaUrl = `http://37.27.29.18:8003/images/${el}`;
+										return (
+											<div key={el}>
+												{el.endsWith('.mp4') ? (
+													<div>
+														<video
+															ref={videoRef}
+															src={mediaUrl}
+															className="w-full h-[80vh] object-cover"
+															playsInline
+															autoPlay
+															muted={isMuted}
+															loop
+														/>
+														<button
+															onClick={toggleMute}
+															className="absolute z-10 mt-[-40px] ml-[270px] text-white"
+														>
+															{isMuted ? <VolumeX size={30} /> : <Volume2 size={30} />}
+														</button>
+													</div>
+												) : (
+													<img src={mediaUrl} alt={`Post by ${el.userName}`} style={mediaStyleModal} />
+												)}
+												<button className="absolute z-10 mt-[-40px] ml-[30px] text-white">
+													<CircleUserRound size={30} />
+												</button>
+											</div>
+										);
+									})()}
+
 								</div>
 								<div className="w-[68%] p-[20px]">
 									<div className="flex  w-full justify-between pb-[20px]  items-center">
@@ -156,13 +193,13 @@ export default function Explore() {
 														</div>
 													</div>
 													{
-														c.userId == useUserId() ? <button className="flex gap-[10px]" onClick={() => deletComit(c.id || c.postCommentId)}>
+														c.userId == useUserId() ? <button className="flex gap-[10px]" onClick={() => RemoveComit(c.postCommentId)}>
 															<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
 																<path strokeLinecap="round" strokeLinejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
 															</svg>
-															<Heart/>
+															<Heart />
 														</button>
-															: <Heart/>
+															: <Heart />
 													}
 												</div>
 											))

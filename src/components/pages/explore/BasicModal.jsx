@@ -48,7 +48,6 @@ const BasicModal = () => {
             stroke={currentReel.isLiked ? 'red' : user ? 'black' : 'gray'}
           />
         </button>
-        <span>{currentReel.postLikeCount}</span>
       </div>
     </div>
   );
