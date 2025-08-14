@@ -3,6 +3,7 @@ import axiosRequest from "@/lib/axiosRequest";
 
 export const useMyProfile = create((set) => ({
   myProfile: [],
+  users: [],
   getChatById: async () => {
     try {
       const { data } = await axiosRequest.get(`/UserProfile/get-my-profile`);
@@ -12,7 +13,21 @@ export const useMyProfile = create((set) => ({
     }
   },
 
-  sendMessage: async (mes) => {
-    await axiosRequest.post(`/Chat/send-message`, mes);
+  getUsers: async () => {
+    try {
+      let { data } = await axiosRequest.get(`/User/get-users`);
+      set({ users: data });
+      console.log(data);
+    } catch (error) {
+      console.error(error);
+    }
+  },
+
+  createChat: async (id) => {
+    try {
+      await axiosRequest.post(`/Chat/create-chat?receiverUserId=${id}`);
+    } catch (error) {
+      console.error(error);
+    }
   },
 }));
