@@ -1,22 +1,27 @@
 "use client";
+
+import img from "@/assets/img/pages/chat/pages/default-chat/userFoto.jpg";
 import { useUserId } from "@/hook/useUserId";
 import { useChatById } from "@/store/pages/chat/pages/chat-by-id/store";
 import { useDefaultChat } from "@/store/pages/chat/pages/default-chat/store";
 import { Box, Button, Drawer } from "@mui/material";
-import { EllipsisVertical, Mic, SendHorizontal, Trash, X } from "lucide-react";
+import {
+  EllipsisVertical,
+  Loader2,
+  Mic,
+  SendHorizontal,
+  Trash,
+  X,
+} from "lucide-react";
 import Image from "next/image";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState, useRef, useCallback } from "react";
+import EmojiPicker from "emoji-picker-react";
 
 export default function ChatById() {
-  const [state, setState] = useState({
-    top: false,
-    left: false,
-    bottom: false,
-    right: false,
-  });
+  const [isOpen, setIsOpen] = useState(false);
 
-  const toggleDrawer = (anchor, open) => (event) => {
+  const toggleDrawer = (open) => (event) => {
     if (
       event &&
       event.type === "keydown" &&
@@ -24,56 +29,86 @@ export default function ChatById() {
     ) {
       return;
     }
-    setState((s) => ({ ...s, [anchor]: open }));
+    setIsOpen(open);
   };
 
-  let { "chat-by-id": id } = useParams();
+  const { "chat-by-id": id } = useParams();
   const userId = useUserId();
 
-  let { messages, getChatById, sendMessage, deleteMessage } = useChatById();
-  let { chats, get } = useDefaultChat();
+  let { messages, deleteChat, getChatById, sendMessage, deleteMessage } =
+    useChatById();
 
   const [profilId, setprofilId] = useState(null);
 
-  // set profilId from chats when chats or id changes (avoid setState in render)
-  useEffect(() => {
-    if (!chats?.data || !id) return;
-    const found = chats.data.find((c) => String(c.id) === String(id));
-    if (found) setprofilId(found.receiveUserId);
-  }, [chats, id]);
+  const intervalRef = useRef(null);
+  const pollingInProgressRef = useRef(false);
+
+  const startPolling = useCallback(() => {
+    if (intervalRef.current) return;
+    intervalRef.current = setInterval(async () => {
+      if (!id) return;
+      if (pollingInProgressRef.current) return;
+      try {
+        pollingInProgressRef.current = true;
+        await getChatById(id);
+      } catch (err) {
+        console.error("polling error", err);
+      } finally {
+        pollingInProgressRef.current = false;
+      }
+    }, 2000);
+  }, [id, getChatById]);
+
+  const stopPolling = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  }, []);
 
   useEffect(() => {
-    get();
     if (!id) return;
 
-    // poll chat every 2s, cleanup on unmount / id change
-    const interval = setInterval(() => {
-      getChatById(id);
-    }, 2000);
-
-    // initial fetch
+    startPolling();
     getChatById(id);
 
-    return () => clearInterval(interval);
-  }, [id, getChatById, get]);
+    return () => {
+      stopPolling();
+    };
+  }, [id, getChatById, startPolling, stopPolling]);
 
-  let [inpMessage, setinpMessage] = useState("");
-  let [inpFile, setinpFile] = useState(null);
-  let [openImg, setOpenImg] = useState(null);
-  let [openIsVideo, setOpenIsVideo] = useState(false);
-  let [delMesModal, setdelMesModal] = useState(null);
+  const [inpMessage, setinpMessage] = useState("");
+  const [inpFile, setinpFile] = useState(null);
+  const [openImg, setOpenImg] = useState(null);
+  const [openIsVideo, setOpenIsVideo] = useState(false);
+  const [delMesModal, setdelMesModal] = useState(null);
 
-  const videoRef = useRef(null);
+  useEffect(() => {
+    return () => {
+      if (openImg && openImg.startsWith("blob:")) {
+        try {
+          URL.revokeObjectURL(openImg);
+        } catch {}
+      }
+      stopPolling();
+    };
+  }, []);
 
-  const isVideoFileName = (name) => {
-    return /\.(mp4|webm|ogg|mov)$/i.test(String(name || ""));
-  };
+  let router = useRouter();
 
-  const handleFileChange = (e) => {
+  async function handleDelChat(chatId) {
+    await deleteChat(chatId);
+    router.push("/chats");
+    setdelMesModal(null);
+  }
+
+  const isVideoFileName = (name) =>
+    /\.(mp4|webm|ogg|mov)$/i.test(String(name || ""));
+
+  const handleFile = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // revoke prev blob only when replacing (we will revoke on close too)
     if (openImg && openImg.startsWith("blob:")) {
       try {
         URL.revokeObjectURL(openImg);
@@ -83,165 +118,199 @@ export default function ChatById() {
     setinpFile(file);
     const objectUrl = URL.createObjectURL(file);
     setOpenImg(objectUrl);
-
-    const isVideo =
-      file.type?.startsWith("video/") || isVideoFileName(file.name);
-    setOpenIsVideo(!!isVideo);
+    setOpenIsVideo(
+      !!(file.type?.startsWith("video/") || isVideoFileName(file.name))
+    );
   };
 
-  // try to play video only after canplay, catch interruption
-  useEffect(() => {
-    if (!openImg || !openIsVideo) return;
-    const v = videoRef.current;
-    if (!v) return;
-
-    const onCanPlay = () => {
-      v.play?.().catch((err) => {
-        // play may be blocked or interrupted — log and continue
-        console.warn("video play interrupted or blocked:", err);
-      });
-    };
-
-    v.addEventListener("canplay", onCanPlay, { once: true });
-
-    return () => {
-      v.removeEventListener("canplay", onCanPlay);
-    };
-  }, [openImg, openIsVideo]);
+  const [loading, setLoading] = useState(false);
 
   const handleSend = async (e) => {
-    if (e?.preventDefault) e.preventDefault();
-
+    e?.preventDefault();
     if (!inpMessage && !inpFile) return;
 
     const formData = new FormData();
     formData.append("ChatId", id);
     formData.append("MessageText", inpMessage || "");
-
     if (inpFile) formData.append("File", inpFile);
 
+    setLoading(true);
     try {
       await sendMessage(formData);
       await getChatById(id);
-    } catch (err) {
-      console.error("sendMessage error:", err);
-    } finally {
-      // cleanup blob only here if it's a blob (we'll close preview)
-      if (openImg && openImg.startsWith("blob:")) {
-        try {
-          URL.revokeObjectURL(openImg);
-        } catch {}
-      }
       setinpMessage("");
       setinpFile(null);
       setOpenImg(null);
       setOpenIsVideo(false);
+      setOpenEmoji(false);
+    } catch (err) {
+      console.error("sendMessage error:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
   async function handleDelMessage(mesId) {
-    await deleteMessage(mesId);
-    await getChatById(id);
+    setLoading(true);
+    try {
+      await deleteMessage(mesId);
+      await getChatById(id);
+    } catch (error) {
+      console.error("sendMessage error:", error);
+    } finally {
+    }
+    setLoading(false);
     setdelMesModal(null);
   }
 
-  // toggle using functional update to avoid stale closure
-  const toggleDelModal = useCallback((mesId) => {
-    setdelMesModal((prev) => (prev === mesId ? null : mesId));
-  }, []);
+  const toggleDelModal = (mesId) =>
+    setdelMesModal((e) => (e === mesId ? null : mesId));
 
-  // close preview helper
-  const closePreview = useCallback(() => {
-    if (openImg && openImg.startsWith("blob:")) {
-      try {
-        URL.revokeObjectURL(openImg);
-      } catch {}
-    }
+  const closePreview = () => {
     setinpFile(null);
     setOpenImg(null);
     setOpenIsVideo(false);
-  }, [openImg]);
+  };
+
+  const onEmojiClick = (emojiData) => {
+    setinpMessage((prev) => prev + emojiData.emoji);
+  };
+
+  let [openEmoji, setOpenEmoji] = useState(false);
+
+  let userData = JSON.parse(localStorage.getItem("userData")) || {};
+  console.log(userData);
 
   return (
     <div>
-      <div>
-        {["left", "right", "top", "bottom"].map((anchor) => (
-          <React.Fragment key={anchor}>
-            <Button onClick={toggleDrawer(anchor, true)}>{anchor}</Button>
-            <Drawer
-              anchor={anchor}
-              open={state[anchor]}
-              onClose={toggleDrawer(anchor, false)}
-            >
-              <Box
-                sx={{
-                  width: anchor === "top" || anchor === "bottom" ? "auto" : 250,
-                }}
-                role="presentation"
-                onClick={toggleDrawer(anchor, false)}
-                onKeyDown={toggleDrawer(anchor, false)}
-                className=" flex flex-col justify-between"
-              >
-                <div>
-                  <p>wdknca w</p>
-                  <p>wdknca w</p>
-                </div>
-              </Box>
-            </Drawer>
-          </React.Fragment>
-        ))}
+      <div className="fixed shadow w-[75%] z-50 bg-white p-2 flex justify-between">
+        <div className="flex items-center gap-2">
+          {!userData.receiveUserImage ? (
+            <Image
+              src={img}
+              width={500}
+              height={500}
+              alt="avatar"
+              className="w-12 h-12 rounded-full"
+            />
+          ) : (
+            <Image
+              src={`http://37.27.29.18:8003/images/${userData.receiveUserImage}`}
+              width={500}
+              height={500}
+              alt="avatar"
+              className="w-12 h-12 rounded-full"
+            />
+          )}
+
+          <div>
+            <p>{userData.receiveUserName}</p>
+            <p>{}</p>
+          </div>
+        </div>
+        <Button onClick={toggleDrawer(true)}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="size-6"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
+            />
+          </svg>
+        </Button>
       </div>
 
-      <div className="w-[1020px] mx-auto p-4 h-[80vh] overflow-y-auto flex flex-col-reverse gap-2">
+      <Drawer anchor="right" open={isOpen} onClose={toggleDrawer(false)}>
+        <Box
+          sx={{ width: 250 }}
+          role="presentation"
+          onClick={toggleDrawer(false)}
+          onKeyDown={toggleDrawer(false)}
+          className="flex flex-col justify-end p-5"
+        >
+          <div>
+            <button
+              type="button"
+              onClick={() => handleDelChat(id)}
+              className="text-red-500 bg-red-100 p-2 rounded flex items-center gap-2"
+            >
+              Remove Chat <Trash size={18} />
+            </button>
+          </div>
+        </Box>
+      </Drawer>
+
+      <div className="w-[1020px] mx-auto p-4 h-[85vh] overflow-y-auto flex flex-col-reverse gap-2">
         {messages &&
           messages.map((e) => {
             const isCurrentUser = e.userId === userId;
-
             return (
               <div
                 key={e.messageId}
-                className={`flex items-end max-w-[100%] p-3 rounded-lg group ${
+                className={`flex items-center justify-center gap-3  p-3 rounded-lg group${
                   isCurrentUser
                     ? " self-end rounded-tr-none flex-row-reverse"
                     : " self-start rounded-tl-none "
                 }`}
               >
-                <div className={`flex flex-col `}>
-                  {e.file &&
-                    (isVideoFileName(e.file) ? (
+                <div
+                  className={`flex flex-col  ${
+                    isCurrentUser ? " self-end " : " self-start "
+                  }`}
+                >
+                  {e.file && isVideoFileName(e.file) ? (
+                    <div
+                      className={`w-1/2 ${
+                        isCurrentUser ? " self-end" : " self-start "
+                      }`}
+                    >
                       <video
-                        className="pb-2 rounded-xl max-w-full"
-                        width={500}
-                        style={{ height: "auto" }}
+                        src={`http://37.27.29.18:8003/images/${e.file}`}
                         controls
                         preload="metadata"
-                        src={`http://37.27.29.18:8003/images/${e.file}`}
-                        onError={(ev) =>
-                          console.error("video load error:", ev, e.file)
-                        }
-                      />
-                    ) : (
-                      <Image
+                        playsInline
+                        crossOrigin="anonymous"
                         className="pb-2 rounded-xl"
-                        width={500}
-                        height={500}
-                        alt="image"
-                        src={`http://37.27.29.18:8003/images/${e.file}`}
                         style={{ width: "100%", height: "auto" }}
-                        priority
                       />
-                    ))}
+                    </div>
+                  ) : e.file ? (
+                    <div
+                      className={`w-[60%] ${
+                        isCurrentUser ? " self-end" : " self-start "
+                      }`}
+                    >
+                      <Image
+                        src={`http://37.27.29.18:8003/images/${e.file}`}
+                        alt="image"
+                        width={1000}
+                        height={1000}
+                        className="pb-2 rounded-xl"
+                        priority
+                        style={{
+                          width: "100%",
+                          height: "auto",
+                        }}
+                      />
+                    </div>
+                  ) : null}
 
                   <div
-                    className={` rounded-lg ${
+                    className={`rounded-lg ${
                       isCurrentUser
                         ? "bg-blue-500 text-white self-end rounded-tr-none p-1.5 px-3"
-                        : "bg-[#F8FAFC] text-[#475569] self-start rounded-tl-none  p-1.5 px-3"
+                        : "bg-gray-100 text-[#475569] self-start rounded-tl-none p-1.5 px-3"
                     }`}
                   >
-                    <p className="leading-3">{e.messageText}</p>
+                    <p className="">{e.messageText}</p>
                     <span
-                      className={`text-[10px] leading-0  self-end ${
+                      className={`text-[10px] self-end ${
                         isCurrentUser ? "text-gray-200" : "text-gray-700"
                       }`}
                     >
@@ -249,43 +318,62 @@ export default function ChatById() {
                         hour: "2-digit",
                         minute: "2-digit",
                       })}
-                    </span>{" "}
+                    </span>
                   </div>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => toggleDelModal(e.messageId)}
-                  className="hidden group-hover:block"
-                >
-                  <EllipsisVertical />
-                </button>
+                <div className="relative ">
+                  <button
+                    type="button"
+                    onClick={() => toggleDelModal(e.messageId)}
+                    className="hidden group-hover:block"
+                  >
+                    <EllipsisVertical />
+                  </button>
 
-                {delMesModal === e.messageId && (
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => handleDelMessage(e.messageId)}
-                      className="text-red-500 bg-red-100 p-2 rounded"
+                  {delMesModal === e.messageId && (
+                    <div
+                      className={`shadow rounded absolute mt-5 bg-white z-5 w-[200px] flex flex-col justify-center items-center gap-2 ${
+                        isCurrentUser
+                          ? " -ml-50"
+                          : ""
+                      }`}
                     >
-                      <Trash size={18} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setdelMesModal(null)}
-                      className="p-2"
-                    >
-                      <X size={16} />
-                    </button>
-                  </div>
-                )}
+                      <button
+                        type="button"
+                        onClick={() => handleDelMessage(e.messageId)}
+                        className="text-red-500 p-2 rounded"
+                      >
+                        {loading ? (
+                          <Loader2 className="animate-spin w-5 h-5" />
+                        ) : (
+                          <p className="flex items-center gap-2">
+                            Delete messege <Trash size={18} />
+                          </p>
+                        )}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setdelMesModal(null)}
+                        className="p-2"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             );
           })}
       </div>
 
       <div className="border-2 min-h-12 max-h-12 m-4 p-2 rounded-xl border-[#E2E8F0] flex justify-between gap-1 items-center">
-        <button type="button">
+        <button
+          className="cursor-pointer"
+          type="button"
+          onClick={() => setOpenEmoji((e) => !e)}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -301,13 +389,19 @@ export default function ChatById() {
             />
           </svg>
         </button>
-
-        <form onSubmit={handleSend} className="w-full flex justify-between">
+        {openEmoji && (
+          <div className="absolute mb-130">
+            <EmojiPicker onEmojiClick={onEmojiClick} />
+          </div>
+        )}
+        <form
+          onSubmit={handleSend}
+          className="w-full flex justify-between items-center"
+        >
           <input
             type="text"
-            className="w-1/1 outline-none"
-            placeholder="Write your messege..."
-            name="inpMessage"
+            className="w-full outline-none px-2"
+            placeholder="Write your message..."
             value={inpMessage}
             onChange={(e) => setinpMessage(e.target.value)}
           />
@@ -319,11 +413,9 @@ export default function ChatById() {
                 <input
                   type="file"
                   className="hidden"
-                  name="inpImage"
                   accept="image/*,video/*"
-                  onChange={handleFileChange}
+                  onChange={handleFile}
                 />
-
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -335,19 +427,22 @@ export default function ChatById() {
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 
-                 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 
-                 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 
-                 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 
-                 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 
-                 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
+                    d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
                   />
                 </svg>
               </label>
             </div>
           ) : (
-            <button type="submit">
-              <SendHorizontal />
+            <button
+              type="submit"
+              className="w-10 h-10 flex items-center justify-center bg-blue-500 text-white rounded-full"
+              disabled={loading}
+            >
+              {loading ? (
+                <Loader2 className="animate-spin w-5 h-5" />
+              ) : (
+                <SendHorizontal />
+              )}
             </button>
           )}
         </form>
@@ -355,19 +450,20 @@ export default function ChatById() {
         {openImg && (
           <div
             style={{ backdropFilter: "blur(6px)" }}
-            className="fixed inset-0 flex items-center justify-center bg-[rgba(255,255,255,0.3)]"
+            className="fixed inset-0 flex items-center justify-center bg-[rgba(0,0,0,0.3)]"
           >
-            {/* modal is NOT a form to avoid nested forms */}
             <div className="w-[400px] bg-white rounded-xl shadow p-5">
               {openIsVideo ? (
                 <video
-                  ref={videoRef}
                   src={openImg}
                   controls
                   preload="metadata"
                   className="max-h-64 mx-auto mb-4"
                   style={{ width: "100%", height: "auto" }}
                   onError={(ev) => console.error("preview video error:", ev)}
+                  onPlay={() => pausePolling()}
+                  onPause={() => resumePolling()}
+                  onEnded={() => resumePolling()}
                 />
               ) : (
                 <img
@@ -378,11 +474,11 @@ export default function ChatById() {
                 />
               )}
 
-              <div className="flex justify-between">
+              <div className="flex justify-between border-t-2 border-gray-300 pt-3">
                 <button
                   type="button"
                   onClick={closePreview}
-                  className=" text-red-500 px-4 py-2 rounded"
+                  className="text-red-500 px-7 py-2 rounded  bg-red-100"
                 >
                   <X />
                 </button>
@@ -390,20 +486,15 @@ export default function ChatById() {
                 <div className="flex gap-2">
                   <button
                     type="button"
-                    onClick={() => {
-                      // send and close preview after
-                      handleSend();
-                    }}
-                    className=" px-4 py-2 rounded mr-2"
+                    onClick={handleSend}
+                    className="px-7 py-2 rounded mr-2 bg-blue-100"
+                    disabled={loading}
                   >
-                    <SendHorizontal />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={closePreview}
-                    className=" px-4 py-2 rounded"
-                  >
-                    Close
+                    {loading ? (
+                      <Loader2 className="animate-spin w-5 h-5" />
+                    ) : (
+                      <SendHorizontal />
+                    )}
                   </button>
                 </div>
               </div>
