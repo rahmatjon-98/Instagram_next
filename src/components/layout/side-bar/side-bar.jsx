@@ -29,6 +29,7 @@ import { Toaster, toast } from "react-hot-toast";
 import { useRegisterStore } from "@/store/pages/auth/registration/registerStore";
 import { useForm } from "react-hook-form";
 import { Eye, EyeOff } from "lucide-react";
+import { usegetUserStore } from "@/store/pages/search/store";
 
 const NavLink = ({ href, icon, activeIcon, label, isActive }) => (
   <Link
@@ -53,7 +54,10 @@ export default function SideBar({ children }) {
   const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
   const handleClick = (event) => setAnchorEl(event.currentTarget);
-  const handleClose = () => setAnchorEl(null);
+  const handleClose = () => setAnchorEl(null)
+
+  let { openModal, setOpenModal } = usegetUserStore()
+  
 
   const isActive = (path) => (pathname === path ? "font-bold" : "font-normal");
 
@@ -93,7 +97,9 @@ export default function SideBar({ children }) {
           <div className="flex flex-col justify-between h-full">
             <div className="flex flex-col gap-2 mt-4">
               <NavLink href="/" icon={homeIcon} activeIcon={homeIconActive} label={t("layout.home")} isActive={isActive} />
-              <NavLink href="#" icon={searchIcon} activeIcon={searchIconActive} label={t("layout.search")} isActive={isActive} />
+              <button onClick={setOpenModal}>
+                <NavLink href="#" icon={searchIcon} activeIcon={searchIconActive} label={t("layout.search")} isActive={isActive} />
+              </button>
               <NavLink href="/explore" icon={compas} activeIcon={compasActive} label={t("layout.explore")} isActive={isActive} />
               <NavLink href="/reels" icon={video} activeIcon={videoActive} label={t("layout.reels")} isActive={isActive} />
               <NavLink href="/chats" icon={message} activeIcon={messageActive} label={t("layout.message")} isActive={isActive} />
