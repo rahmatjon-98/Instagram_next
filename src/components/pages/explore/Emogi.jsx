@@ -1,0 +1,39 @@
+import { Smile } from "lucide-react";
+import EmojiPicker from "emoji-picker-react";
+import { useState } from "react";
+
+export default function CommentInput({ value2, onChange2 }) {
+    const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+
+    const handleEmojiClick = (emojiData) => {
+        onChange2({
+            target: { value: value2 + emojiData.emoji }
+        });
+        setShowEmojiPicker(false);
+    };
+
+    return (
+        <div className="relative flex gap-2 items-center">
+            <button
+                type="button"
+                onClick={() => setShowEmojiPicker((prev) => !prev)}
+            >
+                <Smile color="#ffffff" />
+            </button>
+
+            <input
+                type="text"
+                value={value2}
+                onChange={onChange2}
+                className="flex-1 p-2 rounded border-none outline-none"
+                placeholder="Добавить комментарий..."
+            />
+
+            {showEmojiPicker && (
+                <div className="absolute bottom-12 left-0 z-50">
+                    <EmojiPicker onEmojiClick={handleEmojiClick} />
+                </div>
+            )}
+        </div>
+    );
+}
