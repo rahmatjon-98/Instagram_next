@@ -40,6 +40,7 @@ export default function Main() {
 	}, [])
 	let [stories, setStories] = useState(false)
 	let [muted, setMuted] = useState(true)
+	let [comment, setComment] = useState('')
 	const onMouseDown = e => {
 		isDown = true
 		startX = e.pageX - scrollRef.current.offsetLeft
@@ -327,7 +328,6 @@ export default function Main() {
 													src={`http://37.27.29.18:8003/images/${e.images[0]}`}
 													muted={mutedMap[e.postId] ?? true}
 													loop
-													autoPlay
 													playsInline
 													onClick={() => toggleStop(e.postId)}
 													className='h-[85vh] m-auto'
@@ -576,8 +576,8 @@ export default function Main() {
 												</p>
 											)}
 											<div className='flex w-[100%] items-center justify-between'>
-												<input type='text' className='w-[90%] outline-none text-black text-[15px] placeholder:text-[16px]' placeholder='Add a comment...' />
-												<p className='hover:'>
+												<input type='text' value={comment} onChange={(e) => setComment(e.target.value)} className='w-[90%] outline-none text-black text-[15px] placeholder:text-[16px]' placeholder='Add a comment...' />
+												<p className='hover:underline text-[16px] text-[#64748B]'>
 													public
 												</p>
 											</div>
