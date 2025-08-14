@@ -50,7 +50,7 @@ const LayoutSet = ({ children }) => {
                             <p className='font-semibold text-[15px] text-gray-600 text-center mt-[30px]'>Как вы используете Instagram</p>
                             <div>
                                 <CircleUserRound />
-                                <p></p>
+                                <p>Редактировать профиль</p>
                             </div>
                         </div>
 
