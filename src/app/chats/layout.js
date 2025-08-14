@@ -1,47 +1,105 @@
 "use client";
 
-import { ChevronDown, EllipsisVertical, Trash } from "lucide-react";
+import {
+  ChevronDown,
+  EllipsisVertical,
+  Search,
+  Trash,
+  User,
+  X,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import img from "../../assets/img/pages/chat/pages/default-chat/userFoto.jpg";
 import { useDefaultChat } from "@/store/pages/chat/pages/default-chat/store";
 import { useMyProfile } from "@/store/pages/chat/layout/store";
 import { useUserId } from "@/hook/useUserId";
 import { useChatById } from "@/store/pages/chat/pages/chat-by-id/store";
+import { usegetUserStore } from "@/store/pages/search/store";
+import { Skeleton, Stack } from "@mui/material";
 
 export default function Layout({ children }) {
   const userId = useUserId();
-  let { chats, get } = useDefaultChat();
-  let { myProfile, getChatById } = useMyProfile();
-  let { deleteChat } = useChatById();
+
+  const { chats, get } = useDefaultChat();
+  const { myProfile, getChatById, createChat } = useMyProfile();
+  const { deleteChat } = useChatById();
+
+  function setLocale(user) {
+    localStorage.setItem("userData", JSON.stringify(user));
+    // console.log(user);
+  }
+
+  const { users, getUsers, getSearchHistories } = usegetUserStore();
+
+  const [openModalUsers, setOpenModalUsers] = useState(false);
+  const [search, setSearch] = useState("");
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     get();
-    getChatById(userId);
-  }, []);
+    if (userId) getChatById(userId);
+    getUsers();
+    getSearchHistories();
+  }, [userId]);
 
-  async function handleDelMessage(mesId) {
-    await deleteChat(mesId);
-    getChatById(id);
-  }
+  const allUsers = useMemo(() => users?.data ?? [], [users]);
 
-  let [delMesModal, setdelMesModal] = useState(null);
+  useEffect(() => {
+    if (!search || !search.trim()) {
+      setFilteredUsers(allUsers);
+      setLoading(false);
+      return;
+    }
 
-  function openDelModal(id) {
-    setdelMesModal(delMesModal == id ? null : id);
+    setLoading(true);
+    const t = setTimeout(() => {
+      const q = search.toLowerCase();
+      const results = allUsers.filter((u) =>
+        String(u.userName ?? "")
+          .toLowerCase()
+          .includes(q)
+      );
+      setFilteredUsers(results);
+      setLoading(false);
+    }, 500);
+
+    return () => clearTimeout(t);
+  }, [search, allUsers]);
+
+  const SkeletonRow = () => (
+    <Stack direction="row" spacing={2} alignItems="center" className="p-3">
+      <Skeleton variant="circular" width={44} height={44} />
+      <Stack spacing={0.5} flex={1}>
+        <Skeleton variant="text" width="60%" height={14} />
+        <Skeleton variant="text" width="40%" height={12} />
+      </Stack>
+    </Stack>
+  );
+
+  async function handleCreateChat(id) {
+    await createChat(id);
+    get();
+    setOpenModalUsers(false);
+    setSearch("");
   }
 
   return (
     <div className="flex w-[]">
-      <div className="p-5 border-r-2 h-[100vh] border-gray-300 w-[300px]">
-        <section className="flex items-center justify-between gap-5 ">
+      <div className=" border-r-2 h-[100vh] border-gray-300 w-[300px]">
+        <section className="flex items-center justify-between gap-5 p-5">
           <div className="flex items-center gap-2 text-xl font-bold">
             {myProfile?.userName}
             <ChevronDown />
           </div>
 
-          <span>
+          <button
+            type="button"
+            onClick={() => setOpenModalUsers((s) => !s)}
+            aria-label="New message"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -56,69 +114,164 @@ export default function Layout({ children }) {
                 d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
               />
             </svg>
-          </span>
+          </button>
         </section>
 
-        <section className="flex items-center justify-between font-medium text-sm py-5">
+        {openModalUsers && (
+          <section
+            style={{ backdropFilter: "blur(6px)" }}
+            className="fixed inset-0 z-10 flex items-center justify-center bg-[rgba(0,0,0,0.6)]"
+          >
+            <article className="w-[600px] bg-white rounded-2xl shadow py-5">
+              <div className="relative">
+                <p className="text-center font-bold text-xl pb-5">
+                  Новое сообщение
+                </p>
+                <button
+                  type="button"
+                  className="absolute right-5 top-2"
+                  onClick={() => setOpenModalUsers(false)}
+                >
+                  <X />
+                </button>
+
+                <div className="flex items-center gap-5 border-y-2 border-gray-200 p-3">
+                  <p className="text-[18px] font-bold">Кому:</p>
+                  <input
+                    type="text"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Search"
+                    className={`outline-none w-9/10 `}
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col overflow-y-auto h-[50vh] py-3">
+                <p className="pb-2 px-5 text-left font-bold">Рекомендуемые</p>
+
+                <div className="flex flex-col">
+                  {loading ? (
+                    Array.from({ length: 5 }).map((_, i) => (
+                      <SkeletonRow key={i} />
+                    ))
+                  ) : search && search.trim() ? (
+                    filteredUsers.length > 0 ? (
+                      filteredUsers.map((u) => (
+                        <div
+                          key={u.id}
+                          className="hover:bg-[#eeeeee] rounded p-3"
+                          onClick={() => handleCreateChat(u.id)}
+                        >
+                          <div className="flex items-center gap-5">
+                            {u.avatar ? (
+                              <Image
+                                src={`http://37.27.29.18:8003/images/${u.avatar}`}
+                                width={44}
+                                height={44}
+                                alt="avatar"
+                                className="rounded-full object-cover w-12 h-12"
+                                priority
+                              />
+                            ) : (
+                              <User size={44} />
+                            )}
+                            <div>
+                              <p>{u.userName}</p>
+                              <p>{u.fullName}</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="p-4 text-center text-gray-500">
+                        Пользователи не найдены
+                      </div>
+                    )
+                  ) : (
+                    allUsers.map((u) => (
+                      <div
+                        key={u.id}
+                        className="flex items-center cursor-pointer hover:bg-[#eeeeee] rounded p-3 w-full  gap-5"
+                        onClick={() => handleCreateChat(u.id)}
+                      >
+                        {console.log(u.id)}
+                        {u.avatar ? (
+                          <Image
+                            src={`http://37.27.29.18:8003/images/${u.avatar}`}
+                            width={44}
+                            height={44}
+                            alt="avatar"
+                            className="rounded-full object-cover w-12 h-12"
+                            priority
+                          />
+                        ) : (
+                          <User size={44} />
+                        )}
+                        <div>
+                          <p>{u.userName}</p>
+                          <p>{u.fullName}</p>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </article>
+          </section>
+        )}
+
+        <section className="flex items-center justify-between font-medium text-sm px-5">
           <p className="text-[#64748B]">Messages</p>
-          <button className="text-[#1780C2]">Requests</button>
+          <button type="button" className="text-[#1780C2]">
+            Requests
+          </button>
         </section>
 
-        <section className="space-y-2.5">
+        <section className="py-5">
           {chats &&
-            chats?.data?.map((e, i) => (
-              <div key={i} className="flex items-center justify-between group">
-                <div className="flex items-center gap-1">
+            chats.data?.map((e) => (
+              <Link
+                key={e.chatId}
+                href={`/chats/${e.chatId}`}
+                onClick={() => setLocale(e)}
+              >
+                <div className="flex items-center gap-1 hover:bg-gray-200 p-2">
                   {(
-                    e.receiveUserId == useUserId()
+                    e.receiveUserId === userId
                       ? e.sendUserImage
                       : e.receiveUserImage
                   ) ? (
                     <Image
                       alt=""
                       src={`http://37.27.29.18:8003/images/${
-                        e.receiveUserId == useUserId()
+                        e.receiveUserId === userId
                           ? e.sendUserImage
                           : e.receiveUserImage
                       }`}
-                      width={1000}
-                      height={1000}
+                      width={40}
+                      height={40}
                       className="w-10 h-10 rounded-full object-cover object-center"
+                      priority
                     />
                   ) : (
                     <Image
                       alt=""
                       src={img}
-                      width={500}
-                      height={500}
+                      width={40}
+                      height={40}
                       className="w-10 h-10 rounded-full object-cover"
+                      priority
                     />
                   )}
-                  <Link href={`/chats/${e.chatId}`}>
-                    {e.receiveUserId == useUserId()
+
+                  <div>
+                    {e.receiveUserId === userId
                       ? e.sendUserName
                       : e.receiveUserName}
-                  </Link>{" "}
+                  </div>
                 </div>
-                <div className="flex gap-2">
-                  {delMesModal == e.chatId && (
-                    <button
-                      onClick={() => handleDelMessage(e.chatId)}
-                      className="text-red-500 bg-red-100 p-2 rounded
-                    "
-                    >
-                      <Trash size={18} />
-                    </button>
-                  )}
-
-                  <button
-                    onClick={() => openDelModal(e.chatId)}
-                    className="hidden group-hover:block"
-                  >
-                    <EllipsisVertical />
-                  </button>
-                </div>
-              </div>
+              </Link>
             ))}
         </section>
       </div>

@@ -26,4 +26,23 @@ export const useProfileStore = create((set, get) => ({
 			console.error('failed to get', error)
 		}
 	},
+	deleteProfilePhoto: async () => {
+		try {
+			await axiosRequest.delete(`${api}/UserProfile/delete-user-image-profile`)
+			await get().getProfileData()
+		} catch (error) {
+			console.error('Couldnt delete user photo', error)
+		}
+	},
+	updateProfilePhoto: async formData => {
+		try {
+			await axiosRequest.put(
+				`${api}/UserProfile/update-user-image-profile`,
+				formData
+			)
+			await get().getProfileData()
+		} catch (error) {
+			console.error(error)
+		}
+	},
 }))

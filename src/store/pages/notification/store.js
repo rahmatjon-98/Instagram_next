@@ -1,41 +1,108 @@
-import { create } from 'zustand'
+import { create } from 'zustand';
 
-export let useTodoAsyncStore = create(set => ({
+export const useTodoAsyncStore = create((set) => ({
   users: [],
   loading: false,
   error: null,
 
-  get: async () => {
+  getUsers: async () => {
     try {
-      set({ loading: true, error: null })
-      const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null
-      if (!token) throw new Error('Токен не найден. Авторизуйтесь.')
+      set({ loading: true, error: null });
 
-      const payload = JSON.parse(atob(token.split('.')[1]))
-      const currentUserId = payload.sid 
+      const token = localStorage.getItem('access_token');
+      if (!token) throw new Error('Токен не найден');
 
-      let response = await fetch(`http://37.27.29.18:8003/FollowingRelationShip/get-subscribers?UserId=${currentUserId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'accept': '*/*',
-        },
-      })
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const currentUserId = payload.sid;
 
-      let data = await response.json()
-      
-      if (!data.data) throw new Error('Не удалось получить данные подписчиков')
-      
-      const subscribers = data.data.map(item => ({
-        id: item.id,
-        userId: item.userShortInfo?.userId,
-        userName: item.userShortInfo?.userName || 'Неизвестный пользователь',
-        fullName: item.userShortInfo?.fullname || '',
-        avatar: item.userShortInfo?.userPhoto || ''
-      }))
-      
-      set({ users: subscribers, loading: false })
-    } catch (error) {
-      set({ error: error.message, loading: false })
+      // 1. Получаем подписчиков
+      const subsRes = await fetch(
+        `http://37.27.29.18:8003/FollowingRelationShip/get-subscribers?UserId=${currentUserId}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'accept': '*/*'
+          }
+        }
+      );
+      const subsData = await subsRes.json();
+      const subscribers = subsData.data || [];
+
+      // 2. Получаем мои подписки
+      const followingRes = await fetch(
+        `http://37.27.29.18:8003/FollowingRelationShip/get-subscriptions?UserId=${currentUserId}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'accept': '*/*'
+          }
+        }
+      );
+      const followingData = await followingRes.json();
+      const followingIds = followingData.data?.map(f => f.userShortInfo?.userId) || [];
+
+      // 3. Объединяем данные
+      const merged = subscribers.map(sub => ({
+        id: sub.id,
+        userId: sub.userShortInfo?.userId,
+        userName: sub.userShortInfo?.userName || '',
+        fullName: sub.userShortInfo?.fullname || '',
+        avatar: sub.userShortInfo?.userPhoto || '',
+        isFollowed: followingIds.includes(sub.userShortInfo?.userId)
+      }));
+
+      set({ users: merged, loading: false });
+    } catch (err) {
+      set({ error: err.message, loading: false });
+    }
+  },
+
+  toggleFollow: async (userId) => {
+    try {
+      const token = localStorage.getItem('access_token');
+      if (!token) throw new Error('Токен не найден');
+
+      const state = useTodoAsyncStore.getState();
+      const user = state.users.find(u => u.userId === userId);
+      if (!user) throw new Error('Пользователь не найден');
+
+      if (user.isFollowed) {
+        // Отписка
+        await fetch(
+          `http://37.27.29.18:8003/FollowingRelationShip/delete-following-relation-ship?followingUserId=${userId}`,
+          {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'accept': '*/*'
+            }
+          }
+        );
+        set(state => ({
+          users: state.users.map(u =>
+            u.userId === userId ? { ...u, isFollowed: false } : u
+          )
+        }));
+      } else {
+        // Подписка
+        await fetch(
+          `http://37.27.29.18:8003/FollowingRelationShip/add-following-relation-ship?followingUserId=${userId}`,
+          {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'accept': '*/*'
+            }
+          }
+        );
+        set(state => ({
+          users: state.users.map(u =>
+            u.userId === userId ? { ...u, isFollowed: true } : u
+          )
+        }));
+      }
+    } catch (err) {
+      set({ error: err.message });
     }
   }
-}))
+}));

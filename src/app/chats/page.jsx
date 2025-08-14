@@ -14,6 +14,7 @@ export default function DefaultChat() {
           width={1000}
           height={1000}
           className="w-30 h-30"
+          priority
         />
         <p className="font-medium text-[#1E293B]">Your messages</p>
         <p className="text-[#64748B] text-xs">
