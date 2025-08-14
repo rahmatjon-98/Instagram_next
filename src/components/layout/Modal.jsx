@@ -17,8 +17,6 @@ const Modal = () => {
 
     let { users, getUsers, searchHistories, getSearchHistories, deleteUserHistory, addUserHistory, clearUserHistory, openModal, setOpenModal } = usegetUserStore()
 
-    let myFollowers = []
-
     useEffect(() => {
         getUsers()
         getSearchHistories()
@@ -33,7 +31,7 @@ const Modal = () => {
 
         setLoading(true)
         const delayDebounce = setTimeout(() => {
-            const results = myFollowers?.filter(u =>
+            const results = users?.data?.filter(u =>
                 u.userName?.toLowerCase().includes(search.toLowerCase())
             ) || []
             setFilteredUsers(results)
@@ -42,9 +40,8 @@ const Modal = () => {
 
         return () => clearTimeout(delayDebounce)
     }, [search, users])
-
-
     
+
     const SkeletonRow = () => (
         <Stack direction="row" spacing={2} alignItems="center" className="p-3">
             <Skeleton variant="circular" width={44} height={44} />
