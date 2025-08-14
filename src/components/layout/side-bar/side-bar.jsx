@@ -24,11 +24,17 @@ import {
   setting,
   threads,
 } from "@/assets/icon/layout/svg";
+<<<<<<< HEAD
 import { CircleUserRound, Settings, LogOut } from "lucide-react";
 import { Toaster, toast } from "react-hot-toast";
 import { useRegisterStore } from "@/store/pages/auth/registration/registerStore";
 import { useForm } from "react-hook-form";
 import { Eye, EyeOff } from "lucide-react";
+=======
+import { usegetUserStore } from '@/store/pages/search/store'
+import Modal from "../Modal";
+import { Bookmark, CircleUserRound, LogOut, Settings } from "lucide-react";
+>>>>>>> 41f12d6f572da649e419f2f4245a09092fb74416
 
 const NavLink = ({ href, icon, activeIcon, label, isActive }) => (
   <Link
@@ -83,6 +89,18 @@ export default function SideBar({ children }) {
     }
   };
 
+<<<<<<< HEAD
+=======
+  function logOut() {
+    localStorage.removeItem('access_token')
+    router.push('/login')
+  }
+
+  const isActive = (path) => (pathname === path ? "font-bold" : "font-normal")
+
+  let { openModal, setOpenModal } = usegetUserStore()
+
+>>>>>>> 41f12d6f572da649e419f2f4245a09092fb74416
   return (
     <div>
       <Toaster />
