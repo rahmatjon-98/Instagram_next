@@ -57,6 +57,7 @@ export default function SideBar({ children }) {
   const handleClose = () => setAnchorEl(null)
 
   let { openModal, setOpenModal } = usegetUserStore()
+  
 
   const isActive = (path) => (pathname === path ? "font-bold" : "font-normal");
 
