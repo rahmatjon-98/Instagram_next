@@ -25,6 +25,8 @@ import {
   problemIcon,
   threads,
 } from "@/assets/icon/layout/svg";
+import { usegetUserStore } from '@/store/pages/search/store'
+import { Settings } from 'lucide-react'
 
 const NavLink = ({ href, icon, activeIcon, label, isActive }) => (
   <Link
