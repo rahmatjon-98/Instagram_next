@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { useState } from "react";
 import Image from "next/image";
@@ -51,54 +51,68 @@ export default function Login() {
         </div>
       </div>
 
-					<form onSubmit={handleSubmit(onSubmit)} className='space-y-3'>
-						<input
-							type='text'
-							placeholder='User Name'
-							{...register('userName', { required: 'This field is required' })}
-							className='w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:border-gray-400'
-						/>
-						{errors.userName && (
-							<p className='text-red-500 text-xs'>{errors.userName.message}</p>
-						)}
+      <div className="flex items-center justify-center min-h-screen w-[400px]">
+        <div className="bg-white border border-gray-300 rounded-lg p-8 w-full  max-w-sm shadow-sm">
+          <div className="flex flex-col items-center mb-6">
+            <Image src={frame168} alt="Instagram" />
+          </div>
 
-						<div className='relative'>
-							<input
-								type={showPassword ? 'text' : 'password'}
-								placeholder='Password'
-								{...register('password', { required: 'Password is required' })}
-								className='w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:border-gray-400'
-							/>
-							<span
-								onClick={() => setShowPassword(!showPassword)}
-								className='absolute inset-y-0 right-3 flex items-center text-gray-500 cursor-pointer select-none'
-							>
-								{showPassword ? <Eye /> : <EyeOff />}
-							</span>
-						</div>
-						{errors.password && (
-							<p className='text-red-500 text-xs'>{errors.password.message}</p>
-						)}
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+            <input
+              type="text"
+              placeholder="User Name"
+              {...register("userName", { required: "This field is required" })}
+              className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:border-gray-400"
+            />
+            {errors.userName && (
+              <p className="text-red-500 text-xs">{errors.userName.message}</p>
+            )}
 
-						<button
-							type='submit'
-							className='w-full bg-blue-500 text-white font-semibold py-2 rounded-md hover:bg-blue-600 transition'
-						>
-							Log in
-						</button>
-						<Link href={'/registration'}>
-							<p className='text-[#3B82F6] text-center'>Forgot password?</p>
-						</Link>
-					</form>
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                {...register("password", { required: "Password is required" })}
+                className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:border-gray-400"
+              />
+              <span
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-3 flex items-center text-gray-500 cursor-pointer select-none"
+              >
+                {showPassword ? <Eye /> : <EyeOff />}
+              </span>
+            </div>
+            {errors.password && (
+              <p className="text-red-500 text-xs">{errors.password.message}</p>
+            )}
 
-					<div className='mt-6 border-t pt-4 text-center'>
-						<p className='text-sm'>
-							Don't have an account?{' '}
-							<a href='/login' className='text-blue-500 font-semibold'>
-								Sign up
-							</a>
-						</p>
-					</div>
-				</div>
-	)
+            <button
+              type="submit"
+              disabled={isLoading}
+              className={`w-full text-white font-semibold py-2 rounded-md transition ${
+                isLoading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600"
+              }`}
+            >
+              {isLoading ? "Logging in..." : "Log in"}
+            </button>
+
+
+            <Link href={'/registration'}>
+              <p className="text-[#3B82F6] text-center">Forgot password?</p>
+            </Link>
+          </form>
+
+
+          <div className="mt-6 border-t pt-4 text-center">
+            <p className="text-sm">
+              Don't have an account?{" "}
+              <Link href="/registration" className="text-blue-500 font-semibold">
+                Sign up
+              </Link>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
