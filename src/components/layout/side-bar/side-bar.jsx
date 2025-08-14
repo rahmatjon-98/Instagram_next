@@ -3,7 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import Profile from "@/assets/icon/layout/instagramDefaultProfile.jpg";
-import { Menu, MenuItem } from "@mui/material";
+import { Divider, Menu, MenuItem } from "@mui/material";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import {
@@ -52,9 +52,8 @@ export default function SideBar({ children }) {
     setAnchorEl(null);
   };
 
-  const isActive = (path) => (pathname === path ? "font-bold" : "font-normal")
-
-  let [openModal, setOpenModal] = useState(null)
+  const isActive = (path) => (pathname === path ? "font-bold" : "font-normal");
+  const { openModal, setOpenModal } = usegetUserStore()
 
   return (
     <div>
@@ -72,9 +71,12 @@ export default function SideBar({ children }) {
                 label={t("layout.home")}
                 isActive={isActive}
               />
-              <button onClick={() => (!openModal)}>
+              <button onClick={() => {
+                setOpenModal(!openModal)
+                setAnchorEl(null)
+              }}>
                 <NavLink
-                  href="/search"
+                  href="#"
                   icon={searchIcon}
                   activeIcon={searchIconActive}
                   label={t("layout.search")}
@@ -131,14 +133,6 @@ export default function SideBar({ children }) {
                 isActive={isActive}
               />
             </div>
-            <div>
-              {openModal && (
-                <div className="p-4 rounded-r-[16px] fixed shadow-xl h-screen w-[400px]">
-                  <h1 className="font-medium text-[28px]">Search</h1>
-                  <input type="text" placeholder="Seach" className="py-3 search mt-9 w-full rounded bg-[rgb(239,239,239)] px-4" />
-                </div>
-              )}
-            </div>
 
             <div className="flex items-center gap-4 w-[90%] m-auto rounded-md h-[52px] px-4 hover:bg-gray-100">
               {threads}
@@ -156,14 +150,45 @@ export default function SideBar({ children }) {
                 onClose={handleClose}
                 anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
                 transformOrigin={{ vertical: "top", horizontal: "center" }}
+                PaperProps={{
+                  elevation: 0,
+                  sx: {
+                    overflow: "visible",
+                    mt: 1.5,
+                    borderRadius: "12px",
+                    boxShadow: "0px 4px 16px rgba(0,0,0,0.15)",
+                    minWidth: 200,
+                    "& .MuiMenuItem-root": {
+                      fontSize: "14px",
+                      fontWeight: 500,
+                      padding: "10px 16px",
+                      color: "#262626",
+                      fontFamily: "'Segoe UI', Arial, sans-serif",
+                    },
+                    "& .MuiMenuItem-root:hover": {
+                      backgroundColor: "#fafafa",
+                    },
+                  },
+                }}
               >
-                {/* Your menu items */}
+                <MenuItem onClick={handleClose}> <div className="flex gap-[20px]"><Settings /> Settings</div></MenuItem>
+                <MenuItem onClick={handleClose}>Saved</MenuItem>
+                <MenuItem onClick={handleClose}>Switch account</MenuItem>
+                <Divider />
+                <MenuItem
+                  onClick={handleClose}
+                  sx={{ color: "#ed4956", fontWeight: 600 }}
+                >
+                  🚪 Log out
+                </MenuItem>
               </Menu>
             </div>
           </div>
         </div>
       </section>
-
+      {openModal && (
+        <Modal />
+      )}
       <div className="ml-[320px]">{children}</div>
     </div>
   );

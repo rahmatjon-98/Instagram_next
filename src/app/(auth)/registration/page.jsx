@@ -25,6 +25,7 @@ export default function Registration() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const addUser = useRegisterStore((state) => state.addUser);
+  const isLoading = useRegisterStore((state) => state.isLoading);
   const router = useRouter();
 
   const passwordValue = watch("password", "");
@@ -154,9 +155,11 @@ export default function Registration() {
 
             <button
               type="submit"
-              className="w-full bg-blue-500 text-white font-semibold py-2 rounded-md hover:bg-blue-600 transition"
+              disabled={isLoading}
+              className={`w-full text-white font-semibold py-2 rounded-md transition ${isLoading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600"
+                }`}
             >
-              Sign up
+              {isLoading ? "sign up..." : "Sign up"}
             </button>
           </form>
 
