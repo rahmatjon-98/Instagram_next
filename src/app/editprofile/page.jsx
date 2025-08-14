@@ -14,7 +14,7 @@ const Editprofile = () => {
 	useEffect(() => {
 		getProfileData()
 		console.log(user ? user : 'error')
-	}, [user])
+	}, [])
 
 	const [open, setOpen] = React.useState(false)
 	const handleOpen = () => setOpen(true)
