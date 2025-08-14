@@ -4,7 +4,7 @@ export default function Profile() {
 
 	return (
 		<>
-			<section>hello</section>
+			<section>Posts</section>
 		</>
 	)
 }
