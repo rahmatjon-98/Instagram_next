@@ -40,5 +40,30 @@ export const useRegisterStore = create((set) => ({
       set({ isLoading: false });
       return { success: false, error: error.response || error.message || error }; 
     }
-  }
+  },
+  
+  putLogin: async ({ oldPassword, newPassword, confirmPassword }) => {
+    try {
+      set({ isLoading: true });
+      const res = await axiosRequest.put(
+        `/Account/ChangePassword`,
+        {},
+        {
+          params: {
+            OldPassword: oldPassword,
+            Password: newPassword,
+            ConfirmPassword: confirmPassword
+          }
+        }
+      );
+      set({ isLoading: false });
+      console.log("Password changed successfully:", res.data);
+      return { success: true, data: res.data };
+    } catch (error) {
+      console.error("Password change failed:", error.response || error.message || error);
+      set({ isLoading: false });
+      return { success: false, error: error.response || error.message || error };
+    }
+  },
+
 }));
