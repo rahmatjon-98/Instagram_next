@@ -13,9 +13,11 @@ const Posts = () => {
 
     const getId = infoUsers?.data?.find(e => e.id === profileId).id
 
-    // const { getPostById, posts } = useProfileByIdStore(getId)
+    const { getPostById, posts } = useProfileByIdStore()
 
-    // console.log(posts)
+    console.log(posts)
+
+    
 
 
     useEffect(() => {
@@ -24,7 +26,7 @@ const Posts = () => {
         }
     }, [profileId, getProfileById])
 
-    useEffect(() => { getUsers() }, [])
+    useEffect(() => { getUsers(), getPostById(getId) }, [])
 
     return (
         <div>
