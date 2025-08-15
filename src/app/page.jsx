@@ -13,9 +13,11 @@ import image2 from '../assets/img/pages/home/image 69.svg'
 import userIMG from '../assets/img/pages/home/userDefault.png'
 import './globals.css'
 import { useRealsStore } from './reels/store'
+import Link from 'next/link'
+import StoryComponent from '@/components/pages/home/stories'
 
 export default function Main() {
-	const videoRefs = useRef({});
+	const videoRefs = useRef({})
 	let {
 		getUserStories,
 		data,
@@ -24,10 +26,11 @@ export default function Main() {
 		getUserPosts,
 		isLoading2,
 		likePost,
+		commentPost,
 	} = useHome()
-	let {} = useRealsStore()
 	const [mutedMap, setMutedMap] = useState({})
 	const [stopMap, setStopMap] = useState({})
+	const [commentsMap, setCommentsMap] = useState({})
 	useEffect(() => {
 		getUserPosts()
 	}, [])
@@ -39,6 +42,7 @@ export default function Main() {
 		getUserStories()
 	}, [])
 	let [stories, setStories] = useState(false)
+	let [idUser, setIdUser] = useState(null)
 	let [muted, setMuted] = useState(true)
 	let [comment, setComment] = useState('')
 	const onMouseDown = e => {
@@ -56,7 +60,7 @@ export default function Main() {
 		if (!isDown) return
 		e.preventDefault()
 		const x = e.pageX - scrollRef.current.offsetLeft
-		const walk = (x - startX) * 1.5 // скорость прокрутки
+		const walk = (x - startX) * 2
 		scrollRef.current.scrollLeft = scrollLeft - walk
 	}
 	return (
@@ -89,7 +93,12 @@ export default function Main() {
 							strokeWidth='3'
 						/>
 					</svg>
-					<Image src={image2} className='w-auto' alt='' />
+					<Link href={'/'}>
+						<Image src={image2} className='w-auto' alt='' />
+					</Link>
+					<div className='flex items-center '>
+						<StoryComponent idSoryUser={''} />
+					</div>
 				</section>
 			)}
 			<div className='px-[40px] pt-[40px] w-[100%] md:w-[70%]'>
@@ -102,7 +111,7 @@ export default function Main() {
 					className='pb-[20px] border-b border-b-[#E2E8F0] flex overflow-x-hidden overflow-y-hidden whitespace w-full select-none'
 				>
 					{(isLoading &&
-						Array.from({ length: 9 }).map((_, i) => (
+						Array.from({ length: 10 }).map((_, i) => (
 							<div
 								key={`skeleton-${i}`}
 								className='flex flex-col items-center px-[3px]'
@@ -110,7 +119,7 @@ export default function Main() {
 								<Skeleton
 									variant='circular'
 									width={66}
-									className='mx-[6px]'
+									className='mx-[3px] md:mx-[6px]'
 									height={66}
 								/>
 								<Skeleton variant='text' sx={{ fontSize: '12px' }} width={66} />
@@ -118,9 +127,13 @@ export default function Main() {
 						))) || (
 						<div className='flex gap-[14px]'>
 							{data?.map((e, i) => {
+								console.log(e);
 								return (
 									<div
-										onClick={() => setStories(!stories)}
+										onClick={() => {
+											setStories(!stories)
+											setIdUser(e.userId)
+										}}
 										key={e.id || `story-${i}`}
 										className='size-[80px] flex flex-col items-center'
 									>
@@ -143,7 +156,7 @@ export default function Main() {
 											)) || (
 												<Image
 													draggable={false}
-													className='object-cover bg-white rounded-full p-[2.5px]'
+													className='w-[34px] h-[34px]  object-cover bg-white rounded-full p-[2.5px]'
 													src={`http://37.27.29.18:8003/images/${e.userImage}`}
 													alt=''
 													width={66}
@@ -223,10 +236,10 @@ export default function Main() {
 						))) || (
 						<>
 							{posts?.data?.map((e, i) => {
+								console.log(e)
 								const muted = mutedMap[e.postId] ?? true
 								const stop = stopMap[e.postId] ?? true
-								console.log(e)
-
+								const comments = commentsMap[e.postId] ?? true
 								const toggleMuted = () => {
 									setMutedMap(prev => ({
 										...prev,
@@ -249,6 +262,12 @@ export default function Main() {
 											[postId]: !prev[postId],
 										}
 									})
+								}
+								const toggleComments = () => {
+									setCommentsMap(prev => ({
+										...prev,
+										[e.postId]: !comments,
+									}))
 								}
 								return (
 									<div className='flex py-[10px] flex-col' key={e.postId || i}>
@@ -273,7 +292,7 @@ export default function Main() {
 													)) || (
 														<Image
 															draggable={false}
-															className='size-[37px] rounded-full bg-white p-[2px] object-cover'
+															className='w-[34px] h-[34px]  size-[37px] rounded-full bg-white p-[2px] object-cover'
 															src={`http://37.27.29.18:8003/images/${e.userImage}`}
 															alt=''
 															width={37}
@@ -311,7 +330,9 @@ export default function Main() {
 										{e.images[0].endsWith('.mp4') ? (
 											<div className='flex bg-black rounded-2xl justify-end items-baseline-last'>
 												<svg
-													className={`my-[18%] mx-[22%] ${stopMap[e.postId] ? 'hidden' : "inline"} duration-1000 absolute`}
+													className={`md:my-[18%] my-[70%] mx-[28%] md:mx-[22%] ${
+														stopMap[e.postId] ? 'hidden' : 'inline'
+													} duration-1000 absolute`}
 													xmlns='http://www.w3.org/2000/svg'
 													width='76'
 													height='76'
@@ -407,7 +428,7 @@ export default function Main() {
 																	width={900}
 																	height={200}
 																	style={{ width: '100%', height: 'auto' }}
-																	className='rounded-2xl'
+																	className='rounded-2xl w-[34px] h-[34px]'
 																	draggable={false}
 																	alt='omg sory'
 																/>
@@ -427,7 +448,7 @@ export default function Main() {
 															'--swiper-pagination-color': '#ffffff',
 														}}
 														modules={[Pagination, Keyboard]}
-														className='w-full h-[300px] rounded-xl overflow-hidden'
+														className='w-full h-[70vh] rounded-xl overflow-hidden'
 													>
 														{e.images.map((e, i) => (
 															<SwiperSlide key={i}>
@@ -436,7 +457,6 @@ export default function Main() {
 																		src={`http://37.27.29.18:8003/images/${e}`}
 																		alt={`Slide ${i + 1}`}
 																		fill
-																		style={{ objectFit: 'cover' }}
 																		priority={i === 0}
 																	/>
 																</div>
@@ -536,7 +556,7 @@ export default function Main() {
 												)) || (
 													<Image
 														draggable={false}
-														className='size-[24px] rounded-full bg-white p-[2px] object-cover'
+														className='w-[34px] h-[34px]  size-[24px] rounded-full bg-white p-[2px] object-cover'
 														src={`http://37.27.29.18:8003/images/${e.userImage}`}
 														alt=''
 														width={24}
@@ -571,13 +591,73 @@ export default function Main() {
 												</div>
 											)}
 											{e.commentCount != 0 && (
-												<p className='text-[#94A3B8] text-[14px] hover:underline font-[400]'>
-													View all {e.commentCount} comments
+												<p
+													onClick={toggleComments}
+													className='text-[#94A3B8] text-[14px] hover:underline font-[400]'
+												>
+													{comments ? 'Vie' : 'Close'} all {e.commentCount}{' '}
+													comments
 												</p>
 											)}
+											{!comments && (
+												<div className='flex flex-col overflow-y-auto h-[150px] gap-[4px]'>
+													{e.comments.map((com, index) => {
+														return (
+															<div
+																key={com.id || index}
+																className='flex flex-col gap-[10px] w-full'
+															>
+																<div className='flex items-center gap-[7px]'>
+																	{(e.userImage == '' && (
+																		<Image
+																			draggable={false}
+																			className='object-cover bg-white rounded-full p-[2.5px]'
+																			src={userIMG}
+																			alt=''
+																			width={34}
+																			height={34}
+																		/>
+																	)) || (
+																		<Image
+																			draggable={false}
+																			className='w-[34px] h-[34px]  object-cover bg-white rounded-full p-[2.5px]'
+																			src={`http://37.27.29.18:8003/images/${com.userImage}`}
+																			alt=''
+																			width={34}
+																			height={34}
+																		/>
+																	)}
+																	<p className='text-[#1E293B] text-[14px] font-[600]'>
+																		{com.userName}
+																	</p>
+																</div>
+																<p className='ml-[10px] text-[#1E293B] text-[14px] font-[400]'>
+																	{com.comment}
+																</p>
+															</div>
+														)
+													})}
+												</div>
+											)}
 											<div className='flex w-[100%] items-center justify-between'>
-												<input type='text' value={comment} onChange={(e) => setComment(e.target.value)} className='w-[90%] outline-none text-black text-[15px] placeholder:text-[16px]' placeholder='Add a comment...' />
-												<p className='hover:underline text-[16px] text-[#64748B]'>
+												<input
+													type='text'
+													value={comment}
+													onChange={e => setComment(e.target.value)}
+													className='w-[90%] outline-none text-black text-[15px] placeholder:text-[16px]'
+													placeholder='Add a comment...'
+												/>
+												<p
+													onClick={async () => {
+														await commentPost({
+															comment: comment,
+															postId: e.postId,
+														})
+														setComment('')
+														toggleComments()
+													}}
+													className='hover:underline text-[16px] text-[#64748B]'
+												>
 													public
 												</p>
 											</div>

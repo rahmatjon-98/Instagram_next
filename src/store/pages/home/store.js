@@ -33,8 +33,6 @@ export const useHome = create((set, get) => ({
 	},
 	likePost: async postId => {
 		const prevPosts = get().posts
-
-    // Оптимистичное обновление
     set(state => ({
       posts: {
         ...state.posts,
@@ -53,6 +51,15 @@ export const useHome = create((set, get) => ({
     }))
     try {
       await axiosRequest.post(`/Post/like-post?postId=${postId}`, {})
+    } catch (error) {
+      console.error('Error in Like', error)
+      set({ posts: prevPosts })
+    }
+	},
+	commentPost: async (comment) => {
+		const prevPosts = get().posts
+    try {
+      await axiosRequest.post(`/Post/add-comment`, comment)
     } catch (error) {
       console.error('Error in Like', error)
       set({ posts: prevPosts })
