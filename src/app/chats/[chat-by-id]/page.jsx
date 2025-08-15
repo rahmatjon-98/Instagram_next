@@ -4,7 +4,7 @@ import img from "@/assets/img/pages/chat/pages/default-chat/userFoto.jpg";
 import { useUserId } from "@/hook/useUserId";
 import { useChatById } from "@/store/pages/chat/pages/chat-by-id/store";
 import { useDefaultChat } from "@/store/pages/chat/pages/default-chat/store";
-import { Box, Button, Drawer } from "@mui/material";
+import { Box, Button, Drawer, Skeleton, Stack } from "@mui/material";
 import {
   EllipsisVertical,
   Loader2,
@@ -35,8 +35,16 @@ export default function ChatById() {
   const { "chat-by-id": id } = useParams();
   const userId = useUserId();
 
-  let { messages, deleteChat, getChatById, sendMessage, deleteMessage } =
-    useChatById();
+  const {
+    messages,
+    deleteChat,
+    getChatById,
+    sendMessage,
+    deleteMessage,
+    loadingDelChat,
+  } = useChatById();
+
+  const { get, loadingChat } = useDefaultChat();
 
   const [profilId, setprofilId] = useState(null);
 
@@ -97,9 +105,14 @@ export default function ChatById() {
   let router = useRouter();
 
   async function handleDelChat(chatId) {
-    await deleteChat(chatId);
-    router.push("/chats");
-    setdelMesModal(null);
+    try {
+      router.push("/chats");
+      await deleteChat(chatId);
+      await get();
+      setdelMesModal(null);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   const isVideoFileName = (name) =>
@@ -179,35 +192,106 @@ export default function ChatById() {
   let [openEmoji, setOpenEmoji] = useState(false);
 
   let userData = JSON.parse(localStorage.getItem("userData")) || {};
-  console.log(userData);
+
+  const SkeletonRow = () => (
+    <Stack
+      direction="row"
+      spacing={2}
+      alignItems="center"
+      className="p-3 w-[50%]"
+    >
+      <Skeleton variant="circular" width={44} height={44} />
+      <Stack spacing={0.5} flex={1}>
+        <Skeleton variant="text" width="60%" height={14} />
+        <Skeleton variant="text" width="40%" height={12} />
+      </Stack>
+    </Stack>
+  );
+
+  const SkeletonChat = () => (
+    <div>
+      <Stack direction="row" spacing={2} alignItems="center" className="p-3">
+        <Stack spacing={0.5} flex={1}>
+          <Skeleton variant="text" width="60%" height={14} />
+          <Skeleton variant="text" width="50%" height={14} />
+        </Stack>
+      </Stack>
+      <Stack direction="row" spacing={2} alignItems="center" className="p-3 ">
+        <Stack spacing={0.5} flex={1} className="flex flex-col items-end">
+          <Skeleton variant="text" width="60%" height={14} />
+          <Skeleton variant="text" width="50%" height={14} />
+        </Stack>
+      </Stack>
+      <Stack direction="row" spacing={2} alignItems="center" className="p-3">
+        <Stack spacing={0.5} flex={1}>
+          <Skeleton variant="text" width="60%" height={14} />
+          <Skeleton variant="text" width="50%" height={14} />
+        </Stack>
+      </Stack>
+      <Stack direction="row" spacing={2} alignItems="center" className="p-3 ">
+        <Stack spacing={0.5} flex={1} className="flex flex-col items-end">
+          <Skeleton variant="text" width="60%" height={14} />
+          <Skeleton variant="text" width="50%" height={14} />
+        </Stack>
+      </Stack>
+      <Stack direction="row" spacing={2} alignItems="center" className="p-3">
+        <Stack spacing={0.5} flex={1}>
+          <Skeleton variant="text" width="60%" height={14} />
+          <Skeleton variant="text" width="50%" height={14} />
+        </Stack>
+      </Stack>
+      <Stack direction="row" spacing={2} alignItems="center" className="p-3 ">
+        <Stack spacing={0.5} flex={1} className="flex flex-col items-end">
+          <Skeleton variant="text" width="60%" height={14} />
+          <Skeleton variant="text" width="50%" height={14} />
+        </Stack>
+      </Stack>
+      <Stack direction="row" spacing={2} alignItems="center" className="p-3">
+        <Stack spacing={0.5} flex={1}>
+          <Skeleton variant="text" width="60%" height={14} />
+          <Skeleton variant="text" width="50%" height={14} />
+        </Stack>
+      </Stack>
+      <Stack direction="row" spacing={2} alignItems="center" className="p-3 ">
+        <Stack spacing={0.5} flex={1} className="flex flex-col items-end">
+          <Skeleton variant="text" width="60%" height={14} />
+          <Skeleton variant="text" width="50%" height={14} />
+        </Stack>
+      </Stack>
+    </div>
+  );
 
   return (
-    <div>
-      <div className="fixed shadow w-[75%] z-50 bg-white p-2 flex justify-between">
-        <div className="flex items-center gap-2">
-          {!userData.receiveUserImage ? (
-            <Image
-              src={img}
-              width={500}
-              height={500}
-              alt="avatar"
-              className="w-12 h-12 rounded-full"
-            />
-          ) : (
-            <Image
-              src={`http://37.27.29.18:8003/images/${userData.receiveUserImage}`}
-              width={500}
-              height={500}
-              alt="avatar"
-              className="w-12 h-12 rounded-full"
-            />
-          )}
+    <div className="w-full">
+      <div className="fixed shadow w-[80%] z-10 bg-white p-2 flex justify-between">
+        {loadingChat ? (
+          <SkeletonRow />
+        ) : (
+          <div className="flex items-center gap-2">
+            {!userData.receiveUserImage ? (
+              <Image
+                src={img}
+                width={500}
+                height={500}
+                alt="avatar"
+                className="w-12 h-12 rounded-full"
+              />
+            ) : (
+              <Image
+                src={`http://37.27.29.18:8003/images/${userData.receiveUserImage}`}
+                width={500}
+                height={500}
+                alt="avatar"
+                className="w-12 h-12 rounded-full"
+              />
+            )}
 
-          <div>
-            <p>{userData.receiveUserName}</p>
-            <p>{}</p>
+            <div>
+              <p>{userData.receiveUserName}</p>
+              <p>{}</p>
+            </div>
           </div>
-        </div>
+        )}
         <Button onClick={toggleDrawer(true)}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -238,7 +322,7 @@ export default function ChatById() {
             <button
               type="button"
               onClick={() => handleDelChat(id)}
-              className="text-red-500 bg-red-100 p-2 rounded flex items-center gap-2"
+              className="text-red-500  p-2 rounded flex items-center justify-between gap-2 w-full"
             >
               Remove Chat <Trash size={18} />
             </button>
@@ -246,8 +330,11 @@ export default function ChatById() {
         </Box>
       </Drawer>
 
-      <div className="w-[1020px] mx-auto p-4 h-[85vh] overflow-y-auto flex flex-col-reverse gap-2">
-        {messages &&
+      <div className="w-full mx-auto p-4 h-[85vh] overflow-y-auto flex flex-col-reverse gap-2">
+        { loadingDelChat ? (
+          <SkeletonChat />
+        ) : (
+          messages &&
           messages.map((e) => {
             const isCurrentUser = e.userId === userId;
             return (
@@ -282,7 +369,7 @@ export default function ChatById() {
                     </div>
                   ) : e.file ? (
                     <div
-                      className={`w-[60%] ${
+                      className={`w-[70%] ${
                         isCurrentUser ? " self-end" : " self-start "
                       }`}
                     >
@@ -302,7 +389,7 @@ export default function ChatById() {
                   ) : null}
 
                   <div
-                    className={`rounded-lg ${
+                    className={`rounded-lg  ${
                       isCurrentUser
                         ? "bg-blue-500 text-white self-end rounded-tr-none p-1.5 px-3"
                         : "bg-gray-100 text-[#475569] self-start rounded-tl-none p-1.5 px-3"
@@ -322,23 +409,18 @@ export default function ChatById() {
                   </div>
                 </div>
 
-                <div className="relative ">
-                  <button
-                    type="button"
-                    onClick={() => toggleDelModal(e.messageId)}
-                    className="hidden group-hover:block"
+                <button
+                  type="button"
+                  onClick={() => toggleDelModal(e.messageId)}
+                  className="hidden group-hover:block"
+                >
+                  <EllipsisVertical />
+                </button>
+                {delMesModal === e.messageId && (
+                  <div
+                    className={`flex items-center justify-center fixed inset-0 mt-5  z-5  bg-[rgba(0,0,0,0.5)`}
                   >
-                    <EllipsisVertical />
-                  </button>
-
-                  {delMesModal === e.messageId && (
-                    <div
-                      className={`shadow rounded absolute mt-5 bg-white z-5 w-[200px] flex flex-col justify-center items-center gap-2 ${
-                        isCurrentUser
-                          ? " -ml-50"
-                          : ""
-                      }`}
-                    >
+                    <div className="flex flex-col justify-center items-center gap-2 shadow rounded bg-white w-[350px]">
                       <button
                         type="button"
                         onClick={() => handleDelMessage(e.messageId)}
@@ -361,11 +443,12 @@ export default function ChatById() {
                         Cancel
                       </button>
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             );
-          })}
+          })
+        )}
       </div>
 
       <div className="border-2 min-h-12 max-h-12 m-4 p-2 rounded-xl border-[#E2E8F0] flex justify-between gap-1 items-center">
@@ -450,7 +533,7 @@ export default function ChatById() {
         {openImg && (
           <div
             style={{ backdropFilter: "blur(6px)" }}
-            className="fixed inset-0 flex items-center justify-center bg-[rgba(0,0,0,0.3)]"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.3)]"
           >
             <div className="w-[400px] bg-white rounded-xl shadow p-5">
               {openIsVideo ? (
