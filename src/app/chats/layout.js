@@ -34,7 +34,6 @@ export default function Layout({ children }) {
 
   function setLocale(user) {
     localStorage.setItem("userData", JSON.stringify(user));
-    // console.log(user);
   }
 
   const { users, getUsers, getSearchHistories } = usegetUserStore();
