@@ -1,17 +1,10 @@
 'use client'
 import { useProfileStore } from '@/store/pages/profile/profile/store'
-import React, { useEffect, useState } from 'react'
-import defaultUser from '../../assets/img/pages/profile/profile/instauser (2).jpg'
-import Image from 'next/image'
 import Box from '@mui/material/Box'
 import Modal from '@mui/material/Modal'
-
-import InputLabel from '@mui/material/InputLabel'
-import MenuItem from '@mui/material/MenuItem'
-import FormControl from '@mui/material/FormControl'
-import Select from '@mui/material/Select'
-
-import TextField from '@mui/material/TextField'
+import Image from 'next/image'
+import React, { useEffect, useState } from 'react'
+import defaultUser from '../../assets/img/pages/profile/profile/instauser (2).jpg'
 
 const Editprofile = () => {
 	let { user, getProfileData, deleteProfilePhoto, updateProfilePhoto } =
@@ -77,12 +70,18 @@ const Editprofile = () => {
 		setPhoto(e.target.files[0])
 	}
 
+	let [about, setAbout] = useState('')
+	let [gender, setGender] = useState(0)
+
 	async function handleEditProfile(e) {
 		e.preventDefault()
-		let formData = new FormData()
-		formData.append('about', about)
-		formData.append('gender', gender)
+		let formData = {
+			about: about,
+			gender: 1,
+		}
 		console.log(formData)
+
+		await updateProfilePhoto(formData)
 	}
 
 	return (
@@ -192,16 +191,12 @@ const Editprofile = () => {
 						</Box>
 					</Modal>
 				</div>
-				<form
-					action=''
-					className='flex flex-col gap-[3vh]  '
-					onSubmit={handleEditProfile}
-				>
+				<div action='' className='flex flex-col gap-[3vh]  '>
 					<div className='flex flex-col gap-[2vh] w-[100%]'>
 						<label htmlFor='' className='text-[#64748B] text-[20px]'>
 							About
 						</label>
-						<TextField
+						{/* <TextField
 							sx={{
 								'& .MuiOutlinedInput-root': {
 									'& fieldset': {
@@ -214,8 +209,20 @@ const Editprofile = () => {
 							}}
 							id='outlined-basic'
 							label='Outlined'
-							variant='outlined'
 							name='about'
+						/> */}
+						<input
+							type='text'
+							style={{
+								border: '1px solid #E2E8F0',
+								borderRadius: '20px',
+								height: '60px',
+								color: '#64748B',
+								padding: '10px',
+							}}
+							placeholder='Bio'
+							value={about}
+							onChange={e => setAbout(e.target.value)}
 						/>
 					</div>
 					<div className='flex flex-col gap-[2vh]'>
@@ -244,16 +251,17 @@ const Editprofile = () => {
 							</Select>
 						</FormControl> */}
 						<select
-							name='gender'
 							id=''
 							label='Gender'
 							style={{
 								border: '1px solid #E2E8F0',
 								borderRadius: '20px',
-								height: '60px',
+								height: '55px',
 								color: '#64748B',
 								padding: '10px',
 							}}
+							value={gender}
+							onChange={e => setGender(e.target.value)}
 						>
 							{/* <option value="" >Gender</option> */}
 							<option value='1'>Male</option>
@@ -263,10 +271,13 @@ const Editprofile = () => {
 							This won’t be part of your public profile.
 						</span>
 					</div>
-					<button className='bg-[#64748B] hover:bg-[#214b8e] text-[#FFFFFF] self-baseline px-[7%] py-[15px] rounded-2xl text-[20px] cursor-pointer'>
+					<button
+						className='bg-[#64748B] hover:bg-[#214b8e] text-[#FFFFFF] self-baseline px-[7%] py-[15px] rounded-2xl text-[20px] cursor-pointer'
+						onClick={handleEditProfile}
+					>
 						Submit
 					</button>
-				</form>
+				</div>
 			</section>
 		</div>
 	)
