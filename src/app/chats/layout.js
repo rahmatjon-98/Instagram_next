@@ -28,7 +28,6 @@ export default function Layout({ children }) {
 
   function setLocale(user) {
     localStorage.setItem("userData", JSON.stringify(user));
-    // console.log(user);
   }
 
   const { users, getUsers, getSearchHistories } = usegetUserStore();
@@ -244,11 +243,10 @@ export default function Layout({ children }) {
                   ) ? (
                     <Image
                       alt=""
-                      src={`http://37.27.29.18:8003/images/${
-                        e.receiveUserId === userId
-                          ? e.sendUserImage
-                          : e.receiveUserImage
-                      }`}
+                      src={`http://37.27.29.18:8003/images/${e.receiveUserId === userId
+                        ? e.sendUserImage
+                        : e.receiveUserImage
+                        }`}
                       width={40}
                       height={40}
                       className="w-10 h-10 rounded-full object-cover object-center"
