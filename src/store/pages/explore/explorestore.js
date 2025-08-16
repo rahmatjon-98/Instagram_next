@@ -2,12 +2,6 @@ import { useUserId } from "@/hook/useUserId";
 import axiosRequest from "@/lib/axiosRequest";
 import { create } from "zustand";
 
-// import axios from "axios";
-// let api = "http://37.27.29.18:8003";
-// headers: {
-//   Authorization: `Bearer ${token}`,
-// },
-// const token = localStorage.getItem("accessToken")
 
 export const useUserStore = create((set, get) => ({
   user: [],

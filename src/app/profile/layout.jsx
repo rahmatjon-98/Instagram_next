@@ -50,12 +50,12 @@ const Layout = ({ children }) => {
 						</h1>
 						<div className='flex items-center gap-[10px]'>
 							<button
-								className='text-[#334155] bg-[#F3F4F6] text-[12px] md:text-[16px] px-[10px] md:px-[20px] py-[5px] md:py-[10px] rounded-xl md:rounded-2xl'
+								className='text-[#334155] bg-[#F3F4F6] text-[10px] md:text-[16px] px-[10px] md:px-[20px] py-[5px] md:py-[10px] rounded-xl md:rounded-2xl'
 								onClick={() => router.push('/editprofile')}
 							>
 								Edit profile
 							</button>
-							<button className='text-[#334155] bg-[#F3F4F6] text-[12px] md:text-[16px] px-[10px] md:px-[20px] py-[5px] md:py-[10px] rounded-xl md:rounded-2xl'>
+							<button className='text-[#334155] bg-[#F3F4F6] text-[10px] md:text-[16px] px-[10px] md:px-[20px] py-[5px] md:py-[10px] rounded-xl md:rounded-2xl'>
 								View archive
 							</button>
 							<button>
