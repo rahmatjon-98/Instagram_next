@@ -20,10 +20,33 @@ export const useUserStore = create((set, get) => ({
       console.error(error);
     }
   },
+  getUsers: async (id) => {
+    try {
+      const res = await axiosRequest.get(
+        `/FollowingRelationShip/get-subscribers?UserId=${id}`
+      );
+      set({ user: Array.isArray(res.data) ? res.data : [] });
+    } catch (err) {
+      console.error(err);
+      set({ user: [] });
+    }
+  },
+
   getPostById: async (id) => {
     try {
       let { data } = await axiosRequest.get(`Post/get-post-by-id?id=${id}`);
-      set({ postById: data });
+
+      set((state) => ({
+        postById: {
+          ...data,
+          data: {
+            ...data.data,
+            isFollowing:
+              // если в сторе уже есть true — не затираем false с бэка
+              state.postById?.data?.isFollowing ?? data.data.isFollowing,
+          },
+        },
+      }));
     } catch (error) {
       console.error(error);
     }
@@ -50,7 +73,6 @@ export const useUserStore = create((set, get) => ({
           },
         });
       }
-      
     } catch (error) {
       console.error("Error deleting comment:", error);
     }
@@ -89,15 +111,128 @@ export const useUserStore = create((set, get) => ({
     }
   },
 
-  // Follow:async(FollowId)=>{
-  //   try {
-  //     await axiosRequest.post(`/FollowingRelationShip/add-following-relation-ship?followingUserId=${FollowId}`)
-  //     set(state=>({
-  //       user:state.user.map(el=>el.userId==FollowId?{...el,}:null)
-  //     }))
-  //   } catch (error) {
-  //     console.error(error);
-      
-  //   }
-  // }
+  
+  Follow: async (FollowId) => {
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) throw new Error("Токен не найден");
+
+      const currentPost = get().postById;
+      if (!currentPost?.data) return;
+
+      // Оптимистичное обновление
+      set({
+        postById: {
+          ...currentPost,
+          data: {
+            ...currentPost.data,
+            isFollowing: true,
+            subscribersCount: (currentPost.data.subscribersCount || 0) + 1,
+          },
+        },
+      });
+
+      await fetch(
+        `http://37.27.29.18:8003/FollowingRelationShip/add-following-relation-ship?followingUserId=${FollowId}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            accept: "*/*",
+          },
+        }
+      );
+
+      // Не обновляем весь пост, чтобы избежать сброса состояния
+      // Можно обновить только счетчик, если нужно
+    } catch (err) {
+      console.error("Follow error", err);
+      // Откатываем изменения при ошибке
+      set({ postById: get().postById });
+    }
+  },
+
+  unfollowUser: async (UnfollowId) => {
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) throw new Error("Токен не найден");
+
+      const currentPost = get().postById;
+      if (!currentPost?.data) return;
+
+      // Оптимистичное обновление
+      set({
+        postById: {
+          ...currentPost,
+          data: {
+            ...currentPost.data,
+            isFollowing: false,
+            subscribersCount: Math.max(
+              (currentPost.data.subscribersCount || 0) - 1,
+              0
+            ),
+          },
+        },
+      });
+
+      await fetch(
+        `http://37.27.29.18:8003/FollowingRelationShip/delete-following-relation-ship?followingUserId=${UnfollowId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            accept: "*/*",
+          },
+        }
+      );
+
+      // Не обновляем весь пост
+    } catch (err) {
+      console.error("Unfollow error", err);
+      // Откатываем изменения при ошибке
+      set({ postById: get().postById });
+    }
+  },
+
+  likePost: async (postId) => {
+    const prevPosts = get().user;
+    const prevPostById = get().postById;
+
+    set((state) => ({
+      user: {
+        ...state.user,
+        data: state.user.data.map((post) =>
+          post.postId === postId
+            ? {
+                ...post,
+                postLike: !post.postLike,
+                postLikeCount: post.postLike
+                  ? post.postLikeCount - 1
+                  : post.postLikeCount + 1,
+              }
+            : post
+        ),
+      },
+      postById:
+        prevPostById?.data?.postId === postId
+          ? {
+              ...prevPostById,
+              data: {
+                ...prevPostById.data,
+                postLike: !prevPostById.data.postLike,
+                postLikeCount: prevPostById.data.postLike
+                  ? prevPostById.data.postLikeCount - 1
+                  : prevPostById.data.postLikeCount + 1,
+              },
+            }
+          : prevPostById,
+    }));
+
+    try {
+      await axiosRequest.post(`/Post/like-post?postId=${postId}`, {});
+    } catch (error) {
+      console.error("Error in Like", error);
+      set({ user: prevPosts, postById: prevPostById });
+    }
+  },
 }));
