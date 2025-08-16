@@ -5,14 +5,30 @@ import Modal from '@mui/material/Modal'
 import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
 import defaultUser from '../../assets/img/pages/profile/profile/instauser (2).jpg'
+import { useRouter } from 'next/navigation'
 
 const Editprofile = () => {
-	let { user, getProfileData, deleteProfilePhoto, updateProfilePhoto } =
-		useProfileStore()
+	let {
+		user,
+		getProfileData,
+		deleteProfilePhoto,
+		updateProfilePhoto,
+		updateProfileData,
+	} = useProfileStore()
+
+	let router = useRouter()
+
+	let [aboutInp, setAboutInp] = useState('')
+	let [genderInp, setGenderInp] = useState('0')
 
 	useEffect(() => {
-		getProfileData()
-		console.log(user ? user : 'error')
+		getProfileData().then(() => {
+			if (user) {
+				setAboutInp(user.about || '')
+				setGenderInp(user.gender == 'Male' ? '1' : '0' || '0')
+			}
+		})
+		console.log(user)
 	}, [])
 
 	const [open, setOpen] = React.useState(false)
@@ -70,18 +86,20 @@ const Editprofile = () => {
 		setPhoto(e.target.files[0])
 	}
 
-	let [about, setAbout] = useState('')
-	let [gender, setGender] = useState(0)
-
 	async function handleEditProfile(e) {
 		e.preventDefault()
-		let formData = {
-			about: about,
-			gender: 1,
+		if (aboutInp === '') {
+			alert('Please fill out the inputs ')
+		} else {
+			let updateProfile = {
+				about: aboutInp,
+				gender: Number(genderInp),
+			}
+			console.log(updateProfile)
+			await updateProfileData(updateProfile)
+			router.push('/profile')
+			alert('Profile successfuly updated!')
 		}
-		console.log(formData)
-
-		await updateProfilePhoto(formData)
 	}
 
 	return (
@@ -191,26 +209,11 @@ const Editprofile = () => {
 						</Box>
 					</Modal>
 				</div>
-				<div action='' className='flex flex-col gap-[3vh]  '>
+				<div className='flex flex-col gap-[3vh]  '>
 					<div className='flex flex-col gap-[2vh] w-[100%]'>
 						<label htmlFor='' className='text-[#64748B] text-[20px]'>
-							About
+							About :
 						</label>
-						{/* <TextField
-							sx={{
-								'& .MuiOutlinedInput-root': {
-									'& fieldset': {
-										border: '1px solid #E2E8F0',
-										borderRadius: '20px',
-										height: '60px',
-										color: '#64748B',
-									},
-								},
-							}}
-							id='outlined-basic'
-							label='Outlined'
-							name='about'
-						/> */}
 						<input
 							type='text'
 							style={{
@@ -221,35 +224,14 @@ const Editprofile = () => {
 								padding: '10px',
 							}}
 							placeholder='Bio'
-							value={about}
-							onChange={e => setAbout(e.target.value)}
+							value={aboutInp}
+							onChange={e => setAboutInp(e.target.value)}
 						/>
 					</div>
 					<div className='flex flex-col gap-[2vh]'>
-						{/* <FormControl
-							fullWidth
-							sx={{
-								'& .MuiOutlinedInput-root': {
-									'& fieldset': {
-										border: '1px solid #E2E8F0',
-										borderRadius: '20px',
-										height: '60px',
-										color: '#64748B',
-									},
-								},
-							}}
-						>
-							 <InputLabel id='demo-simple-select-label'>Gender</InputLabel> 
-							<Select
-								labelId='demo-simple-select-label'
-								id='demo-simple-select'
-								label='Gender'
-								name='gender'
-							>
-								<MenuItem value={0}>Female</MenuItem>
-								<MenuItem value={1}>Male</MenuItem>
-							</Select>
-						</FormControl> */}
+						<label htmlFor='' className='text-[#64748B] text-[20px]'>
+							Gender :
+						</label>
 						<select
 							id=''
 							label='Gender'
@@ -260,12 +242,11 @@ const Editprofile = () => {
 								color: '#64748B',
 								padding: '10px',
 							}}
-							value={gender}
-							onChange={e => setGender(e.target.value)}
+							value={genderInp}
+							onChange={e => setGenderInp(e.target.value)}
 						>
-							{/* <option value="" >Gender</option> */}
-							<option value='1'>Male</option>
 							<option value='0'>Female</option>
+							<option value='1'>Male</option>
 						</select>
 						<span className='text-[#64748B]'>
 							This won’t be part of your public profile.
