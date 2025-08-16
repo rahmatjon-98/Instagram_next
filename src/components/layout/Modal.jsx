@@ -1,4 +1,4 @@
-    'use client'
+'use client'
 import React, { useEffect, useState } from 'react'
 import { Search, User, XCircle, X, Loader2 } from 'lucide-react'
 import { usegetUserStore } from '@/store/pages/search/store'
