@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from 'react'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
-import { Keyboard, Pagination } from 'swiper/modules'
+import { EffectCube, Keyboard, Pagination } from 'swiper/modules'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import image2 from '../assets/img/pages/home/image 69.svg'
 import userIMG from '../assets/img/pages/home/userDefault.png'
@@ -96,8 +96,46 @@ export default function Main() {
 					<Link href={'/'}>
 						<Image src={image2} className='w-auto' alt='' />
 					</Link>
-					<div className='flex items-center '>
-						<StoryComponent idSoryUser={''} />
+					<div className='flex items-center justify-center'>
+						<Swiper
+							effect={'cube'}
+							grabCursor={true}
+							cubeEffect={{
+								shadow: false,
+							}}
+							pagination={true}
+							style={{
+								width:"380px",
+								height:'100%'
+							}}
+							modules={[EffectCube, Pagination]}
+							className='YoqubSwiper'
+						>
+							<SwiperSlide style={{
+								width:"380px",
+								height:'100%'
+							}}>
+								<StoryComponent idStoryUser={idUser} />
+							</SwiperSlide>
+							<SwiperSlide style={{
+								width:"380px",
+								height:'100%'
+							}}>
+								<StoryComponent idStoryUser={idUser} />
+							</SwiperSlide>
+							<SwiperSlide style={{
+								width:"380px",
+								height:'100%'
+							}}>
+								<StoryComponent idStoryUser={idUser} />
+							</SwiperSlide>
+							<SwiperSlide style={{
+								width:"380px",
+								height:'100%'
+							}}>
+								<StoryComponent idStoryUser={idUser} />
+							</SwiperSlide>
+						</Swiper>
 					</div>
 				</section>
 			)}
@@ -127,7 +165,6 @@ export default function Main() {
 						))) || (
 						<div className='flex gap-[14px]'>
 							{data?.map((e, i) => {
-								console.log(e);
 								return (
 									<div
 										onClick={() => {
@@ -156,7 +193,7 @@ export default function Main() {
 											)) || (
 												<Image
 													draggable={false}
-													className='w-[34px] h-[34px]  object-cover bg-white rounded-full p-[2.5px]'
+													className='w-[64px] h-[64px] object-cover bg-white rounded-full p-[2.5px]'
 													src={`http://37.27.29.18:8003/images/${e.userImage}`}
 													alt=''
 													width={66}
@@ -236,7 +273,6 @@ export default function Main() {
 						))) || (
 						<>
 							{posts?.data?.map((e, i) => {
-								console.log(e)
 								const muted = mutedMap[e.postId] ?? true
 								const stop = stopMap[e.postId] ?? true
 								const comments = commentsMap[e.postId] ?? true
@@ -428,7 +464,7 @@ export default function Main() {
 																	width={900}
 																	height={200}
 																	style={{ width: '100%', height: 'auto' }}
-																	className='rounded-2xl w-[34px] h-[34px]'
+																	className='max-h-[90vh] rounded-2xl w-[34px] max-w- h-[34px]'
 																	draggable={false}
 																	alt='omg sory'
 																/>
