@@ -3,7 +3,11 @@ import axiosRequest from "@/lib/axiosRequest";
 
 export const useChatById = create((set) => ({
   messages: [],
+  loadingChatById: false,
+  loadingDelChat: false,
+
   getChatById: async (id) => {
+    set({ loadingChatById: true });
     try {
       const { data } = await axiosRequest.get(
         `/Chat/get-chat-by-id?chatId=${id}`
@@ -11,6 +15,8 @@ export const useChatById = create((set) => ({
       set({ messages: data.data });
     } catch (error) {
       console.error(error);
+    } finally {
+      set({ loadingChatById: false });
     }
   },
 
@@ -23,6 +29,13 @@ export const useChatById = create((set) => ({
   },
 
   deleteChat: async (id) => {
-    await axiosRequest.delete(`/Chat/delete-chat?chatId=${id}`);
+    set({ loadingDelChat: true });
+    try {
+      await axiosRequest.delete(`/Chat/delete-chat?chatId=${id}`);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      set({ loadingDelChat: false });
+    }
   },
 }));

@@ -1,24 +1,28 @@
 'use client'
 import { useProfileStore } from '@/store/pages/profile/profile/store'
-import React, { useEffect } from 'react'
-import defaultUser from '../../assets/img/pages/profile/profile/instauser (2).jpg'
-import Image from 'next/image'
 import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
-import Typography from '@mui/material/Typography'
 import Modal from '@mui/material/Modal'
+import Image from 'next/image'
+import React, { useEffect, useState } from 'react'
+import defaultUser from '../../assets/img/pages/profile/profile/instauser (2).jpg'
 
 const Editprofile = () => {
-	let { user, getProfileData } = useProfileStore()
+	let { user, getProfileData, deleteProfilePhoto, updateProfilePhoto } =
+		useProfileStore()
 
 	useEffect(() => {
 		getProfileData()
 		console.log(user ? user : 'error')
-	}, [user])
+	}, [])
 
 	const [open, setOpen] = React.useState(false)
 	const handleOpen = () => setOpen(true)
 	const handleClose = () => setOpen(false)
+
+	const [openEdit, setOpenEdit] = React.useState(false)
+	const handleOpenEdit = () => setOpenEdit(true)
+	const handleCloseEdit = () => setOpenEdit(false)
+	let [photo, setPhoto] = useState(null)
 
 	const style = {
 		position: 'absolute',
@@ -30,6 +34,54 @@ const Editprofile = () => {
 		border: '2px solid #000',
 		boxShadow: 24,
 		p: 4,
+	}
+	async function handleDeletePhoto() {
+		try {
+			deleteProfilePhoto()
+			setOpen(false)
+			alert('Photo has been successfuly removed')
+			getProfileData()
+		} catch (error) {
+			alert('couldnt delete profile photo', error)
+		}
+	}
+
+	async function handleSubmit(e) {
+		e.preventDefault()
+		if (photo === null) {
+			alert('please input image!')
+			handleCloseEdit()
+			setPhoto(null)
+		} else {
+			try {
+				const formData = new FormData()
+				formData.append('imageFile', photo)
+				updateProfilePhoto(formData)
+				handleCloseEdit()
+				alert('Photo successfuly updated')
+				getProfileData()
+				setPhoto(null)
+			} catch (error) {
+				alert("Couldn't update photo", error)
+			}
+		}
+	}
+	const handleFileChange = e => {
+		setPhoto(e.target.files[0])
+	}
+
+	let [about, setAbout] = useState('')
+	let [gender, setGender] = useState(0)
+
+	async function handleEditProfile(e) {
+		e.preventDefault()
+		let formData = {
+			about: about,
+			gender: 1,
+		}
+		console.log(formData)
+
+		await updateProfilePhoto(formData)
 	}
 
 	return (
@@ -80,11 +132,15 @@ const Editprofile = () => {
 					<aside className='flex gap-[20px] text-[#FFFFFF]'>
 						<button
 							className=' rounded-[10px] px-[10px] md:px-[20px] py-[5px] text-[14px] md:text-[16px] md:py-[10px] bg-red-500'
+							style={{ display: user.image ? 'flex' : 'none' }}
 							onClick={handleOpen}
 						>
 							Delete photo
 						</button>
-						<button className=' rounded-[10px] px-[10px] md:px-[20px] py-[5px] text-[14px] md:text-[16px] md:py-[10px] bg-blue-500'>
+						<button
+							className=' rounded-[10px] px-[10px] md:px-[20px] py-[5px] text-[14px] md:text-[16px] md:py-[10px] bg-blue-500'
+							onClick={handleOpenEdit}
+						>
 							Change photo
 						</button>
 					</aside>
@@ -95,17 +151,132 @@ const Editprofile = () => {
 						aria-describedby='modal-modal-description'
 					>
 						<Box sx={style}>
-							<Typography id='modal-modal-title' variant='h6' component='h2'>
-								Are you sure ?
-							</Typography>
-							<Typography id='modal-modal-description' sx={{ mt: 2 }}>
-								Your profile photo will be delete and no return actions can be done
-							</Typography>
-							<button className=' rounded-[10px] px-[10px] md:px-[20px] py-[5px] text-[14px] md:text-[16px] md:py-[10px] bg-red-500 text-[#FFFFFF] mt-[20px]'>
+							<h1 className='text-[25px] font-bold'>Are you sure?</h1>
+							<p className='pt-[10px]'>
+								You agree to proceed and delete your profile photo. You can then
+								change profile photo with new photo
+							</p>
+							<button
+								className=' rounded-[10px] px-[10px] md:px-[20px] py-[5px] text-[14px] md:text-[16px] md:py-[10px] bg-red-500 text-[#FFFFFF] mt-[20px]'
+								onClick={handleDeletePhoto}
+							>
 								Yes, delete
 							</button>
 						</Box>
 					</Modal>
+					<Modal open={openEdit} onClose={handleCloseEdit}>
+						<Box sx={style}>
+							<form action='' onSubmit={handleSubmit}>
+								<h1 className='text-[25px] font-bold'>Please select file</h1>
+								<input
+									type='file'
+									className='py-[20px]'
+									onChange={handleFileChange}
+								/>
+								<div className='flex gap-[15px]'>
+									<button
+										className='px-[10px] py-[5px] rounded-[10px] text-[red]  border'
+										onClick={handleCloseEdit}
+									>
+										Cancel
+									</button>
+									<button
+										className='px-[10px] py-[5px] rounded-[10px] text-[blue] border'
+										type='submit'
+									>
+										Update
+									</button>
+								</div>
+							</form>
+						</Box>
+					</Modal>
+				</div>
+				<div action='' className='flex flex-col gap-[3vh]  '>
+					<div className='flex flex-col gap-[2vh] w-[100%]'>
+						<label htmlFor='' className='text-[#64748B] text-[20px]'>
+							About
+						</label>
+						{/* <TextField
+							sx={{
+								'& .MuiOutlinedInput-root': {
+									'& fieldset': {
+										border: '1px solid #E2E8F0',
+										borderRadius: '20px',
+										height: '60px',
+										color: '#64748B',
+									},
+								},
+							}}
+							id='outlined-basic'
+							label='Outlined'
+							name='about'
+						/> */}
+						<input
+							type='text'
+							style={{
+								border: '1px solid #E2E8F0',
+								borderRadius: '20px',
+								height: '60px',
+								color: '#64748B',
+								padding: '10px',
+							}}
+							placeholder='Bio'
+							value={about}
+							onChange={e => setAbout(e.target.value)}
+						/>
+					</div>
+					<div className='flex flex-col gap-[2vh]'>
+						{/* <FormControl
+							fullWidth
+							sx={{
+								'& .MuiOutlinedInput-root': {
+									'& fieldset': {
+										border: '1px solid #E2E8F0',
+										borderRadius: '20px',
+										height: '60px',
+										color: '#64748B',
+									},
+								},
+							}}
+						>
+							 <InputLabel id='demo-simple-select-label'>Gender</InputLabel> 
+							<Select
+								labelId='demo-simple-select-label'
+								id='demo-simple-select'
+								label='Gender'
+								name='gender'
+							>
+								<MenuItem value={0}>Female</MenuItem>
+								<MenuItem value={1}>Male</MenuItem>
+							</Select>
+						</FormControl> */}
+						<select
+							id=''
+							label='Gender'
+							style={{
+								border: '1px solid #E2E8F0',
+								borderRadius: '20px',
+								height: '55px',
+								color: '#64748B',
+								padding: '10px',
+							}}
+							value={gender}
+							onChange={e => setGender(e.target.value)}
+						>
+							{/* <option value="" >Gender</option> */}
+							<option value='1'>Male</option>
+							<option value='0'>Female</option>
+						</select>
+						<span className='text-[#64748B]'>
+							This won’t be part of your public profile.
+						</span>
+					</div>
+					<button
+						className='bg-[#64748B] hover:bg-[#214b8e] text-[#FFFFFF] self-baseline px-[7%] py-[15px] rounded-2xl text-[20px] cursor-pointer'
+						onClick={handleEditProfile}
+					>
+						Submit
+					</button>
 				</div>
 			</section>
 		</div>
