@@ -6,12 +6,12 @@ import * as React from 'react'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Modal from '@mui/material/Modal'
-import { colors } from "@mui/material"
-import axios from "axios"
-import { Bookmark, CircleUserRound, Heart, MessageCircle, Send, SendHorizontal, Smile, Volume2, VolumeX } from "lucide-react"
+import { Bookmark, CircleUserRound, Heart, MessageCircle, Send, SendHorizontal, Smile, Volume2, VolumeX, X } from "lucide-react"
 import BasicModal from "@/components/pages/explore/BasicModal"
 import CommentInput from "@/components/pages/explore/Emogi"
 import { useUserId } from "@/hook/useUserId"
+import { useRouter } from "next/navigation"
+import ModalUsers from "@/components/pages/explore/ModalUsers"
 
 
 const style = {
@@ -19,9 +19,7 @@ const style = {
 	top: '50%',
 	left: '50%',
 	transform: 'translate(-50%, -50%)',
-	width: 1000,
-	// height: "50vh",
-	// backgroundColor: "#272727",
+	width: 900,
 	color: "white"
 
 }
@@ -36,7 +34,7 @@ const mediaStyle = {
 }
 const mediaStyleModal = {
 	width: '100%',
-	height: '80vh',
+	height: '85vh',
 	objectFit: 'cover',
 	borderRadius: '2px',
 	cursor: 'pointer',
@@ -46,17 +44,20 @@ const mediaStyleModal = {
 
 
 export default function Explore() {
-	let { user, fechUser, postById, getPostById, deletComit, AddComit } = useUserStore()
+	let { user, fechUser, postById, getPostById, deletComit, AddComit, unfollowUser, Follow, getUsers, likePost } = useUserStore()
 	const [open, setOpen] = React.useState(false)
 	let cnt = 3
 
+	let router = useRouter()
+
 	async function RemoveComit(postCommentId) {
 		await deletComit(postCommentId)
-		fechUser()
 	}
 
 	useEffect(() => {
 		fechUser()
+		const saved = JSON.parse(localStorage.getItem("bookmarks")) || []
+		setwishLix(saved)
 	}, [])
 
 	const handleOpen = async (id) => {
@@ -81,44 +82,66 @@ export default function Explore() {
 	const handleAddComment = async () => {
 		if (newcomit.trim() === "") return;
 		await AddComit(newcomit, postById.data?.postId);
+		await getPostById(postById.data?.postId);
 		setnewComit("");
 	};
 
+	const [likedComments, setLikedComments] = React.useState({});
+
+
+	const handleLikeComment = (commentId) => {
+		setLikedComments(prev => ({
+			...prev,
+			[commentId]: !prev[commentId]
+		}));
+	};
+
+	let [wishLix, setwishLix] = React.useState([])
+
+	function AddwishLix(postId) {
+		let upDated;
+		if (wishLix.includes(postId)) {
+			upDated = wishLix.filter(id => id != postId)
+		}
+		else {
+			upDated = [...wishLix, postId]
+		}
+		setwishLix(upDated)
+		localStorage.setItem("bookmarks", JSON.stringify(upDated))
+	}
+	let [isFollowing, setFollow] = React.useState(false)
+
+
+	async function HendlFollow() {
+		try {
+			if (!postById?.data) return;
+
+			const { userId, isFollowing } = postById.data;
+
+			if (isFollowing) {
+				await unfollowUser(userId);
+			} else {
+				await Follow(userId);
+			}
+
+			// Обновляем данные поста
+			await getPostById(postById.data.postId);
+
+		} catch (error) {
+			console.error("Ошибка при подписке/отписке:", error);
+			// Можно добавить уведомление пользователю об ошибке
+		}
+	}
 
 	return (
 		<div>
-			<Modal
-				open={open}
-				onClose={handleClose}
-				aria-labelledby="modal-modal-title"
-				aria-describedby="modal-modal-description"
-			>
+			<Modal open={open} onClose={handleClose} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
 				<Box sx={style}>
-					<div className="flex gap-[40px] h-[80vh] bg-[#272727]">
+					<div className="flex gap-[40px] h-[85vh] bg-[#272727]">
 						{postById ? (
 
 							<div className="flex w-full gap-[20px]">
-								<div className="w-[40%] ">
-									{/* {postById.data?.images.map(el => {
-										const mediaUrl = `http://37.27.29.18:8003/images/${el}`
-										return (
-											<div key={el.id}>
-												{el.endsWith('.mp4') ? (
-													<div>
-														<video ref={videoRef} src={mediaUrl} className="w-full h-[80vh] object-cover" playsInline autoPlay muted={isMuted} loop />
-														<button onClick={toggleMute} className="absolute z-10 mt-[-40px] ml-[270px] text-white ">
-															{isMuted ? <VolumeX size={30} /> : <Volume2 size={30} />}
-														</button>
-													</div>
-												) : (
-													<img src={mediaUrl} alt={`Post by ${el.userName}`}  style={mediaStyleModal} />
-												)}
-												<button className="absolute z-10 mt-[-40px] ml-[30px] text-white">
-													<CircleUserRound size={30} />
-												</button>
-											</div>
-										)
-									})} */}
+								<div className="w-[47%] ">
 									{postById.data?.images?.[0] && (() => {
 										const el = postById.data.images[0];
 										const mediaUrl = `http://37.27.29.18:8003/images/${el}`;
@@ -129,7 +152,7 @@ export default function Explore() {
 														<video
 															ref={videoRef}
 															src={mediaUrl}
-															className="w-full h-[80vh] object-cover"
+															className="w-full h-[85vh] object-cover"
 															playsInline
 															autoPlay
 															muted={isMuted}
@@ -137,7 +160,7 @@ export default function Explore() {
 														/>
 														<button
 															onClick={toggleMute}
-															className="absolute z-10 mt-[-40px] ml-[270px] text-white"
+															className="absolute z-10 mt-[-40px] ml-[380px] text-white"
 														>
 															{isMuted ? <VolumeX size={30} /> : <Volume2 size={30} />}
 														</button>
@@ -145,42 +168,58 @@ export default function Explore() {
 												) : (
 													<img src={mediaUrl} alt={`Post by ${el.userName}`} style={mediaStyleModal} />
 												)}
-												<button className="absolute z-10 mt-[-40px] ml-[30px] text-white">
-													<CircleUserRound size={30} />
-												</button>
 											</div>
 										);
 									})()}
 
 								</div>
-								<div className="w-[68%] p-[20px]">
+								<div className="w-[51%] p-[20px]">
 									<div className="flex  w-full justify-between pb-[20px]  items-center">
 										<div className="flex gap-[20px]">
-											<img src={`http://37.27.29.18:8003/images/${postById.data?.userImage}`} className="w-[40px] h-[40px] rounded-full" alt="test" />
-											<p className="font-medium cursor-pointer text-[25px]">{postById.data?.userName}</p> <br />
+											<div>
+												<img src={`http://37.27.29.18:8003/images/${postById.data?.userImage}`} className="w-[40px] h-[40px] rounded-full" alt="test" />
+											</div>
+
+											<p onClick={() => router.push(`/${postById.data?.userId}`)} className="font-medium cursor-pointer  min-w-20 max-w-40 text-[25px] truncate">{postById.data?.userName}</p> <br />
 										</div>
-										<button className="font-bold text-2xl text-blue-500 cursor-pointer hover:duration-500 hover:scale-120 ">Follow</button>
+										<button
+											className="px-3 py-1 ml-4 text-sm cursor-pointer text-black bg-white rounded-full"
+											onClick={HendlFollow}
+										>
+											{postById?.data?.isFollowing ? "Вы подписаны" : "Подписаться"}
+										</button>
+
+										<button className="cursor-pointer" onClick={() => setOpen(false)}>
+											<X />
+										</button>
 
 									</div>
-									<div className="overflow-y-auto overflow-x-hidden whitespace-nowrap select-none max-h-[35vh] space-y-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+									<div className="overflow-y-auto break-words select-none max-h-[43vh] space-y-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
 										{postById.data?.comments?.length > 0 ? (
-											postById.data.comments.map(c => (
-												<div className="flex items-center justify-between">
-													<div className="flex items-center gap-3">
-														{c.userImage
+											postById.data.comments.map(comment => (
+												<div key={comment.id} className="flex items-center justify-between">
+													<div className="flex  gap-3 flex-1 min-w-0">
+														{comment.userImage
 															? (
-																<img src={`http://37.27.29.18:8003/images/${c.userImage}`} alt="" className="w-[40px] h-[40px] rounded-full border-2" />
+																<img
+																	src={comment.userImage ? `http://37.27.29.18:8003/images/${comment.userImage}` : "https://via.placeholder.com/40"}
+																	alt={comment.userName}
+																	className="w-8 h-8 border border-gray-300 rounded-full"
+																/>
 															)
 															: (
-																<CircleUserRound size={40} color="#ffffff" />
+																<div>
+																	<CircleUserRound className="cursor-pointer" size={30} onClick={() => router.push(`/${comment.userId}`)} color="#ffffff" />
+
+																</div>
 															)
 														}
-														<div>
-															<p className="text-[20px] cursor-pointer">{c.comment}</p>
-															{c.dateCommented && (
+														<div className="min-w-120">
+															<p className="text-[15px]  w-[90%] ">{comment.comment}</p>
+															{comment.dateCommented && (
 
-																<span className="text-[10px] leading-0 self-end">
-																	{new Date(c.dateCommented).toLocaleString([], {
+																<span className="text-[10px] text-gray-400 leading-0 self-end">
+																	{new Date(comment.dateCommented).toLocaleString([], {
 																		year: "numeric",
 																		month: "2-digit",
 																		day: "2-digit",
@@ -193,13 +232,29 @@ export default function Explore() {
 														</div>
 													</div>
 													{
-														c.userId == useUserId() ? <button className="flex gap-[10px]" onClick={() => RemoveComit(c.postCommentId)}>
-															<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-																<path strokeLinecap="round" strokeLinejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-															</svg>
-															<Heart />
-														</button>
-															: <Heart />
+														comment.userId == useUserId() ?
+															<div className="flex gap-[10px]">
+
+																<button className="cursor-pointer hover:text-red-500" onClick={() => RemoveComit(comment.postCommentId)}>
+																	<X />
+																</button>
+																<Heart
+																	className="cursor-pointer"
+																	onClick={() => handleLikeComment(comment.postCommentId)}
+																	size={20}
+																	color="#ffffff"
+																	fill={likedComments[comment.postCommentId] ? 'red' : 'nane'}
+																	stroke={likedComments[comment.postCommentId] ? 'red' : 'white'}
+																/>
+															</div>
+															: <Heart
+																className="cursor-pointer"
+																onClick={() => handleLikeComment(comment.postCommentId)}
+																size={20}
+																color="#ffffff"
+																fill={likedComments[comment.postCommentId] ? 'red' : 'none'}
+																stroke={likedComments[comment.postCommentId] ? 'red' : 'white'}
+															/>
 													}
 												</div>
 											))
@@ -207,22 +262,30 @@ export default function Explore() {
 											<p className="text-gray-400">Нет комментариев</p>
 										)}
 									</div>
-									<div className="border-t sticky bottom-0 bg-[#272727] h-[180px] z-10 w-full mt-[300px] pt-[10px]">
+									<div className="border-t fixed bottom-0 bg-[#272727] h-[180px] z-10 w-[47%] mt-[300px] pt-[10px]">
 										<div className="flex justify-between">
 											<div className="flex gap-[20px]">
-												<button>
-													{/* <Heart size={34} color="#ffffff" /> */}
-													<BasicModal />
+												<button
+													onClick={async () => {
+														await likePost(postById.data?.postId)
+													}}
+													style={{ cursor: 'pointer' }}
+													className='cursor-pointer'
+												>
+													<Heart size={25} color="#ffffff"
+														fill={postById.data?.postLike ? 'red' : 'none'}
+														stroke={postById.data?.postLike ? 'red' : 'white'}
+													/>
 												</button>
-												<button>
-													<MessageCircle size={30} color="#ffffff" />
+												<button className="cursor-pointer">
+													<MessageCircle size={25} color="#ffffff" />
 												</button>
-												<button>
-													<Send size={30} color="#ffffff" />
+												<button className="cursor-pointer">
+													<Send size={25} color="#ffffff" />
 												</button>
 											</div>
-											<button>
-												<Bookmark size={30} color="#ffffff" />
+											<button className="cursor-pointer" onClick={() => AddwishLix(postById.data?.postId)}>
+												<Bookmark fill={wishLix.includes(postById.data?.postId) ? "white" : "none"} size={25} color="#ffffff" />
 											</button>
 										</div>
 										<div>
@@ -230,11 +293,8 @@ export default function Explore() {
 												{postById.data?.postLikeCount} отметок "Нравится"
 											</span>
 										</div>
-										<div className="border-2 min-h-12 max-h-12 mt-[40px] p-2 rounded border-[#E2E8F0] flex justify-between gap-1 items-center">
-											<button>
-												<CommentInput value2={newcomit} onChange2={(e) => setnewComit(e.target.value)} />
-											</button>
-											{/* <input type="text" value={newcomit} onChange={(e) => setnewComit(e.target.value)} className="w-1/1 outline-none" /> */}
+										<div className="border-2 h-12 mt-[40px] p-2 rounded border-[#E2E8F0] flex justify-between gap-1 items-center">
+											<CommentInput value2={newcomit} onChange2={(e) => setnewComit(e.target.value)} />
 											<button onClick={handleAddComment}>
 												<SendHorizontal />
 											</button>
@@ -256,37 +316,8 @@ export default function Explore() {
 				</Box>
 			</Modal>
 
-			{/* <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 md:gap-4 mt-[10px]">
-				{user && user?.data?.map(el => (
-					<div className="bg-black rounded-2xl" key={el.postId}>
-						{el.images.map((item, index) => {
-							const mediaUrl = `http://37.27.29.18:8003/images/${item}`
 
-							return (
-								<div className=" hover:opacity-[50%] hover:duration-1000  relative group" key={index} style={mediaStyle} onClick={() => handleOpen(el.postId)} >
-									<div className="absolute inset-0 flex items-center justify-center gap-[30px] text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
-										<div className="flex gap-[10px] font-bold text-4xl items-center">
-											<Heart size={46} color="#ffffff" />
-											<span>{el.postLikeCount}</span>
-										</div>
-										<div className="flex gap-[10px] font-bold text-4xl items-center">
-											<MessageCircle size={46} color="#ffffff" />
-											<span>{el.commentCount}</span>
-										</div>
-									</div>
-									{item.endsWith('.mp4') ? (
-										<video src={mediaUrl} style={mediaStyle} controls />
-									) : (
-										<Image src={mediaUrl} alt={`Post by ${el.userName}`} width={300} height={300} style={mediaStyle} />
-									)}
-								</div>
-							)
-						})}
-					</div>
-				))}
-			</div> */}
-
-			<div className="flex justify-end">
+			<div className="flex justify-center">
 				<div className="grid grid-cols-2 sm:grid-cols-3 gap-2 md:gap-4 mt-[10px] mx-[10px]  max-w-[1240px]">
 					{user?.data?.map((el, i) => {
 						if (i == 15) {
