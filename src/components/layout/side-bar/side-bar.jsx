@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import Profile from "@/assets/icon/layout/instagramDefaultProfile.jpg";
@@ -24,11 +24,12 @@ import {
   setting,
   threads,
 } from "@/assets/icon/layout/svg";
-import { CircleUserRound, Settings, LogOut } from "lucide-react";
+import { CircleUserRound, Settings, LogOut, Moon, Sun } from "lucide-react";
 import { Toaster, toast } from "react-hot-toast";
 import { useRegisterStore } from "@/store/pages/auth/registration/registerStore";
 import { useForm } from "react-hook-form";
 import { Eye, EyeOff } from "lucide-react";
+import useDarkSide from "@/hook/useDarkSide";
 
 const NavLink = ({ href, icon, activeIcon, label, isActive }) => (
   <Link
@@ -45,10 +46,12 @@ export default function SideBar({ children }) {
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState(null);
   const [openSwitchModal, setOpenSwitchModal] = useState(false);
+  const [openMode, setOpenMode] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { t } = useTranslation();
   const addLogin = useRegisterStore((state) => state.addLogin);
   const isLoading = useRegisterStore((state) => state.isLoading);
+  const [isNightMode, setIsNightMode] = useState(false);
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
@@ -63,6 +66,8 @@ export default function SideBar({ children }) {
     toast("Logged out!");
   };
 
+
+
   const onSubmit = async (data) => {
     const result = await addLogin({
       userName: data.userName,
@@ -72,19 +77,26 @@ export default function SideBar({ children }) {
     if (result?.success) {
       reset();
       toast.success("Login successful!");
+      const newUser = { userName: data.userName };
+
       if (typeof window != "undefined") {
         localStorage.setItem('access_token', result?.data?.data);
-        localStorage.setItem('current_user', JSON.stringify({ userName: data.userName }));
+        localStorage.setItem('current_user', JSON.stringify(newUser));
       }
+
       setOpenSwitchModal(false);
       router.push("/profile");
     } else {
       toast.error("Login failed. Please try again.");
     }
+
   };
 
+
+  const [colorTheme, setTheme] = useDarkSide()
+
   return (
-    <div>
+    <div className={colorTheme === 'dark' ? 'bg-black text-white' : 'bg-white text-black'}>
       <Toaster />
       <section className="w-[320px] h-full fixed border-r border-gray-300">
         <div className="sideBar h-full pb-[100px]">
@@ -127,7 +139,7 @@ export default function SideBar({ children }) {
                 anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
                 transformOrigin={{ vertical: "top", horizontal: "center" }}
               >
-                <Link href={"/setting"}>
+                <Link href={"/setting/pro"}>
                   <MenuItem onClick={handleClose}>
                     <div className="flex gap-[20px]"><Settings /> Settings</div>
                   </MenuItem>
@@ -140,15 +152,41 @@ export default function SideBar({ children }) {
                 >
                   <div className="flex gap-[20px]"><CircleUserRound /> Switch account</div>
                 </MenuItem>
+                <MenuItem>
+                  <div className="p-6 rounded-xl max-w-sm mx-auto shadow-lg">
+                    <div className="flex gap-[10px] justify-between items-center mb-6">
+                      <span className="text-lg font-semibold">Переключить режим</span>
+                      {colorTheme === 'dark' ? <Moon /> : <Sun />}
+                    </div>
+
+                    <div className="flex justify-between items-center">
+                      <span className="text-base">Ночной режим</span>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={colorTheme === 'dark'}
+                          onChange={() => setTheme(colorTheme === 'dark' ? 'light' : 'dark')} 
+                          className="sr-only peer"
+                        />
+
+                        <div className="w-11 h-6 bg-gray-400 rounded-full peer peer-checked:bg-blue-600 transition-colors"></div>
+                        <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform peer-checked:translate-x-full"></div>
+                      </label>
+                    </div>
+                  </div>
+                </MenuItem>
                 <Divider />
                 <MenuItem sx={{ color: "#ed4956", fontWeight: 600 }}>
                   <div onClick={logOut} className="flex gap-[20px]"><LogOut /> Log out</div>
                 </MenuItem>
+
               </Menu>
             </div>
           </div>
         </div>
       </section>
+
+
 
       <Modal
         open={openSwitchModal}
@@ -166,7 +204,7 @@ export default function SideBar({ children }) {
           boxShadow: 24,
           p: 3
         }}>
-          <Image src={frame168} />
+          <Image src={frame168} alt='insta' />
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
             <input
               type="text"
@@ -203,6 +241,7 @@ export default function SideBar({ children }) {
           </form>
         </Box>
       </Modal>
+
 
       <div className="ml-[320px]">{children}</div>
     </div>
