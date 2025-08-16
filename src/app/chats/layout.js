@@ -19,8 +19,10 @@ import { useUserId } from "@/hook/useUserId";
 import { useChatById } from "@/store/pages/chat/pages/chat-by-id/store";
 import { usegetUserStore } from "@/store/pages/search/store";
 import { Skeleton, Stack } from "@mui/material";
+import { useRouter } from "next/navigation";
 
 export default function Layout({ children }) {
+  const router = useRouter();
   const userId = useUserId();
 
   const { chats, get, loadingChat } = useDefaultChat();
@@ -31,6 +33,8 @@ export default function Layout({ children }) {
     loadingMyProfil,
     loadingCreateChat,
   } = useMyProfile();
+
+  // const { addChats, getChats, chats } = useProfileByIdStore()
 
   function setLocale(user) {
     localStorage.setItem("userData", JSON.stringify(user));
@@ -87,16 +91,36 @@ export default function Layout({ children }) {
   let [idx, setIdx] = useState(null);
 
   async function handleCreateChat(id) {
-    setIdx(id);
-    await createChat(id);
-    get();
-    // setOpenModalUsers(false);
-    setSearch("");
+    try {
+      setIdx(id);
+      await createChat(id);
+      await get();
+
+      const chat = useDefaultChat
+        .getState()
+        .chats?.data?.find(
+          (e) => e.receiveUserId === id || e.sendUserId === id
+        );
+
+      setOpenModalUsers(false);
+      
+      console.log(chats?.chatId);
+
+      if (chat?.chatId) {
+        router.push(`/chats/${chat.chatId}`);
+      } else {
+        console.error("Chat not found for this user");
+      }
+
+      setSearch("");
+    } catch (error) {
+      console.error("Error creating chat:", error);
+    }
   }
 
   return (
     <div className="flex ">
-      <div className=" border-r-2 h-[100vh] border-gray-300 w-[500px]">
+      <div className=" border-r-2 h-[100vh] border-gray-300 w-[40%]">
         <section className="flex items-center justify-between gap-5 p-5">
           <div className="flex items-center gap-2 text-xl font-bold">
             {loadingMyProfil ? (
@@ -237,14 +261,14 @@ export default function Layout({ children }) {
                   )}
                 </div>
               </div>
-              <div className="flex justify-center">
+              {/* <div className="flex justify-center">
                 <button
                   className="w-9/10 text-center bg-blue-500 mx-5 text-white rounded py-1"
                   onClick={() => setOpenModalUsers(false)}
                 >
                   Close
                 </button>
-              </div>
+              </div> */}
             </article>
           </section>
         )}
