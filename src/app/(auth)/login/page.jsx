@@ -38,7 +38,6 @@ export default function Login() {
     }
   };
 
-
   return (
     <div className="flex justify-around w-[80%] m-auto items-center">
       <Toaster />

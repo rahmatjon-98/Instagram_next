@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import axiosRequest from '@/lib/axiosRequest'
 import { jwtDecode } from 'jwt-decode'
+import axios from 'axios'
 
 let api = 'http://37.27.29.18:8003'
 
@@ -36,7 +37,7 @@ export const useProfileStore = create((set, get) => ({
 	},
 	updateProfilePhoto: async formData => {
 		try {
-			await axiosRequest.put(
+			await axios.put(
 				`${api}/UserProfile/update-user-image-profile`,
 				formData
 			)

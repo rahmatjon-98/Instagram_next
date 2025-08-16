@@ -3,6 +3,7 @@
 import {
   ChevronDown,
   EllipsisVertical,
+  Loader2,
   Search,
   Trash,
   User,
@@ -22,13 +23,17 @@ import { Skeleton, Stack } from "@mui/material";
 export default function Layout({ children }) {
   const userId = useUserId();
 
-  const { chats, get } = useDefaultChat();
-  const { myProfile, getChatById, createChat } = useMyProfile();
-  const { deleteChat } = useChatById();
+  const { chats, get, loadingChat } = useDefaultChat();
+  const {
+    myProfile,
+    getMyProfil,
+    createChat,
+    loadingMyProfil,
+    loadingCreateChat,
+  } = useMyProfile();
 
   function setLocale(user) {
     localStorage.setItem("userData", JSON.stringify(user));
-    // console.log(user);
   }
 
   const { users, getUsers, getSearchHistories } = usegetUserStore();
@@ -40,7 +45,7 @@ export default function Layout({ children }) {
 
   useEffect(() => {
     get();
-    if (userId) getChatById(userId);
+    if (userId) getMyProfil(userId);
     getUsers();
     getSearchHistories();
   }, [userId]);
@@ -79,19 +84,26 @@ export default function Layout({ children }) {
     </Stack>
   );
 
+  let [idx, setIdx] = useState(null);
+
   async function handleCreateChat(id) {
+    setIdx(id);
     await createChat(id);
     get();
-    setOpenModalUsers(false);
+    // setOpenModalUsers(false);
     setSearch("");
   }
 
   return (
-    <div className="flex w-[]">
-      <div className=" border-r-2 h-[100vh] border-gray-300 w-[300px]">
+    <div className="flex ">
+      <div className=" border-r-2 h-[100vh] border-gray-300 w-[500px]">
         <section className="flex items-center justify-between gap-5 p-5">
           <div className="flex items-center gap-2 text-xl font-bold">
-            {myProfile?.userName}
+            {loadingMyProfil ? (
+              <Skeleton variant="text" width={100} height={30} />
+            ) : (
+              myProfile?.userName
+            )}
             <ChevronDown />
           </div>
 
@@ -120,9 +132,9 @@ export default function Layout({ children }) {
         {openModalUsers && (
           <section
             style={{ backdropFilter: "blur(6px)" }}
-            className="fixed inset-0 z-10 flex items-center justify-center bg-[rgba(0,0,0,0.6)]"
+            className="fixed inset-0 z-20 flex items-center justify-center bg-[rgba(0,0,0,0.6)]"
           >
-            <article className="w-[600px] bg-white rounded-2xl shadow py-5">
+            <article className="w-[600px] bg-white rounded-2xl space-y-2.5 shadow py-5">
               <div className="relative">
                 <p className="text-center font-bold text-xl pb-5">
                   Новое сообщение
@@ -151,7 +163,7 @@ export default function Layout({ children }) {
                 <p className="pb-2 px-5 text-left font-bold">Рекомендуемые</p>
 
                 <div className="flex flex-col">
-                  {loading ? (
+                  {loadingChat ? (
                     Array.from({ length: 5 }).map((_, i) => (
                       <SkeletonRow key={i} />
                     ))
@@ -160,7 +172,7 @@ export default function Layout({ children }) {
                       filteredUsers.map((u) => (
                         <div
                           key={u.id}
-                          className="hover:bg-[#eeeeee] rounded p-3"
+                          className="hover:bg-[#eeeeee] rounded p-3 flex items-center justify-between cursor-pointer"
                           onClick={() => handleCreateChat(u.id)}
                         >
                           <div className="flex items-center gap-5">
@@ -181,6 +193,9 @@ export default function Layout({ children }) {
                               <p>{u.fullName}</p>
                             </div>
                           </div>
+                          {loadingCreateChat && idx == u.id && (
+                            <Loader2 className="animate-spin w-5 h-5" />
+                          )}
                         </div>
                       ))
                     ) : (
@@ -192,30 +207,43 @@ export default function Layout({ children }) {
                     allUsers.map((u) => (
                       <div
                         key={u.id}
-                        className="flex items-center cursor-pointer hover:bg-[#eeeeee] rounded p-3 w-full  gap-5"
+                        className="hover:bg-[#eeeeee] rounded p-3 flex items-center justify-between cursor-pointer"
                         onClick={() => handleCreateChat(u.id)}
                       >
-                        {console.log(u.id)}
-                        {u.avatar ? (
-                          <Image
-                            src={`http://37.27.29.18:8003/images/${u.avatar}`}
-                            width={44}
-                            height={44}
-                            alt="avatar"
-                            className="rounded-full object-cover w-12 h-12"
-                            priority
-                          />
-                        ) : (
-                          <User size={44} />
-                        )}
-                        <div>
-                          <p>{u.userName}</p>
-                          <p>{u.fullName}</p>
+                        <div className="flex items-center gap-5">
+                          {console.log(u.id)}
+                          {u.avatar ? (
+                            <Image
+                              src={`http://37.27.29.18:8003/images/${u.avatar}`}
+                              width={44}
+                              height={44}
+                              alt="avatar"
+                              className="rounded-full object-cover w-12 h-12"
+                              priority
+                            />
+                          ) : (
+                            <User size={44} />
+                          )}
+                          <div>
+                            <p>{u.userName}</p>
+                            <p>{u.fullName}</p>
+                          </div>
                         </div>
+                        {loadingCreateChat && idx == u.id && (
+                          <Loader2 className="animate-spin w-5 h-5" />
+                        )}
                       </div>
                     ))
                   )}
                 </div>
+              </div>
+              <div className="flex justify-center">
+                <button
+                  className="w-9/10 text-center bg-blue-500 mx-5 text-white rounded py-1"
+                  onClick={() => setOpenModalUsers(false)}
+                >
+                  Close
+                </button>
               </div>
             </article>
           </section>
@@ -228,51 +256,53 @@ export default function Layout({ children }) {
           </button>
         </section>
 
-        <section className="py-5">
-          {chats &&
-            chats.data?.map((e) => (
-              <Link
-                key={e.chatId}
-                href={`/chats/${e.chatId}`}
-                onClick={() => setLocale(e)}
-              >
-                <div className="flex items-center gap-1 hover:bg-gray-200 p-2">
-                  {(
-                    e.receiveUserId === userId
-                      ? e.sendUserImage
-                      : e.receiveUserImage
-                  ) ? (
-                    <Image
-                      alt=""
-                      src={`http://37.27.29.18:8003/images/${
-                        e.receiveUserId === userId
-                          ? e.sendUserImage
-                          : e.receiveUserImage
-                      }`}
-                      width={40}
-                      height={40}
-                      className="w-10 h-10 rounded-full object-cover object-center"
-                      priority
-                    />
-                  ) : (
-                    <Image
-                      alt=""
-                      src={img}
-                      width={40}
-                      height={40}
-                      className="w-10 h-10 rounded-full object-cover"
-                      priority
-                    />
-                  )}
+        <section className="py-5 flex flex-col overflow-y-scroll h-[85vh]">
+          {loadingChat
+            ? Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)
+            : chats &&
+              chats.data?.map((e) => (
+                <Link
+                  key={e.chatId}
+                  href={`/chats/${e.chatId}`}
+                  onClick={() => setLocale(e)}
+                >
+                  <div className="flex items-center gap-1 hover:bg-gray-200 p-2">
+                    {(
+                      e.receiveUserId === userId
+                        ? e.sendUserImage
+                        : e.receiveUserImage
+                    ) ? (
+                      <Image
+                        alt=""
+                        src={`http://37.27.29.18:8003/images/${
+                          e.receiveUserId === userId
+                            ? e.sendUserImage
+                            : e.receiveUserImage
+                        }`}
+                        width={40}
+                        height={40}
+                        className="w-10 h-10 rounded-full object-cover object-center"
+                        priority
+                      />
+                    ) : (
+                      <Image
+                        alt=""
+                        src={img}
+                        width={40}
+                        height={40}
+                        className="w-10 h-10 rounded-full object-cover"
+                        priority
+                      />
+                    )}
 
-                  <div>
-                    {e.receiveUserId === userId
-                      ? e.sendUserName
-                      : e.receiveUserName}
+                    <div>
+                      {e.receiveUserId === userId
+                        ? e.sendUserName
+                        : e.receiveUserName}
+                    </div>
                   </div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              ))}
         </section>
       </div>
 
