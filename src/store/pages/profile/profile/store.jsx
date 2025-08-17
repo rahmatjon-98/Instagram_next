@@ -37,9 +37,32 @@ export const useProfileStore = create((set, get) => ({
 	},
 	updateProfilePhoto: async formData => {
 		try {
+			const token = localStorage.getItem('access_token')
+			await axiosRequest.put(
+				'http://37.27.29.18:8003/UserProfile/update-user-image-profile',
+				formData,
+				{
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				}
+			)
+			await get().getProfileData()
+		} catch (error) {
+			console.error(error)
+		}
+	},
+	updateProfileData: async updateProfile => {
+		try {
+			const token = localStorage.getItem('access_token')
 			await axios.put(
-				`${api}/UserProfile/update-user-image-profile`,
-				formData
+				`http://37.27.29.18:8003/UserProfile/update-user-profile`,
+				updateProfile,
+				{
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				}
 			)
 			await get().getProfileData()
 		} catch (error) {

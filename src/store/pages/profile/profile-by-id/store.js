@@ -7,6 +7,7 @@ export const useProfileByIdStore = create((set, get) => ({
     users: [],
     chats: [],
     posts: [],
+    followers: [],
     getProfileById: async (id) => {
         try {
             let { data } = await axiosRequest.get(`${api}UserProfile/get-user-profile-by-id?id=${id}`)
@@ -23,8 +24,28 @@ export const useProfileByIdStore = create((set, get) => ({
         await axiosRequest.post(`Chat/create-chat?receiverUserId=${id}`)
         await get().getChats()
     },
-    getPostById: async (id) => {
-        let { data } = await axiosRequest.get(`Post/get-post-by-id?id=${id}`)
-        set({ posts: data })
+    getPosts: async () => {
+        try {
+            let { data } = await axiosRequest.get(`Post/get-posts`)
+            set({ posts: data })
+        } catch (error) {
+            console.error(error);
+        }
     },
+    getPostById: async (id) => {
+        try {
+            let { data } = await axiosRequest.get(`Post/get-post-by-id?id=${id}`)
+            set({ posts: data })
+        } catch (error) {
+            console.error(error);
+        }
+    },
+    getFollowers: async (id) => {
+        try {
+            let { data } = await axiosRequest.get(`FollowingRelationShip/get-subscribers?UserId=${id}`)
+            set({ followers: data })
+        } catch (error) {
+            console.error(error)
+        }
+    }
 }))

@@ -18,8 +18,6 @@ const Layout = ({ children }) => {
 
 	useEffect(() => {
 		getProfileData()
-		// console.log(decodeToken);
-		console.log(pathname)
 		console.log(user ? user : 'error')
 	}, [])
 	return (

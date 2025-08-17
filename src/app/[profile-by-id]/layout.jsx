@@ -14,18 +14,17 @@ import { ArrowRight, Calendar, Loader, Search, User, UserPlusIcon, X, XCircle } 
 import Suggetions from '@/components/pages/profile/profile-by-id/Suggetions';
 import { useRouter } from 'next/navigation'
 import { usegetUserStore } from '@/store/pages/search/store';
-
-import './style.css'
 import { MdOutlineGridOn, MdOutlinePhotoCameraFront } from 'react-icons/md';
 import { FaRegBookmark } from 'react-icons/fa';
 import Loading from '@/components/pages/profile/profile-by-id/Loading';
+import './style.css'
 
 const style = {
 	position: 'absolute',
 	top: '50%',
 	left: '50%',
 	transform: 'translate(-50%, -50%)',
-	width: 500,
+	width: 550,
 	height: 400,
 	bgcolor: 'background.paper',
 	border: 'none',
@@ -62,16 +61,14 @@ const ProfileById = ({ children }) => {
 
 	let user = users?.data
 
-	let router = useRouter()
-
 	let pathname = usePathname()
-
-	const { addChats, getChats, chats } = useProfileByIdStore()
+	const router = useRouter()
 
 	const { users: infoUsers, getUsers } = usegetUserStore()
 
-	let getId = infoUsers?.data?.find(e => e.id === profileId).id
+	const { addChats, getChats, chats, followers, getFollowers } = useProfileByIdStore()
 
+	let getId = infoUsers?.data?.find(e => e.id === profileId).id
 
 	async function createChat() {
 		await addChats(getId)
@@ -86,7 +83,6 @@ const ProfileById = ({ children }) => {
 		}
 	}
 
-
 	const SkeletonRow = () => (
 		<Stack direction="row" spacing={2} alignItems="center" className="p-3">
 			<Skeleton variant="circular" width={44} height={44} />
@@ -96,6 +92,12 @@ const ProfileById = ({ children }) => {
 			</Stack>
 		</Stack>
 	)
+
+	// let navigate = useRouter()
+
+	// function linkToProfile(id) {
+	// 	navigate.push(`/${id}`)
+	// }
 
 	useEffect(() => {
 		if (!search.trim()) {
@@ -120,10 +122,14 @@ const ProfileById = ({ children }) => {
 	useEffect(() => {
 		if (profileId) {
 			getProfileById(profileId)
+			getFollowers(profileId)
 		}
-	}, [profileId, getProfileById])
+	}, [profileId, getProfileById, getFollowers])
 
-	useEffect(() => { getChats(), getUsers() }, [])
+	useEffect(() => {
+		getChats()
+		getUsers()
+	}, [])
 
 	return (
 		<div className='pl-[8%] p-[8%]'>
@@ -162,59 +168,56 @@ const ProfileById = ({ children }) => {
 							aria-describedby="keep-mounted-modal-description"
 						>
 							<Box sx={style}>
-								<div className="flex p-4 pb-2 border-b-1 border-gray-300 items-center justify-between">
-									<div></div>
-									<h3 className='font-semibold text-[18px]'>Followers</h3>
-									<button onClick={handleClose}><X /></button>
-								</div>
-								<div className="relative m-4">
-									{!focused && (
-										<Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
-									)}
-									<input
-										type="text"
-										value={search}
-										onChange={(e) => setSearch(e.target.value)}
-										placeholder="Search"
-										className={`py-2 w-full rounded-lg bg-[rgb(239,239,239)] pr-10 ${!focused ? 'pl-10' : 'pl-4'}`}
-										onFocus={() => setFocused(true)}
-										onBlur={() => setFocused(false)}
-									/>
+								<div className="">
+									<div className="flex p-4 pb-2 border-b-1 border-gray-300 items-center justify-between">
+										<div></div>
+										<h3 className='font-semibold text-[18px]'>Followers</h3>
+										<button onClick={handleClose}><X /></button>
+									</div>
+									<div className="relative m-4">
+										{!focused && (
+											<Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
+										)}
+										<input
+											type="text"
+											value={search}
+											onChange={(e) => setSearch(e.target.value)}
+											placeholder="Search"
+											className={`py-2 w-full rounded-lg bg-[rgb(239,239,239)] pr-10 ${!focused ? 'pl-10' : 'pl-4'}`}
+											onFocus={() => setFocused(true)}
+											onBlur={() => setFocused(false)}
+										/>
 
-									{loading ? (
-										<Loader className="absolute right-3 top-6 -translate-y-1/2 text-gray-400 animate-spin" size={18} />
-									) : (
-										search && (
-											<button
-												type="button"
-												onClick={() => setSearch('')}
-												className="absolute right-3 top-6 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-											>
-												<XCircle size={18} />
-											</button>
-										)
-									)}
-								</div>
-								<div className="flex flex-col">
-									{search ? (
-										loading ? (
-											Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)
-										) : filteredUsers.length > 0 ? (
-											filteredUsers.map(e => (
-												<div onClick={() => addUserHistory(e.id)} key={e.id}>
-													<div onClick={() => linkToProfile(e.id)} className='flex hover:bg-[#eeeeee] rounded p-3 items-center gap-5'>
-														{e.avatar == '' ? <User size={44} /> : <Image src={`http://37.27.29.18:8003/images/${e.avatar}`} width={44} height={44} alt="avatar" />}
-														<div>
-															<p>{e.userName}</p>
-															<p>{e.fullName}</p>
-														</div>
+										{loading ? (
+											<Loader className="absolute right-3 top-6 -translate-y-1/2 text-gray-400 animate-spin" size={18} />
+										) : (
+											search && (
+												<button
+													type="button"
+													onClick={() => setSearch('')}
+													className="absolute right-3 top-6 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+												>
+													<XCircle size={18} />
+												</button>
+											)
+										)}
+									</div>
+									<div className="flex h-[270px] overflow-y-scroll flex-col">
+										{followers?.data?.map(e => (
+											<div key={e.id} className='flex items-center justify-between hover:bg-[#eeeeee] rounded p-3'>
+												<div onClick={() => router.push(`${e?.userShortInfo?.userId}`)} className='flex items-center gap-5'>
+													<Image src={e?.userShortInfo?.userPhoto ?
+														`http://37.27.29.18:8003/images/${e?.userShortInfo?.userPhoto}` : defaultUser}
+														className='object-cover w-[44px] h-[44px] rounded-full' width={44} height={44} alt="avatar" />
+													<div>
+														<p>{e?.userShortInfo?.userName}</p>
+														<p>{e?.userShortInfo?.fullname}</p>
 													</div>
 												</div>
-											))
-										) : (
-											<p className="text-center text-gray-500 py-5">No users found with this name</p>
-										)
-									) : ("")}
+												<button>Follow</button>
+											</div>
+										))}
+									</div>
 								</div>
 							</Box>
 						</Modal>
@@ -296,10 +299,10 @@ const ProfileById = ({ children }) => {
 					</div>
 				</div>
 			</section>
-			{!user?.postCount && (
+			{openSuggest && (
 				<Suggetions />
 			)}
-			<div className='border-t-[#E2E8F0] border-t w-[95%] md:w-[80%] flex justify-center gap-[10px] md:gap-[50px]'>
+			<div className='w-[95%] mt-15 md:w-[80%] flex justify-center gap-[10px] md:gap-[50px]'>
 				<button
 					className='flex items-center gap-[10px] py-[10px]'
 					style={{
@@ -337,7 +340,7 @@ const ProfileById = ({ children }) => {
 				</button>
 			</div>
 			<section className='w-[95%] md:w-[80%]'>{children}</section>
-			{openSuggest && (
+			{!user?.postCount && (
 				<Suggetions />
 			)}
 		</div>

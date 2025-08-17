@@ -13,7 +13,7 @@ export default function CommentInput({ value2, onChange2 }) {
     };
 
     return (
-        <div className="relative flex gap-2 items-center">
+        <div className=" flex w-[100%] gap-2 items-center">
             <button
                 type="button"
                 onClick={() => setShowEmojiPicker((prev) => !prev)}
@@ -25,7 +25,7 @@ export default function CommentInput({ value2, onChange2 }) {
                 type="text"
                 value={value2}
                 onChange={onChange2}
-                className="flex-1 p-2 rounded border-none outline-none"
+               className="w-1/1 outline-none"
                 placeholder="Добавить комментарий..."
             />
 
