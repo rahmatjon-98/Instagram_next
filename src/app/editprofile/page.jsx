@@ -130,7 +130,7 @@ const Editprofile = () => {
 						</div>
 						<div>
 							<div>
-								<h1 className='font-bold text-[#1E293B] text-[22px]'>
+								<h1 className='font-bold text-[#1E293B] text-[22px] w-[140px] overflow-hidden'>
 									{user.userName}
 								</h1>
 							</div>
