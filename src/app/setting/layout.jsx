@@ -12,8 +12,10 @@ const LayoutSet = ({ children }) => {
      const { t } = useTranslation();
 
     return (
-        <div className='flex gap-[50px]'>
-            <div className="h-screen p-[20px] overflow-y-auto scroll-smooth">
+        <div className='flex gap-[10px]'>
+          <div className="h-screen w-[450px] p-[20px] overflow-y-auto scroll-smooth">
+
+
                 <p className='font-semibold text-[22px]'>{t('setting.settings')}</p>
 
                 <div className='p-4 w-[300px] mt-[20px] shadow-xl rounded-xl font-sans transition-transform duration-300 ease-in-out hover:scale-101'>
@@ -70,7 +72,7 @@ const LayoutSet = ({ children }) => {
                         <p>{t('setting.notification')}</p>
                     </div>
                 </Link>
-                <p className='font-semibold text-[15px] text-gray-600 mt-[30px]'>Кто может видеть ваш контент</p>
+                <p className='font-semibold text-[15px] text-gray-600 mt-[30px]'>{t('setting.content')}</p>
                 <Link href={'/setting/block-account'}>
                     <div
                         className={`flex gap-[10px] items-center p-3 rounded-md mt-[15px] transition-colors duration-300
@@ -296,7 +298,7 @@ const LayoutSet = ({ children }) => {
                 </Link>
             </div>
 
-            <div>
+            <div className='w-[1000px]'>
                 {children}
             </div>
         </div>

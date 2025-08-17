@@ -24,7 +24,7 @@ const Language = () => {
   );
 
   return (
-    <div className="mt-10 max-w-md mx-auto p-6 bg-white rounded-2xl shadow">
+    <div className="mt-10 max-w-md mx-auto p-6 rounded-2xl shadow">
       <h2 className="text-lg font-bold mb-2">{t('setting.lang')}</h2>
       <p className="text-sm text-gray-500 mb-6">
         {t('setting.text')}
