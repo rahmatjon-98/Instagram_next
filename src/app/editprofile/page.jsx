@@ -1,11 +1,12 @@
 'use client'
+import useDarkSide from '@/hook/useDarkSide'
 import { useProfileStore } from '@/store/pages/profile/profile/store'
 import Box from '@mui/material/Box'
 import Modal from '@mui/material/Modal'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import defaultUser from '../../assets/img/pages/profile/profile/instauser (2).jpg'
-import { useRouter } from 'next/navigation'
 
 const Editprofile = () => {
 	let {
@@ -103,13 +104,13 @@ const Editprofile = () => {
 	}
 
 	return (
-		<div className='pt-[5vh]'>
+		<div className='pt-[5vh] h-[100vh]'>
 			<section className='flex flex-col gap-[3vh] w-[80%] m-auto'>
 				<h1 className='text-[#2563EB] font-bold text-[25px]'>
 					Profile
 					<span className='text-[#1E293B]'>{' > '} Edit profile</span>
 				</h1>
-				<div className='bg-[#F3F4F6] rounded-2xl p-[20px] gap-y-[5vh] flex flex-col md:flex-row items-center justify-between'>
+				<div className=' rounded-2xl p-[20px] gap-y-[5vh] flex flex-col md:flex-row items-center justify-between border border-gray-300'>
 					<aside className='flex items-center gap-[10px]'>
 						<div className='overflow-hidden flex items-center justify-center w-[100px] md:w-[160px] h-[100px] md:h-[160px] rounded-[50%]'>
 							<Image
@@ -147,14 +148,14 @@ const Editprofile = () => {
 					</aside>
 					<aside className='flex gap-[20px] text-[#FFFFFF]'>
 						<button
-							className=' rounded-[10px] px-[10px] md:px-[20px] py-[5px] text-[14px] md:text-[16px] md:py-[10px] bg-red-500'
+							className=' rounded-[10px] px-[10px] lg:px-[20px] py-[5px] text-[14px] lg:text-[16px] lg:py-[10px] items-center bg-red-500 active:scale-95 transition-transform duration-100 ease-in'
 							style={{ display: user.image ? 'flex' : 'none' }}
 							onClick={handleOpen}
 						>
 							Delete photo
 						</button>
 						<button
-							className=' rounded-[10px] px-[10px] md:px-[20px] py-[5px] text-[14px] md:text-[16px] md:py-[10px] bg-blue-500'
+							className=' rounded-[10px] px-[10px] lg:px-[20px] py-[5px] text-[14px] lg:text-[16px] lg:py-[10px] bg-blue-500 active:scale-95 transition-transform duration-100 ease-in'
 							onClick={handleOpenEdit}
 						>
 							Change photo
@@ -173,7 +174,7 @@ const Editprofile = () => {
 								change profile photo with new photo
 							</p>
 							<button
-								className=' rounded-[10px] px-[10px] md:px-[20px] py-[5px] text-[14px] md:text-[16px] md:py-[10px] bg-red-500 text-[#FFFFFF] mt-[20px]'
+								className=' rounded-[10px] px-[10px] md:px-[20px] py-[5px] text-[14px] md:text-[16px] md:py-[10px] bg-red-500 text-[#FFFFFF] mt-[20px] active:scale-95 transition-transform duration-100 ease-in'
 								onClick={handleDeletePhoto}
 							>
 								Yes, delete
@@ -191,13 +192,13 @@ const Editprofile = () => {
 								/>
 								<div className='flex gap-[15px]'>
 									<button
-										className='px-[10px] py-[5px] rounded-[10px] text-[red]  border'
+										className='px-[10px] py-[5px] rounded-[10px] text-[red] border active:scale-95 transition-transform duration-100 ease-in'
 										onClick={handleCloseEdit}
 									>
 										Cancel
 									</button>
 									<button
-										className='px-[10px] py-[5px] rounded-[10px] text-[blue] border'
+										className='px-[10px] py-[5px] rounded-[10px] text-[blue] border active:scale-95 transition-transform duration-100 ease-in'
 										type='submit'
 									>
 										Update
@@ -251,7 +252,7 @@ const Editprofile = () => {
 						</span>
 					</div>
 					<button
-						className='bg-[#64748B] hover:bg-[#214b8e] text-[#FFFFFF] self-baseline px-[7%] py-[15px] rounded-2xl text-[20px] cursor-pointer'
+						className='bg-[#64748B] hover:bg-[#214b8e] text-[#FFFFFF] self-baseline px-[7%] py-[15px] rounded-2xl text-[20px] cursor-pointer active:scale-95 transition-transform duration-100 ease-in'
 						onClick={handleEditProfile}
 					>
 						Submit
