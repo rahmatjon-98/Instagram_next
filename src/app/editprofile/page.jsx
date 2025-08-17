@@ -111,7 +111,7 @@ const Editprofile = () => {
 				</h1>
 				<div className='bg-[#F3F4F6] rounded-2xl p-[20px] gap-y-[5vh] flex flex-col md:flex-row items-center justify-between'>
 					<aside className='flex items-center gap-[10px]'>
-						<div>
+						<div className='overflow-hidden flex items-center justify-center  w-[100px] md:w-[160px]'>
 							<Image
 								src={`http://37.27.29.18:8003/images/${user.image}`}
 								alt='profile picture'
@@ -119,7 +119,7 @@ const Editprofile = () => {
 								height={500}
 								className={`${
 									user.image ? 'flex' : 'hidden'
-								} w-[100px] md:w-[160px] h-[100px] md:h-[160px] rounded-[50%] overflow-hidden`}
+								} rounded-[50%] overflow-hidden`}
 							/>
 							<Image
 								src={defaultUser}
