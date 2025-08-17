@@ -2,10 +2,11 @@ import { useUserId } from "@/hook/useUserId";
 import axiosRequest from "@/lib/axiosRequest";
 import { create } from "zustand";
 
-
 export const useUserStore = create((set, get) => ({
   user: [],
   postById: {},
+  FolowUser:[],
+  f:false,
   fechUser: async () => {
     try {
       let res = await axiosRequest.get(`/Post/get-posts?PageSize=10000`, {});
@@ -14,32 +15,28 @@ export const useUserStore = create((set, get) => ({
       console.error(error);
     }
   },
-  getUsers: async (id) => {
+  getUsersFollow: async (id) => {
     try {
       const res = await axiosRequest.get(
-        `/FollowingRelationShip/get-subscribers?UserId=${id}`
+        `/FollowingRelationShip/get-subscriptions?UserId=${id}`
       );
-      set({ user: Array.isArray(res.data) ? res.data : [] });
+      console.log(res.data)
+      set({FolowUser:res.data});
     } catch (err) {
       console.error(err);
-      set({ user: [] });
     }
   },
-
   getPostById: async (id) => {
     try {
       let { data } = await axiosRequest.get(`Post/get-post-by-id?id=${id}`);
-
       set((state) => ({
         postById: {
           ...data,
           data: {
             ...data.data,
-            isFollowing:
-              // если в сторе уже есть true — не затираем false с бэка
-              state.postById?.data?.isFollowing ?? data.data.isFollowing,
+            isFollowing:state.FolowUser?.data?.some(e => e.userShortInfo.userId==data.data.userId)
           },
-        },
+        }
       }));
     } catch (error) {
       console.error(error);
@@ -105,7 +102,6 @@ export const useUserStore = create((set, get) => ({
     }
   },
 
-  
   Follow: async (FollowId) => {
     try {
       const token = localStorage.getItem("access_token");
@@ -113,8 +109,7 @@ export const useUserStore = create((set, get) => ({
 
       const currentPost = get().postById;
       if (!currentPost?.data) return;
-
-      // Оптимистичное обновление
+ 
       set({
         postById: {
           ...currentPost,
@@ -124,6 +119,7 @@ export const useUserStore = create((set, get) => ({
             subscribersCount: (currentPost.data.subscribersCount || 0) + 1,
           },
         },
+        f:true
       });
 
       await fetch(
@@ -136,12 +132,8 @@ export const useUserStore = create((set, get) => ({
           },
         }
       );
-
-      // Не обновляем весь пост, чтобы избежать сброса состояния
-      // Можно обновить только счетчик, если нужно
     } catch (err) {
       console.error("Follow error", err);
-      // Откатываем изменения при ошибке
       set({ postById: get().postById });
     }
   },
@@ -153,8 +145,7 @@ export const useUserStore = create((set, get) => ({
 
       const currentPost = get().postById;
       if (!currentPost?.data) return;
-
-      // Оптимистичное обновление
+ 
       set({
         postById: {
           ...currentPost,
@@ -167,6 +158,7 @@ export const useUserStore = create((set, get) => ({
             ),
           },
         },
+        f:false
       });
 
       await fetch(
@@ -179,11 +171,8 @@ export const useUserStore = create((set, get) => ({
           },
         }
       );
-
-      // Не обновляем весь пост
     } catch (err) {
       console.error("Unfollow error", err);
-      // Откатываем изменения при ошибке
       set({ postById: get().postById });
     }
   },

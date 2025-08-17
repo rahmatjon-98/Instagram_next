@@ -41,16 +41,30 @@
 		"metaVerified": "Meta Verified",
 		"from": "©️ 2024 Instagram from Meta"
 	},
-  "authentication":{
-    "login": {
-      "login": "Phone number, username, or email",
-      "password": "Password",
-      "enter": "Log in",
-      "or": "or",
-      "facebook": " Log in with Facebook",
-      "forgot": "forgot password?",
-      "noAccount": "Don't have an account? Sign up",
-      "download": "Get the app."
-    }
-  }
+	"authentication": {
+		"login": {
+			"login": "Phone number, username, or email",
+			"password": "Password",
+			"enter": "Log in",
+			"or": "or",
+			"facebook": " Log in with Facebook",
+			"forgot": "forgot password?",
+			"noAccount": "Don't have an account? Sign up",
+			"download": "Get the app."
+		}
+	},
+	"setting": {
+		"settings": "Settings",
+		"center": "Accounts Center",
+		"desc": "Manage cross-service features and account settings across Meta platforms.",
+		"insta": "How you use Instagram",
+		"profile": "Edit Profile",
+		"notification": "Notifications",
+		"content": "Who can see your content",
+		"russian": "Russian",
+		"tajik": "Tajik",
+		"english": "English",
+		"lang": "Language Preferences",
+		"text": "Text on buttons, headings, and other text will be shown in the language you prefer."
+	}
 }
