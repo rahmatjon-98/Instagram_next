@@ -12,7 +12,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import img from "../../assets/img/pages/chat/pages/default-chat/userFoto.jpg";
+import img from "@/assets/img/pages/chat/layout/userFoto.jpg";
 import { useDefaultChat } from "@/store/pages/chat/pages/default-chat/store";
 import { useMyProfile } from "@/store/pages/chat/layout/store";
 import { useUserId } from "@/hook/useUserId";
@@ -20,6 +20,7 @@ import { useChatById } from "@/store/pages/chat/pages/chat-by-id/store";
 import { usegetUserStore } from "@/store/pages/search/store";
 import { Skeleton, Stack } from "@mui/material";
 import { useRouter } from "next/navigation";
+import useDarkSide from "@/hook/useDarkSide";
 
 export default function Layout({ children }) {
   const router = useRouter();
@@ -103,7 +104,7 @@ export default function Layout({ children }) {
         );
 
       setOpenModalUsers(false);
-      
+
       console.log(chats?.chatId);
 
       if (chat?.chatId) {
@@ -118,8 +119,10 @@ export default function Layout({ children }) {
     }
   }
 
+  const [theme, setTheme] = useDarkSide();
+
   return (
-    <div className="flex ">
+    <div className={`flex ${theme == "dark" ? "bg-black text-white" : "bg-white text-black"}`}>
       <div className=" border-r-2 h-[100vh] border-gray-300 w-[40%]">
         <section className="flex items-center justify-between gap-5 p-5">
           <div className="flex items-center gap-2 text-xl font-bold">
