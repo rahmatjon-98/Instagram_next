@@ -23,15 +23,13 @@ const Layout = ({ children }) => {
 	return (
 		<div className='pl-[8%] pt-[8%]'>
 			<section className='flex gap-[20px] '>
-				<div className='hidden md:flex'>
+				<div className='hidden md:flex overflow-hidden items-center justify-center w-[100px] md:w-[160px] h-[100px] md:h-[160px] rounded-[50%]'>
 					<Image
 						src={`http://37.27.29.18:8003/images/${user.image}`}
 						alt='profile picture'
 						width={500}
 						height={500}
-						className={`${
-							user.image ? 'flex' : 'hidden'
-						} w-[160px] h-[160px] rounded-[50%] overflow-hidden`}
+						className={`${user.image ? 'flex' : 'hidden'} `}
 					/>
 					<Image
 						src={defaultUser}
@@ -62,15 +60,13 @@ const Layout = ({ children }) => {
 						</div>
 					</div>
 					<div className='flex items-center gap-[20px]'>
-						<div className='flex md:hidden'>
+						<div className='flex md:hidden overflow-hidden  items-center justify-center w-[100px] md:w-[160px] h-[100px] md:h-[160px] rounded-[50%]'>
 							<Image
 								src={`http://37.27.29.18:8003/images/${user.image}`}
 								alt='profile picture'
 								width={500}
 								height={500}
-								className={`${
-									user.image ? 'flex' : 'hidden'
-								} w-[70px] h-[70px] rounded-[50%]`}
+								className={`${user.image ? 'flex' : 'hidden'}`}
 							/>
 							<Image
 								src={defaultUser}
