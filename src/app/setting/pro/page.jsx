@@ -1,9 +1,12 @@
-import React from 'react'
+
+
+import React from "react";
+
 
 const PageProfile = () => {
-  return (
-    <div>PageProfile</div>
-  )
-}
+  return <div>
+    profile
+  </div>
+};
 
-export default PageProfile
+export default PageProfile;
