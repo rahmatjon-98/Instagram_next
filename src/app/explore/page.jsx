@@ -42,7 +42,7 @@ const mediaStyleModal = {
 
 
 export default function Explore() {
-	let { user, fechUser, postById, getPostById, deletComit, AddComit, unfollowUser, Follow, getUsersFollow, FolowUser, likePost,f } = useUserStore()
+	let { postSaved, user, fechUser, postById, getPostById, deletComit, AddComit, unfollowUser, Follow, getUsersFollow, FolowUser, likePost, f } = useUserStore()
 	console.log(postById)
 	const [open, setOpen] = React.useState(false)
 	let cnt = 3
@@ -140,34 +140,34 @@ export default function Explore() {
 	async function HendlFollow(id) {
 		// вычислим текущее состояние подписки из стора
 		const currentlyFollowed = FolowUser?.data?.some(e => e.userShortInfo.userId == id);
-		
+
 		try {
 			if (currentlyFollowed) {
 				await unfollowUser(id);
-			setFollow(true);
+				setFollow(true);
 
-				
+
 			} else {
 				await Follow(id);
-			setFollow(false);
+				setFollow(false);
 
 			}
-			
+
 			// Обновляем список подписок, чтобы стор стал актуальным
 			try {
 				await getUsersFollow(userId);
 			} catch (err) {
 				console.error("Ошибка при getUsersFollow в HendlFollow:", err);
 			}
-			
+
 			// Теперь пересчитаем follow исходя из обновлённого FolowUser
 			const updatedFollow = FolowUser?.data?.some(e => e.userShortInfo.userId == id);
 			// setFollow(updatedFollow ? false : true);
-			
-			
-			
+
+
+
 			// setFollow(e=> !e)
-			
+
 		} catch (error) {
 			console.error("Ошибка при подписке/отписке:", error);
 		}
@@ -323,9 +323,12 @@ export default function Explore() {
 													<MessageCircleMore size={24} color="#ffffff" />
 													<Send size={24} color="#ffffff" />
 												</div>
-												<button onClick={() => AddwishLix(postById.data?.postId)}>
+												<button onClick={() => {
+													postSaved(postById.data?.postId);
+													// AddwishLix(postById.data?.postId);
+												}}>
 													<Bookmark
-														fill={wishLix.includes(postById.data?.postId) ? "white" : "none"}
+														fill={postById.data?.postFavorite ? "white" : "none"}
 														size={24}
 														color="#ffffff"
 													/>
