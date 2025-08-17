@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import Profile from "@/assets/icon/layout/instagramDefaultProfile.jpg";
-import { Divider, Menu, MenuItem, Modal, Box, Button } from "@mui/material";
+import { Divider, Menu, MenuItem, Modal, Box } from "@mui/material";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import frame168 from "../../../assets/img/pages/auth/registration/Frame 168.png";
@@ -185,7 +185,6 @@ export default function SideBar({ children }) {
                 <MenuItem sx={{ color: "#ed4956", fontWeight: 600 }}>
                   <div onClick={logOut} className="flex gap-[20px]"><LogOut /> Log out</div>
                 </MenuItem>
-
               </Menu>
             </div>
           </div>
@@ -210,7 +209,9 @@ export default function SideBar({ children }) {
           boxShadow: 24,
           p: 3
         }}>
-          <Image src={frame168} alt='insta' />
+          <div className="flex justify-center mb-[10px]">
+            <Image src={frame168} alt='insta' />
+          </div>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
             <input
               type="text"
