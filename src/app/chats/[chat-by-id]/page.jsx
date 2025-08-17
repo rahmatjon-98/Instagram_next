@@ -263,7 +263,7 @@ export default function ChatById() {
 
   return (
     <div className="w-full">
-      <div className="fixed shadow w-[80%] z-10 bg-white p-2 flex justify-between">
+      <div className="fixed shadow w-[70%] z-10 bg-white p-2 flex justify-between">
         {loadingChat ? (
           <SkeletonRow />
         ) : (

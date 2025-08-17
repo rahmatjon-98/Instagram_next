@@ -28,12 +28,15 @@ export default function Main() {
 		isLoading2,
 		likePost,
 		commentPost,
+		getUser,
+		users,
 	} = useHome()
 	const [mutedMap, setMutedMap] = useState({})
 	const [stopMap, setStopMap] = useState({})
 	const [commentsMap, setCommentsMap] = useState({})
 	useEffect(() => {
 		getUserPosts()
+		getUser()
 	}, [])
 	const scrollRef = useRef(null)
 	let isDown = false
@@ -43,7 +46,7 @@ export default function Main() {
 		getUserStories()
 	}, [])
 	let [stories, setStories] = useState(false)
-	let [idUser, setIdUser] = useState(null)
+	let [idUser, setIdUser] = useState(0)
 	let [muted, setMuted] = useState(true)
 	let [comment, setComment] = useState('')
 	const onMouseDown = e => {
@@ -64,6 +67,20 @@ export default function Main() {
 		const walk = (x - startX) * 2
 		scrollRef.current.scrollLeft = scrollLeft - walk
 	}
+	let [theme, setTheme] = useState(
+		typeof window !== 'undefined' ? localStorage.getItem('theme') : ''
+	)
+	useEffect(() => {
+		const handleStorageChange = event => {
+			if (event.key === 'theme') {
+				setTheme(event.newValue)
+			}
+		}
+		window.addEventListener('storage', handleStorageChange)
+		return () => {
+			window.removeEventListener('storage', handleStorageChange)
+		}
+	}, [])
 	return (
 		<div className='flex w-full items-start'>
 			{stories && (
@@ -98,7 +115,7 @@ export default function Main() {
 						<Image src={image2} className='w-auto' alt='' />
 					</Link>
 					<div className='flex items-center justify-center'>
-							<SwiperStories  />
+						<SwiperStories indexUser={idUser} />
 					</div>
 				</section>
 			)}
@@ -131,8 +148,8 @@ export default function Main() {
 								return (
 									<div
 										onClick={() => {
+											setIdUser(i)
 											setStories(!stories)
-											setIdUser(e.userId)
 										}}
 										key={e.id || `story-${i}`}
 										className='size-[80px] flex flex-col items-center'
@@ -147,7 +164,9 @@ export default function Main() {
 											{(e.userImage == '' && (
 												<Image
 													draggable={false}
-													className='object-cover bg-white rounded-full p-[2.5px]'
+													className={`object-cover ${
+														theme == 'dark' ? 'bg-black' : 'bg-white'
+													} rounded-full p-[2.5px]`}
 													src={userIMG}
 													alt=''
 													width={66}
@@ -156,7 +175,9 @@ export default function Main() {
 											)) || (
 												<Image
 													draggable={false}
-													className='w-[64px] h-[64px] object-cover bg-white rounded-full p-[2.5px]'
+													className={`w-[64px] h-[64px] object-cover ${
+														theme == 'dark' ? 'bg-black' : 'bg-white'
+													} rounded-full p-[2.5px]`}
 													src={`http://37.27.29.18:8003/images/${e.userImage}`}
 													alt=''
 													width={66}
@@ -164,9 +185,7 @@ export default function Main() {
 												/>
 											)}
 										</div>
-										<p className='text-[#1F2937] text-[14px] font-[400]'>
-											{e.userName}
-										</p>
+										<p className='text-[14px] font-[400]'>{e.userName}</p>
 									</div>
 								)
 							})}
@@ -300,9 +319,7 @@ export default function Main() {
 													)}
 												</div>
 												<div className='flex flex-col'>
-													<p className='text-[#1E293B] font-[600] text-[14px]'>
-														{e.userName}
-													</p>
+													<p className='font-[600] text-[14px]'>{e.userName}</p>
 												</div>
 											</div>
 											<svg
@@ -451,11 +468,13 @@ export default function Main() {
 													>
 														{e.images.map((e, i) => (
 															<SwiperSlide key={i}>
-																<div className='relative w-full h-full'>
+																<div className='relative w-full flex justify-center items-center bg-black h-full'>
 																	<Image
 																		src={`http://37.27.29.18:8003/images/${e}`}
 																		alt={`Slide ${i + 1}`}
-																		fill
+																		width={610}
+																		height={600}
+																		className='m-auto w-auto h-full'
 																		priority={i === 0}
 																	/>
 																</div>
@@ -570,9 +589,7 @@ export default function Main() {
 											</div>
 											{e.content != null && (
 												<div className='flex items-center gap-[10px]'>
-													<p className='text-[#1E293B] font-bold'>
-														{e.userName}
-													</p>
+													<p className='font-bold'>{e.userName}</p>
 													{(e.content.length > 90 && (
 														<p className='text-[#262626] text-[14px] font-[400]'>
 															{e.content.slice(0, 87)}...
@@ -626,11 +643,11 @@ export default function Main() {
 																			height={34}
 																		/>
 																	)}
-																	<p className='text-[#1E293B] text-[14px] font-[600]'>
+																	<p className='text-[14px] font-[600]'>
 																		{com.userName}
 																	</p>
 																</div>
-																<p className='ml-[10px] text-[#1E293B] text-[14px] font-[400]'>
+																<p className='ml-[10px] text-[14px] font-[400]'>
 																	{com.comment}
 																</p>
 															</div>
@@ -668,7 +685,103 @@ export default function Main() {
 					)}
 				</div>
 			</div>
-			<div className='w-[30%] h-[100vh] right-0 py-[28px] hidden md:flex flex-col gap-[20px] sticky top-0'></div>
+			<div className='w-[30%] h-[100vh] right-0 py-[28px] hidden md:flex flex-col gap-[20px] sticky top-0'>
+				<div>
+					{(isLoading &&
+						Array.from({ length: 1 }).map((_, i) => (
+							<div
+								key={`skeleton-${i}`}
+								className='flex gap-[8px] items-center px-[3px]'
+							>
+								<Skeleton
+									variant='circular'
+									width={48}
+									className='mx-[3px] md:mx-[6px]'
+									height={48}
+								/>
+								<Skeleton variant='text' sx={{ fontSize: '12px' }} width={36} />
+							</div>
+						))) || (
+						<div className='flex gap-[14px]'>
+							<div
+								onClick={() => {
+									setIdUser(0)
+									setStories(!stories)
+								}}
+								key={data[0]?.id || `story-${0}`}
+								className='size-[80px] flex gap-[8px] items-center'
+							>
+								{(data[0]?.userImage == '' && (
+									<Image
+										draggable={false}
+										className={`object-cover ${
+											theme == 'dark' ? 'bg-black' : 'bg-white'
+										} rounded-full p-[2.5px]`}
+										src={userIMG}
+										alt=''
+										width={48}
+										height={48}
+									/>
+								)) || (
+									<Image
+										draggable={false}
+										className={`w-[48px] h-[48px] object-cover rounded-full`}
+										src={`http://37.27.29.18:8003/images/${data[0]?.userImage}`}
+										alt=''
+										width={48}
+										height={48}
+									/>
+								)}
+								<p className='text-[14px] font-[400]'>{data[0]?.userName}</p>
+							</div>
+						</div>
+					)}
+				</div>
+				<div className='w-full flex flex-col'>
+					<p className='block text-[#64748B] text-[14px] font-[500] '>
+						Suggested for you
+					</p>
+					{users?.data?.slice(0, 5).map(e => {
+						console.log(e);
+						
+						return (
+							<div className='py-[12px] pr-[8px] flex justify-between'>
+								<div className='flex gap-[8px] items-center'>
+									{(e.avatar == '' && (
+										<Image
+											draggable={false}
+											className={`object-cover ${
+												theme == 'dark' ? 'bg-black' : 'bg-white'
+											} rounded-full p-[2.5px]`}
+											src={userIMG}
+											alt=''
+											width={48}
+											height={48}
+										/>
+									)) || (
+										<Image
+											draggable={false}
+											className={`w-[48px] h-[48px] object-cover rounded-full`}
+											src={`http://37.27.29.18:8003/images/${e.avatar}`}
+											alt=''
+											width={48}
+											height={48}
+										/>
+									)}
+									<div className='flex flex-col'>
+										<p className='text-[16px] font-[500]'>
+											{e.userName}
+										</p>
+										<p className='text-[12px] font-[400]'>
+											{e.fullName}
+										</p>
+									</div>
+								</div>
+							</div>
+						)
+					})}
+				</div>
+			</div>
 		</div>
 	)
 }
