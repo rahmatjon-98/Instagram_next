@@ -54,8 +54,6 @@ const Modal = () => {
         </Stack>
     )
 
-    const id = users?.data?.map(e => e.id)
-
     let navigate = useRouter()
 
     function linkToProfile(id) {
@@ -118,7 +116,7 @@ const Modal = () => {
                     ) : filteredUsers.length > 0 ? (
                         filteredUsers.map(e => (
                             <div onClick={() => addUserHistory(e.id)} key={e.id}>
-                                <div onClick={() => linkToProfile(e.id)} className='flex hover:bg-[#eeeeee] rounded p-3 items-center gap-5'>
+                                <div onClick={() => linkToProfile(e.id)} className='flex cursor-pointer hover:bg-[#eeeeee] rounded p-3 items-center gap-5'>
                                     {e.avatar == '' ? <Image src={defaultUser} className='object-cover w-[44px] h-[44px] rounded-full' height={44} width={44} /> : <Image src={`http://37.27.29.18:8003/images/${e.avatar}`} className='object-cover w-[44px] h-[44px] rounded-full' width={44} height={44} alt="avatar" />}
                                     <div>
                                         <p>{e.userName}</p>
@@ -132,9 +130,9 @@ const Modal = () => {
                     )
                 ) : (
                     searchHistories?.data?.map(e => (
-                        <div className="flex items-center cursor-pointer hover:bg-[#eeeeee] rounded p-3 w-full justify-between">
-                            <div onClick={() => linkToProfile(e?.users.id)} className='flex items-center gap-5'>
-                                {e?.users?.avatar == '' ? <Image src={defaultUser} className='object-cover w-[44px] h-[44px] rounded-full' height={44} width={44} /> : <Image src={`http://37.27.29.18:8003/images/${e?.users?.avatar}`} className='object-cover w-[44px] h-[44px] rounded-full' width={44} height={44} alt="avatar" />}
+                        <div key={e.id} className="flex items-center cursor-pointer hover:bg-[#eeeeee] rounded p-3 w-full justify-between">
+                            <div onClick={() => linkToProfile(e?.users.id)} className='flex cursor-pointer items-center gap-5'>
+                                {e?.users?.avatar == '' ? <Image src={defaultUser} className='object-cover w-[44px] h-[44px] rounded-full' height={44} width={44} alt='image' /> : <Image src={`http://37.27.29.18:8003/images/${e?.users?.avatar}`} className='object-cover w-[44px] h-[44px] rounded-full' width={44} height={44} alt="avatar" />}
                                 <div>
                                     <p>{e?.users?.userName}</p>
                                     <p>{e?.users?.fullName}</p>

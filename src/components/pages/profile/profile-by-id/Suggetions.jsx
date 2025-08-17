@@ -8,9 +8,8 @@ import { useRouter } from 'next/navigation'
 const Suggetions = () => {
     let { users, getUsers } = usegetUserStore()
     let randomUsers = users?.data?.slice(0, 12)
-    const [openSuggest, setOpenSuggest] = useState(null)
+    // const [openSuggest, setOpenSuggest] = useState(null)
     let router = useRouter()
-
 
     const containerRef = useRef(null)
     let width = 320
@@ -42,7 +41,7 @@ const Suggetions = () => {
                                 <p className='text-[14px]'>{e.fullName}</p>
                             </div>
                             <div className="border-1 border-gray-300 rounded-b border-t-0 flex justify-center p-3">
-                                <button>Follow</button>
+                                <button>Follow </button>
                             </div>
                         </div>
                     ))}
