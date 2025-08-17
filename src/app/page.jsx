@@ -741,11 +741,9 @@ export default function Main() {
 					<p className='block text-[#64748B] text-[14px] font-[500] '>
 						Suggested for you
 					</p>
-					{users?.data?.slice(0, 5).map(e => {
-						console.log(e);
-						
+					{users?.data?.slice(0, 5).map((e,i) => {
 						return (
-							<div className='py-[12px] pr-[8px] flex justify-between'>
+							<div key={i} className='py-[12px] pr-[8px] flex justify-between'>
 								<div className='flex gap-[8px] items-center'>
 									{(e.avatar == '' && (
 										<Image
