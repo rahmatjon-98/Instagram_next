@@ -15,6 +15,7 @@ import './globals.css'
 import { useRealsStore } from './reels/store'
 import Link from 'next/link'
 import StoryComponent from '@/components/pages/home/stories'
+import SwiperStories from '@/components/pages/home/stories'
 
 export default function Main() {
 	const videoRefs = useRef({})
@@ -97,45 +98,7 @@ export default function Main() {
 						<Image src={image2} className='w-auto' alt='' />
 					</Link>
 					<div className='flex items-center justify-center'>
-						<Swiper
-							effect={'cube'}
-							grabCursor={true}
-							cubeEffect={{
-								shadow: false,
-							}}
-							pagination={true}
-							style={{
-								width:"380px",
-								height:'100%'
-							}}
-							modules={[EffectCube, Pagination]}
-							className='YoqubSwiper'
-						>
-							<SwiperSlide style={{
-								width:"380px",
-								height:'100%'
-							}}>
-								<StoryComponent idStoryUser={idUser} />
-							</SwiperSlide>
-							<SwiperSlide style={{
-								width:"380px",
-								height:'100%'
-							}}>
-								<StoryComponent idStoryUser={idUser} />
-							</SwiperSlide>
-							<SwiperSlide style={{
-								width:"380px",
-								height:'100%'
-							}}>
-								<StoryComponent idStoryUser={idUser} />
-							</SwiperSlide>
-							<SwiperSlide style={{
-								width:"380px",
-								height:'100%'
-							}}>
-								<StoryComponent idStoryUser={idUser} />
-							</SwiperSlide>
-						</Swiper>
+							<SwiperStories  />
 					</div>
 				</section>
 			)}
