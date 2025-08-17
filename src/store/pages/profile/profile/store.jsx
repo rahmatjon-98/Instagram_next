@@ -37,9 +37,15 @@ export const useProfileStore = create((set, get) => ({
 	},
 	updateProfilePhoto: async formData => {
 		try {
+			const token = localStorage.getItem('access_token')
 			await axiosRequest.put(
 				'http://37.27.29.18:8003/UserProfile/update-user-image-profile',
-				formData
+				formData,
+				{
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				}
 			)
 			await get().getProfileData()
 		} catch (error) {
@@ -54,9 +60,7 @@ export const useProfileStore = create((set, get) => ({
 				updateProfile,
 				{
 					headers: {
-						'Authorization': `Bearer ${token}`,
-						'accept': '*/*',
-						'Content-Type': 'application/json',
+						Authorization: `Bearer ${token}`,
 					},
 				}
 			)

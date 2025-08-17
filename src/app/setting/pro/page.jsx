@@ -1,9 +1,12 @@
-import React from 'react'
+
+import Editprofile from "@/app/editprofile/page";
+import React from "react";
+
 
 const PageProfile = () => {
-  return (
-    <div>PageProfile</div>
-  )
-}
+  return <div>
+   <Editprofile />
+  </div>
+};
 
-export default PageProfile
+export default PageProfile;
