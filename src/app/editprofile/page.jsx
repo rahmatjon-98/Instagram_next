@@ -135,7 +135,7 @@ const Editprofile = () => {
 								</h1>
 							</div>
 							<div>
-								<p className='font-normal text-[#64748B] text-[20px]'>
+								<p className='font-normal text-[#64748B] text-[20px] w-[100px] overflow-hidden'>
 									{user.firstName}
 								</p>
 								{user.lastName && (
