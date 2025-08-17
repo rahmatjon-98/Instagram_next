@@ -37,10 +37,6 @@ export default function Layout({ children }) {
 
   // const { addChats, getChats, chats } = useProfileByIdStore()
 
-  function setLocale(user) {
-    localStorage.setItem("userData", JSON.stringify(user));
-  }
-
   const { users, getUsers, getSearchHistories } = usegetUserStore();
 
   const [openModalUsers, setOpenModalUsers] = useState(false);
@@ -95,6 +91,7 @@ export default function Layout({ children }) {
     try {
       setIdx(id);
       await createChat(id);
+      setOpenModalUsers(false);
       await get();
 
       const chat = useDefaultChat
@@ -103,7 +100,6 @@ export default function Layout({ children }) {
           (e) => e.receiveUserId === id || e.sendUserId === id
         );
 
-      setOpenModalUsers(false);
 
       console.log(chats?.chatId);
 
@@ -123,7 +119,8 @@ export default function Layout({ children }) {
 
   return (
     <div className={`flex ${theme == "dark" ? "bg-black text-white" : "bg-white text-black"}`}>
-      <div className=" border-r-2 h-[100vh] border-gray-300 w-[40%]">
+
+      <div className="lg:block hidden border-r-2 h-[100vh] border-gray-300 w-[40%]">
         <section className="flex items-center justify-between gap-5 p-5">
           <div className="flex items-center gap-2 text-xl font-bold">
             {loadingMyProfil ? (
@@ -291,7 +288,6 @@ export default function Layout({ children }) {
                 <Link
                   key={e.chatId}
                   href={`/chats/${e.chatId}`}
-                  onClick={() => setLocale(e)}
                 >
                   <div className="flex items-center gap-1 hover:bg-gray-200 p-2">
                     {(
