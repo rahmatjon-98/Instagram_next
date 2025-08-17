@@ -158,131 +158,142 @@ export const useRealsStore = create((set, get) => ({
   },
 
   addNewComent: async ({ postId, commentText }) => {
-    const { currentUserName, currentUserImage, currentUserId } = get();
+    const { currentUserId, currentUserName, currentUserImage } = get();
+    if (!currentUserId) return;
 
-    if (!currentUserId) {
-      console.warn("Идентификатори корбар ёфт нашуд");
-      return;
-    }
-
-    const tempCommentId = `temp_${Date.now()}_${Math.random().toString(36).substring(2)}`;
-    const newComment = {
-      postCommentId: tempCommentId,
+    const tempId = `temp_${Date.now()}`;
+    const tempComment = {
+      postCommentId: tempId,
       userId: currentUserId,
-      userName: currentUserName || "Номаълум",
-      userImage: currentUserImage || "",
+      userName: currentUserName,
+      userImage: currentUserImage,
       dateCommented: new Date().toISOString(),
       comment: commentText,
     };
 
+    // локально добавляем
     set((state) => ({
-      rels: state.rels.map((reel) =>
-        reel.postId === postId
+      rels: state.rels.map((r) =>
+        r.postId === postId
           ? {
-              ...reel,
-              comments: [...(reel.comments || []), newComment],
-              commentCount: (reel.commentCount || 0) + 1,
+              ...r,
+              comments: [...r.comments, tempComment],
+              commentCount: (r.commentCount || 0) + 1,
             }
-          : reel
+          : r
       ),
     }));
 
     try {
-      const response = await axiosRequest.post(
-        "/Post/add-comment",
-        {
-          comment: commentText,
-          postId,
-        },
-      );
+      const res = await axiosRequest.post("/Post/add-comment", {
+        comment: commentText,
+        postId,
+      });
+      const realId = res.data.data?.commentId;
 
-      if (response.data.statusCode === 200) {
-        const newCommentId = response.data.data?.commentId || tempCommentId;
+      if (realId) {
+        // заменяем tempId на реальный
         set((state) => ({
-          rels: state.rels.map((reel) =>
-            reel.postId === postId
+          rels: state.rels.map((r) =>
+            r.postId === postId
               ? {
-                  ...reel,
-                  comments: (reel.comments || []).map((comment) =>
-                    comment.postCommentId === tempCommentId
-                      ? { ...comment, postCommentId: newCommentId }
-                      : comment
+                  ...r,
+                  comments: r.comments.map((c) =>
+                    c.postCommentId === tempId
+                      ? { ...c, postCommentId: realId }
+                      : c
                   ),
                 }
-              : reel
+              : r
           ),
         }));
-      } else {
-        throw new Error(`Хатогии иловаи шарҳ: Status ${response.data.statusCode}`);
       }
-    } catch (error) {
-      console.error("Хатогии иловаи шарҳ:", error.message, error.response?.data);
+    } catch (err) {
+      console.error("Ошибка при добавлении комментария:", err.message);
+      // убираем временный, если API упал
       set((state) => ({
-        rels: state.rels.map((reel) =>
-          reel.postId === postId
+        rels: state.rels.map((r) =>
+          r.postId === postId
             ? {
-                ...reel,
-                comments: (reel.comments || []).filter(
-                  (c) => c.postCommentId !== tempCommentId
+                ...r,
+                comments: r.comments.filter(
+                  (c) => c.postCommentId !== tempId
                 ),
-                commentCount: Math.max((reel.commentCount || 1) - 1, 0),
+                commentCount: Math.max((r.commentCount || 1) - 1, 0),
               }
-            : reel
+            : r
         ),
       }));
     }
   },
 
-  deleteComment: async (postId, commentId) => {
-    const { rels, currentUserId } = get();
-    const reel = rels.find((r) => r.postId === postId);
-    const comment = reel?.comments?.find((c) => c.postCommentId === commentId);
+ // В deleteComment: сравнение через String(...) и добавим логирование при отказе
+ deleteComment: async (postId, commentId) => {
+  const { rels, currentUserId } = get();
+  const reel = rels.find((r) => String(r.postId) === String(postId));
+  const comment = reel?.comments?.find(
+    (c) => String(c.postCommentId) === String(commentId)
+  );
+  if (!reel || !comment) return;
 
-    if (!reel || !comment) {
-      console.warn("Рил ё комментарий ёфт нашуд!");
-      return;
-    }
-
-    if (comment.userId !== currentUserId && reel.userId !== currentUserId) {
-      console.warn("Шумо иҷозати нест кардани ин комментарийро надоред!");
-      return;
-    }
-
+  // если это временный коммент — удаляем только локально
+  if (String(commentId).startsWith("temp_")) {
     set({
       rels: rels.map((r) =>
         r.postId === postId
           ? {
               ...r,
-              comments: r.comments.filter((c) => c.postCommentId !== commentId),
-              commentCount: Math.max((r.commentCount || 0) - 1, 0),
+              comments: r.comments.filter(
+                (c) => String(c.postCommentId) !== String(commentId)
+              ),
+              commentCount: Math.max((r.commentCount || 1) - 1, 0),
             }
           : r
       ),
     });
+    return;
+  }
 
-    try {
-      const response = await axiosRequest.delete(
-        `/Post/delete-comment?commentId=${commentId}`,
-      );
+  // удаляем из стора сразу
+  set({
+    rels: rels.map((r) =>
+      r.postId === postId
+        ? {
+            ...r,
+            comments: r.comments.filter(
+              (c) => String(c.postCommentId) !== String(commentId)
+            ),
+            commentCount: Math.max((r.commentCount || 0) - 1, 0),
+          }
+        : r
+    ),
+  });
 
-      if (response.data.statusCode !== 200 || !response.data.data) {
-        throw new Error("Хатогии API барои нест кардани комментарий");
-      }
-    } catch (error) {
-      console.error("Хатогии нест кардани комментарий:", error.message, error.response?.data);
-      set({
-        rels: rels.map((r) =>
-          r.postId === postId
-            ? {
-                ...r,
-                comments: [...r.comments, comment].sort(
-                  (a, b) => new Date(a.dateCommented) - new Date(b.dateCommented)
-                ),
-                commentCount: (r.commentCount || 0) + 1,
-              }
-            : r
-        ),
-      });
-    }
-  },
+  try {
+    await axiosRequest.delete(
+      `/Post/delete-comment?commentId=${commentId}`
+    );
+  } catch (err) {
+    console.error("Ошибка удаления комментария:", err.message);
+    // откат — возвращаем коммент
+    set({
+      rels: rels.map((r) =>
+        r.postId === postId
+          ? {
+              ...r,
+              comments: [...r.comments, comment].sort(
+                (a, b) =>
+                  new Date(a.dateCommented) - new Date(b.dateCommented)
+              ),
+              commentCount: (r.commentCount || 0) + 1,
+            }
+          : r
+      ),
+    });
+  }
+},
+
+  
+
+  
 }));

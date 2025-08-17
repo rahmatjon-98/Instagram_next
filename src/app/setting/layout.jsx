@@ -5,14 +5,18 @@ import metaa from '../../assets/img/pages/auth/registration/metaa.png'
 import { ALargeSmall, ArrowDownToLine, AtSign, Baby, BadgeCheck, Ban, Bell, BellOff, BookText, CircleOff, CircleStar, CircleUserRound, Crown, HeartOff, Languages, LifeBuoy, Lock, LockKeyhole, MessageCircleDashed, MessageCircleReply, RefreshCw, Repeat, ShieldCheck, ShieldPlus, SquareChartGantt, SquarePlay, User, UserRound, Users, UserX, Wallet } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useTranslation } from 'react-i18next'
 
 const LayoutSet = ({ children }) => {
     const pathname = usePathname(); 
+     const { t } = useTranslation();
 
     return (
-        <div className='flex gap-[50px]'>
-            <div className="h-screen p-[20px] overflow-y-auto scroll-smooth">
-                <p className='font-semibold text-[22px]'>Настройки</p>
+        <div className='flex gap-[10px]'>
+          <div className="h-screen w-[450px] p-[20px] overflow-y-auto scroll-smooth">
+
+
+                <p className='font-semibold text-[22px]'>{t('setting.settings')}</p>
 
                 <div className='p-4 w-[300px] mt-[20px] shadow-xl rounded-xl font-sans transition-transform duration-300 ease-in-out hover:scale-101'>
                     <Image
@@ -20,9 +24,9 @@ const LayoutSet = ({ children }) => {
                         src={metaa}
                         alt="meta"
                     />
-                    <h2 className="text-lg font-semibold mb-3">Центр аккаунтов</h2>
+                    <h2 className="text-lg font-semibold mb-3">{t('setting.center')}</h2>
                     <p className="text-sm text-gray-600 leading-snug">
-                        Управляйте кросс-сервисными функциями и настройками аккаунтов на платформах Meta.
+                        {t('setting.desc')}
                     </p>
 
                     <div className="mt-[20px]">
@@ -48,7 +52,7 @@ const LayoutSet = ({ children }) => {
                     </a>
                 </div>
 
-                <p className='font-semibold text-[15px] text-gray-600 mt-[30px]'>Как вы используете Instagram</p>
+                <p className='font-semibold text-[15px] text-gray-600 w-[300px] mt-[30px]'>{t('setting.insta')}</p>
 
                 <Link href={'/setting/pro'}>
                     <div
@@ -56,7 +60,7 @@ const LayoutSet = ({ children }) => {
                         ${pathname === "/setting/pro" ? "bg-gray-300" : "hover:bg-gray-200"}`}
                     >
                         <CircleUserRound />
-                        <p>Редактировать профиль</p>
+                        <p>{t('setting.profile')}</p>
                     </div>
                 </Link>
                 <Link href={'/setting/likes'}>
@@ -65,10 +69,10 @@ const LayoutSet = ({ children }) => {
                         ${pathname === "/setting/likes" ? "bg-gray-300" : "hover:bg-gray-200"}`}
                     >
                         <Bell />
-                        <p>Уведомления</p>
+                        <p>{t('setting.notification')}</p>
                     </div>
                 </Link>
-                <p className='font-semibold text-[15px] text-gray-600 mt-[30px]'>Кто может видеть ваш контент</p>
+                <p className='font-semibold text-[15px] text-gray-600 mt-[30px]'>{t('setting.content')}</p>
                 <Link href={'/setting/block-account'}>
                     <div
                         className={`flex gap-[10px] items-center p-3 rounded-md mt-[15px] transition-colors duration-300
@@ -294,7 +298,7 @@ const LayoutSet = ({ children }) => {
                 </Link>
             </div>
 
-            <div>
+            <div className='w-[1000px]'>
                 {children}
             </div>
         </div>
