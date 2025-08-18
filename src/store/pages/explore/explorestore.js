@@ -225,8 +225,7 @@ export const useUserStore = create((set, get) => ({
   postSaved: async (postId) => {
   try {
    let res= await axiosRequest.post(`/Post/add-post-favorite`, { postId });
-    // set({user,user:res?.data?.postId})
-    // обновляем стор
+   
     set((state) => ({
       user: {
         ...state.user,
