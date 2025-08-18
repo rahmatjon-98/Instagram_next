@@ -1,7 +1,7 @@
 "use client";
 import img1 from "../../assets/img/pages/chat/pages/chat-by-id/icon.png";
 
-import { Loader2, User, X, ChevronDown, ArrowLeft } from "lucide-react";
+import { Loader2, User, X, ChevronDown, ArrowLeft, Search } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { useDefaultChat } from "@/store/pages/chat/pages/default-chat/store";
@@ -142,7 +142,6 @@ export default function DefaultChat() {
       setIdx(id);
       await createChat(id);
       setOpenModalUsers(false);
-      await get();
 
       const chat = useDefaultChat
         .getState()
@@ -150,13 +149,13 @@ export default function DefaultChat() {
           (e) => e.receiveUserId === id || e.sendUserId === id
         );
 
-      console.log(chats?.chatId);
-
       if (chat?.chatId) {
         router.push(`/chats/${chat.chatId}`);
       } else {
         console.error("Chat not found for this user");
       }
+
+      await get();
 
       setSearch("");
     } catch (error) {
@@ -205,6 +204,21 @@ export default function DefaultChat() {
                 />
               </svg>
             </button>
+          </section>
+
+          <section
+            className={`m-2 rounded p-2  flex items-center gap-2 my-3 ${
+              theme == "dark" ? "bg-gray-600" : "bg-neutral-100"
+            }`}
+          >
+            <Search className="text-gray-400 text-sm" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search"
+              className={` w-9/10 `}
+            />
           </section>
 
           {openModalUsers && (
@@ -330,45 +344,52 @@ export default function DefaultChat() {
             {loadingChat
               ? Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)
               : chats &&
-                chats.data?.map((e) => (
-                  <Link key={e.chatId} href={`/chats/${e.chatId}`}>
-                    <div className="flex items-center gap-1 hover:bg-gray-200 p-2">
-                      {(
-                        e.receiveUserId === userId
-                          ? e.sendUserImage
-                          : e.receiveUserImage
-                      ) ? (
-                        <Image
-                          alt=""
-                          src={`http://37.27.29.18:8003/images/${
-                            e.receiveUserId === userId
-                              ? e.sendUserImage
-                              : e.receiveUserImage
-                          }`}
-                          width={40}
-                          height={40}
-                          className="w-10 h-10 rounded-full object-cover object-center"
-                          priority
-                        />
-                      ) : (
-                        <Image
-                          alt=""
-                          src={img}
-                          width={40}
-                          height={40}
-                          className="w-10 h-10 rounded-full object-cover"
-                          priority
-                        />
-                      )}
+                chats.data
+                  ?.filter((e) =>
+                    (e.receiveUserId === userId
+                      ? e.sendUserName
+                      : e.receiveUserName
+                    ).includes(search.toLowerCase())
+                  )
+                  .map((e) => (
+                    <Link key={e.chatId} href={`/chats/${e.chatId}`}>
+                      <div className="flex items-center gap-1 hover:bg-gray-200 p-2">
+                        {(
+                          e.receiveUserId === userId
+                            ? e.sendUserImage
+                            : e.receiveUserImage
+                        ) ? (
+                          <Image
+                            alt=""
+                            src={`http://37.27.29.18:8003/images/${
+                              e.receiveUserId === userId
+                                ? e.sendUserImage
+                                : e.receiveUserImage
+                            }`}
+                            width={40}
+                            height={40}
+                            className="w-10 h-10 rounded-full object-cover object-center"
+                            priority
+                          />
+                        ) : (
+                          <Image
+                            alt=""
+                            src={img}
+                            width={40}
+                            height={40}
+                            className="w-10 h-10 rounded-full object-cover"
+                            priority
+                          />
+                        )}
 
-                      <div>
-                        {e.receiveUserId === userId
-                          ? e.sendUserName
-                          : e.receiveUserName}
+                        <div>
+                          {e.receiveUserId === userId
+                            ? e.sendUserName
+                            : e.receiveUserName}
+                        </div>
                       </div>
-                    </div>
-                  </Link>
-                ))}
+                    </Link>
+                  ))}
           </section>
         </div>
       </div>

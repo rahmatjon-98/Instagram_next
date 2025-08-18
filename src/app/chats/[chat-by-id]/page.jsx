@@ -6,6 +6,7 @@ import { useChatById } from "@/store/pages/chat/pages/chat-by-id/store";
 import { useDefaultChat } from "@/store/pages/chat/pages/default-chat/store";
 import { Box, Button, Drawer, Skeleton, Stack } from "@mui/material";
 import {
+  ArrowLeft,
   EllipsisVertical,
   Loader2,
   Mic,
@@ -278,48 +279,57 @@ export default function ChatById() {
   //------------------------------------------------------------------------------------------------------
   return (
     <div className="w-full">
-      <div className="relative shadow w-[100%] z-10 p-2 flex justify-between">
-        {loadingChat ? (
-          <SkeletonRow />
-        ) : (
-          <div className="flex items-center gap-2">
-            {userData ? (
-              <div className="flex items-center gap-2">
-                {!userData.receiveUserImage ? (
-                  <Image
-                    src={img}
-                    width={500}
-                    height={500}
-                    alt="avatar"
-                    className="w-12 h-12 rounded-full object-cover"
-                  />
-                ) : (
-                  <Image
-                    src={`http://37.27.29.18:8003/images/${
-                      userData.receiveUserId === userId
-                        ? userData.sendUserImage
-                        : userData.receiveUserImage
-                    }`}
-                    width={500}
-                    height={500}
-                    alt="avatar"
-                    className="w-12 h-12 rounded-full object-cover"
-                  />
-                )}
+      <div className="relative shadow w-[100%] z-10 p-2 flex justify-between items-center">
+        <div className="flex items-center gap-3">
+          <Link href={`/chats`} className="lg:hidden block">
+            <button>
+              <ArrowLeft />
+            </button>
+          </Link>
 
-                <div>
-                  <p>
-                    {userData.receiveUserId === userId
-                      ? userData.sendUserName
-                      : userData.receiveUserName}
-                  </p>
+          {loadingChat ? (
+            <SkeletonRow />
+          ) : (
+            <div className="flex items-center gap-2">
+              {userData ? (
+                <div className="flex items-center gap-2">
+                  {!userData.receiveUserImage ? (
+                    <Image
+                      src={img}
+                      width={500}
+                      height={500}
+                      alt="avatar"
+                      className="w-12 h-12 rounded-full object-cover"
+                    />
+                  ) : (
+                    <Image
+                      src={`http://37.27.29.18:8003/images/${
+                        userData.receiveUserId === userId
+                          ? userData.sendUserImage
+                          : userData.receiveUserImage
+                      }`}
+                      width={500}
+                      height={500}
+                      alt="avatar"
+                      className="w-12 h-12 rounded-full object-cover"
+                    />
+                  )}
+
+                  <div>
+                    <p>
+                      {userData.receiveUserId === userId
+                        ? userData.sendUserName
+                        : userData.receiveUserName}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <SkeletonRow />
-            )}
-          </div>
-        )}
+              ) : (
+                <SkeletonRow />
+              )}
+            </div>
+          )}
+        </div>
+
         <Button onClick={toggleDrawer(true)}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -358,7 +368,7 @@ export default function ChatById() {
         </Box>
       </Drawer>
 
-      <div className="w-full mx-auto p-4 h-[78vh] overflow-y-auto gap-2 ">
+      <div className="w-full mx-auto p-4 h-[76vh] overflow-y-auto gap-2 ">
         {loadingDelChat ? (
           <SkeletonChat />
         ) : (
@@ -505,8 +515,8 @@ export default function ChatById() {
 
                         {delMesModal === e.messageId && (
                           <div
-                            className={`absolute flex flex-col justify-center items-center gap-2 shadow rounded bg-white w-[250px] ${
-                              isCurrentUser ? "-ml-60 -mt-30" : "ml-5 -mt-30"
+                            className={`absolute flex flex-col justify-center items-center gap-2 shadow rounded bg-white w-[200px] ${
+                              isCurrentUser ? "lg:-ml-60 lg:-mt-30 -mx-20 -mt-32 " : "lg:ml-5 lg:-mt-30  -mx-10 -mt-32"
                             }`}
                           >
                             <button
