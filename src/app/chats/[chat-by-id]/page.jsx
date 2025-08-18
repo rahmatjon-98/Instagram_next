@@ -1,10 +1,10 @@
 "use client";
 
-import img from "@/assets/img/pages/chat/pages/default-chat/userFoto.jpg";
+import img from "@/assets/img/pages/chat/layout/userFoto.jpg";
 import { useUserId } from "@/hook/useUserId";
 import { useChatById } from "@/store/pages/chat/pages/chat-by-id/store";
 import { useDefaultChat } from "@/store/pages/chat/pages/default-chat/store";
-import { Box, Button, Drawer } from "@mui/material";
+import { Box, Button, Drawer, Skeleton, Stack } from "@mui/material";
 import {
   EllipsisVertical,
   Loader2,
@@ -17,6 +17,8 @@ import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import EmojiPicker from "emoji-picker-react";
+import Link from "next/link";
+import useDarkSide from "@/hook/useDarkSide";
 
 export default function ChatById() {
   const [isOpen, setIsOpen] = useState(false);
@@ -35,8 +37,16 @@ export default function ChatById() {
   const { "chat-by-id": id } = useParams();
   const userId = useUserId();
 
-  let { messages, deleteChat, getChatById, sendMessage, deleteMessage } =
-    useChatById();
+  const {
+    messages,
+    deleteChat,
+    getChatById,
+    sendMessage,
+    deleteMessage,
+    loadingDelChat,
+  } = useChatById();
+
+  const { chats, get, loadingChat } = useDefaultChat();
 
   const [profilId, setprofilId] = useState(null);
 
@@ -48,6 +58,7 @@ export default function ChatById() {
     intervalRef.current = setInterval(async () => {
       if (!id) return;
       if (pollingInProgressRef.current) return;
+
       try {
         pollingInProgressRef.current = true;
         await getChatById(id);
@@ -96,10 +107,22 @@ export default function ChatById() {
 
   let router = useRouter();
 
+  function formatMessageTime(dateString) {
+    const date = new Date(dateString);
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    return `${hours}:${minutes}`;
+  }
+
   async function handleDelChat(chatId) {
-    await deleteChat(chatId);
-    router.push("/chats");
-    setdelMesModal(null);
+    try {
+      router.push("/chats");
+      await deleteChat(chatId);
+      await get();
+      setdelMesModal(null);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   const isVideoFileName = (name) =>
@@ -118,9 +141,7 @@ export default function ChatById() {
     setinpFile(file);
     const objectUrl = URL.createObjectURL(file);
     setOpenImg(objectUrl);
-    setOpenIsVideo(
-      !!(file.type?.startsWith("video/") || isVideoFileName(file.name))
-    );
+    setOpenIsVideo(isVideoFileName(file.name));
   };
 
   const [loading, setLoading] = useState(false);
@@ -178,36 +199,127 @@ export default function ChatById() {
 
   let [openEmoji, setOpenEmoji] = useState(false);
 
-  let userData = JSON.parse(localStorage.getItem("userData")) || {};
-  console.log(userData);
+  let userData = chats?.data?.find((e) => e.chatId == id);
 
-  return (
+  const SkeletonRow = () => (
+    <Stack
+      direction="row"
+      spacing={2}
+      alignItems="center"
+      className="p-3 w-[50%]"
+    >
+      <Skeleton variant="circular" width={44} height={44} />
+      <Stack spacing={0.5} flex={1}>
+        <Skeleton variant="text" width="60%" height={14} />
+        <Skeleton variant="text" width="40%" height={12} />
+      </Stack>
+    </Stack>
+  );
+
+  const SkeletonChat = () => (
     <div>
-      <div className="fixed shadow w-[75%] z-50 bg-white p-2 flex justify-between">
-        <div className="flex items-center gap-2">
-          {!userData.receiveUserImage ? (
-            <Image
-              src={img}
-              width={500}
-              height={500}
-              alt="avatar"
-              className="w-12 h-12 rounded-full"
-            />
-          ) : (
-            <Image
-              src={`http://37.27.29.18:8003/images/${userData.receiveUserImage}`}
-              width={500}
-              height={500}
-              alt="avatar"
-              className="w-12 h-12 rounded-full"
-            />
-          )}
+      <Stack direction="row" spacing={2} alignItems="center" className="p-3">
+        <Stack spacing={0.5} flex={1}>
+          <Skeleton variant="text" width="60%" height={14} />
+          <Skeleton variant="text" width="50%" height={14} />
+        </Stack>
+      </Stack>
+      <Stack direction="row" spacing={2} alignItems="center" className="p-3 ">
+        <Stack spacing={0.5} flex={1} className="flex flex-col items-end">
+          <Skeleton variant="text" width="60%" height={14} />
+          <Skeleton variant="text" width="50%" height={14} />
+        </Stack>
+      </Stack>
+      <Stack direction="row" spacing={2} alignItems="center" className="p-3">
+        <Stack spacing={0.5} flex={1}>
+          <Skeleton variant="text" width="60%" height={14} />
+          <Skeleton variant="text" width="50%" height={14} />
+        </Stack>
+      </Stack>
+      <Stack direction="row" spacing={2} alignItems="center" className="p-3 ">
+        <Stack spacing={0.5} flex={1} className="flex flex-col items-end">
+          <Skeleton variant="text" width="60%" height={14} />
+          <Skeleton variant="text" width="50%" height={14} />
+        </Stack>
+      </Stack>
+      <Stack direction="row" spacing={2} alignItems="center" className="p-3">
+        <Stack spacing={0.5} flex={1}>
+          <Skeleton variant="text" width="60%" height={14} />
+          <Skeleton variant="text" width="50%" height={14} />
+        </Stack>
+      </Stack>
+      <Stack direction="row" spacing={2} alignItems="center" className="p-3 ">
+        <Stack spacing={0.5} flex={1} className="flex flex-col items-end">
+          <Skeleton variant="text" width="60%" height={14} />
+          <Skeleton variant="text" width="50%" height={14} />
+        </Stack>
+      </Stack>
+      <Stack direction="row" spacing={2} alignItems="center" className="p-3">
+        <Stack spacing={0.5} flex={1}>
+          <Skeleton variant="text" width="60%" height={14} />
+          <Skeleton variant="text" width="50%" height={14} />
+        </Stack>
+      </Stack>
+      <Stack direction="row" spacing={2} alignItems="center" className="p-3 ">
+        <Stack spacing={0.5} flex={1} className="flex flex-col items-end">
+          <Skeleton variant="text" width="60%" height={14} />
+          <Skeleton variant="text" width="50%" height={14} />
+        </Stack>
+      </Stack>
+    </div>
+  );
 
-          <div>
-            <p>{userData.receiveUserName}</p>
-            <p>{}</p>
+  function linkToProfile(id) {
+    router.push(`/${id}`);
+  }
+
+  const [theme, setTheme] = useDarkSide();
+
+  //------------------------------------------------------------------------------------------------------
+  return (
+    <div className="w-full">
+      <div className="relative shadow w-[100%] z-10 p-2 flex justify-between">
+        {loadingChat ? (
+          <SkeletonRow />
+        ) : (
+          <div className="flex items-center gap-2">
+            {userData ? (
+              <div className="flex items-center gap-2">
+                {!userData.receiveUserImage ? (
+                  <Image
+                    src={img}
+                    width={500}
+                    height={500}
+                    alt="avatar"
+                    className="w-12 h-12 rounded-full object-cover"
+                  />
+                ) : (
+                  <Image
+                    src={`http://37.27.29.18:8003/images/${
+                      userData.receiveUserId === userId
+                        ? userData.sendUserImage
+                        : userData.receiveUserImage
+                    }`}
+                    width={500}
+                    height={500}
+                    alt="avatar"
+                    className="w-12 h-12 rounded-full object-cover"
+                  />
+                )}
+
+                <div>
+                  <p>
+                    {userData.receiveUserId === userId
+                      ? userData.sendUserName
+                      : userData.receiveUserName}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <SkeletonRow />
+            )}
           </div>
-        </div>
+        )}
         <Button onClick={toggleDrawer(true)}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -238,7 +350,7 @@ export default function ChatById() {
             <button
               type="button"
               onClick={() => handleDelChat(id)}
-              className="text-red-500 bg-red-100 p-2 rounded flex items-center gap-2"
+              className="text-red-500  p-2 rounded flex items-center justify-between gap-2 w-full"
             >
               Remove Chat <Trash size={18} />
             </button>
@@ -246,126 +358,187 @@ export default function ChatById() {
         </Box>
       </Drawer>
 
-      <div className="w-[1020px] mx-auto p-4 h-[85vh] overflow-y-auto flex flex-col-reverse gap-2">
-        {messages &&
-          messages.map((e) => {
-            const isCurrentUser = e.userId === userId;
-            return (
-              <div
-                key={e.messageId}
-                className={`flex items-center justify-center gap-3  p-3 rounded-lg group${
-                  isCurrentUser
-                    ? " self-end rounded-tr-none flex-row-reverse"
-                    : " self-start rounded-tl-none "
-                }`}
-              >
-                <div
-                  className={`flex flex-col  ${
-                    isCurrentUser ? " self-end " : " self-start "
-                  }`}
-                >
-                  {e.file && isVideoFileName(e.file) ? (
-                    <div
-                      className={`w-1/2 ${
-                        isCurrentUser ? " self-end" : " self-start "
+      <div className="w-full mx-auto p-4 h-[80vh] overflow-y-auto gap-2 ">
+        {loadingDelChat ? (
+          <SkeletonChat />
+        ) : (
+          <div>
+            <div className="flex items-center gap-2">
+              {userData ? (
+                <div className="flex items-center gap-2 w-full justify-center flex-col">
+                  {!userData.receiveUserImage ? (
+                    <Image
+                      src={img}
+                      width={500}
+                      height={500}
+                      alt="avatar"
+                      className="w-12 h-12 rounded-full object-cover"
+                    />
+                  ) : (
+                    <Image
+                      src={`http://37.27.29.18:8003/images/${
+                        userData.receiveUserId === userId
+                          ? userData.sendUserImage
+                          : userData.receiveUserImage
                       }`}
-                    >
-                      <video
-                        src={`http://37.27.29.18:8003/images/${e.file}`}
-                        controls
-                        preload="metadata"
-                        playsInline
-                        crossOrigin="anonymous"
-                        className="pb-2 rounded-xl"
-                        style={{ width: "100%", height: "auto" }}
-                      />
-                    </div>
-                  ) : e.file ? (
-                    <div
-                      className={`w-[60%] ${
-                        isCurrentUser ? " self-end" : " self-start "
-                      }`}
-                    >
-                      <Image
-                        src={`http://37.27.29.18:8003/images/${e.file}`}
-                        alt="image"
-                        width={1000}
-                        height={1000}
-                        className="pb-2 rounded-xl"
-                        priority
-                        style={{
-                          width: "100%",
-                          height: "auto",
-                        }}
-                      />
-                    </div>
-                  ) : null}
+                      width={500}
+                      height={500}
+                      alt="avatar"
+                      className="w-25 h-25 rounded-full object-cover"
+                    />
+                  )}
 
-                  <div
-                    className={`rounded-lg ${
-                      isCurrentUser
-                        ? "bg-blue-500 text-white self-end rounded-tr-none p-1.5 px-3"
-                        : "bg-gray-100 text-[#475569] self-start rounded-tl-none p-1.5 px-3"
+                  <div>
+                    <p className="text-gray-500">
+                      {userData.receiveUserId === userId
+                        ? userData.sendUserName
+                        : userData.receiveUserName}
+                      - Instagram
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={() =>
+                      linkToProfile(
+                        `${
+                          userData.receiveUserId === userId
+                            ? userData.sendUserId
+                            : userData.receiveUserId
+                        }`
+                      )
+                    }
+                    className={`cursor-pointer font-medium rounded px-5 py-1 ${
+                      theme == "dark"
+                        ? "bg-[rgb(80,80,80)] text-white"
+                        : "bg-gray-100 text-black"
                     }`}
                   >
-                    <p className="">{e.messageText}</p>
-                    <span
-                      className={`text-[10px] self-end ${
-                        isCurrentUser ? "text-gray-200" : "text-gray-700"
-                      }`}
-                    >
-                      {new Date(e.sendMassageDate).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="relative ">
-                  <button
-                    type="button"
-                    onClick={() => toggleDelModal(e.messageId)}
-                    className="hidden group-hover:block"
-                  >
-                    <EllipsisVertical />
+                    See profill
                   </button>
-
-                  {delMesModal === e.messageId && (
+                </div>
+              ) : (
+                <SkeletonRow />
+              )}
+            </div>
+            <div className=" flex flex-col-reverse">
+              {messages &&
+                messages.map((e) => {
+                  const isCurrentUser = e.userId === userId;
+                  return (
                     <div
-                      className={`shadow rounded absolute mt-5 bg-white z-5 w-[200px] flex flex-col justify-center items-center gap-2 ${
+                      key={e.messageId}
+                      className={`flex items-center gap-3  p-3 rounded-lg group w-full ${
                         isCurrentUser
-                          ? " -ml-50"
-                          : ""
+                          ? " self-end rounded-tr-none flex-row-reverse"
+                          : " self-start rounded-tl-none "
                       }`}
                     >
-                      <button
-                        type="button"
-                        onClick={() => handleDelMessage(e.messageId)}
-                        className="text-red-500 p-2 rounded"
+                      <div
+                        className={`flex flex-col max-w-7/10  ${
+                          isCurrentUser ? " self-end" : " self-start"
+                        }`}
                       >
-                        {loading ? (
-                          <Loader2 className="animate-spin w-5 h-5" />
-                        ) : (
-                          <p className="flex items-center gap-2">
-                            Delete messege <Trash size={18} />
-                          </p>
-                        )}
-                      </button>
+                        {e.file && isVideoFileName(e.file) ? (
+                          <div
+                            className={` ${
+                              isCurrentUser ? " self-end" : " self-start "
+                            }`}
+                          >
+                            <video
+                              src={`http://37.27.29.18:8003/images/${e.file}`}
+                              controls
+                              preload="metadata"
+                              playsInline
+                              className="pb-2 rounded-xl"
+                              style={{ width: "100%", height: "auto" }}
+                            />
+                          </div>
+                        ) : e.file ? (
+                          <div
+                            className={` ${
+                              isCurrentUser ? " self-end" : " self-start "
+                            }`}
+                          >
+                            <Image
+                              src={`http://37.27.29.18:8003/images/${e.file}`}
+                              alt="image"
+                              width={1000}
+                              height={1000}
+                              className="pb-2 rounded-xl"
+                              priority
+                              style={{
+                                width: "100%",
+                                height: "auto",
+                              }}
+                            />
+                          </div>
+                        ) : null}
 
-                      <button
-                        type="button"
-                        onClick={() => setdelMesModal(null)}
-                        className="p-2"
-                      >
-                        Cancel
-                      </button>
+                        <div
+                          className={`rounded-lg  ${
+                            isCurrentUser
+                              ? "bg-blue-500 text-white self-end rounded-tr-none p-1.5 px-3"
+                              : "bg-gray-100 text-[#475569] self-start rounded-tl-none p-1.5 px-3"
+                          }`}
+                        >
+                          <p className="">{e.messageText}</p>
+                          <span
+                            className={`text-[10px] self-end ${
+                              isCurrentUser ? "text-gray-200" : "text-gray-700"
+                            }`}
+                          >
+                            {formatMessageTime(e.sendMassageDate)}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="relative">
+                        <button
+                          type="button"
+                          onClick={() => toggleDelModal(e.messageId)}
+                          className={`hidden group-hover:block ${
+                            delMesModal === e.messageId ? "block" : ""
+                          }`}
+                        >
+                          <EllipsisVertical />
+                        </button>
+
+                        {delMesModal === e.messageId && (
+                          <div
+                            className={`absolute flex flex-col justify-center items-center gap-2 shadow rounded bg-white w-[250px] ${
+                              isCurrentUser ? "-ml-60 -mt-30" : "ml-5 -mt-30"
+                            }`}
+                          >
+                            <button
+                              type="button"
+                              onClick={() => handleDelMessage(e.messageId)}
+                              className="text-red-500 p-2 rounded"
+                            >
+                              {loading ? (
+                                <Loader2 className="animate-spin w-5 h-5" />
+                              ) : (
+                                <p className="flex items-center gap-2">
+                                  Delete messege <Trash size={18} />
+                                </p>
+                              )}
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => setdelMesModal(null)}
+                              className="p-2"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+                  );
+                })}
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="border-2 min-h-12 max-h-12 m-4 p-2 rounded-xl border-[#E2E8F0] flex justify-between gap-1 items-center">
@@ -450,7 +623,7 @@ export default function ChatById() {
         {openImg && (
           <div
             style={{ backdropFilter: "blur(6px)" }}
-            className="fixed inset-0 flex items-center justify-center bg-[rgba(0,0,0,0.3)]"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.3)]"
           >
             <div className="w-[400px] bg-white rounded-xl shadow p-5">
               {openIsVideo ? (
@@ -460,10 +633,6 @@ export default function ChatById() {
                   preload="metadata"
                   className="max-h-64 mx-auto mb-4"
                   style={{ width: "100%", height: "auto" }}
-                  onError={(ev) => console.error("preview video error:", ev)}
-                  onPlay={() => pausePolling()}
-                  onPause={() => resumePolling()}
-                  onEnded={() => resumePolling()}
                 />
               ) : (
                 <img

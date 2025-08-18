@@ -1,265 +1,247 @@
 'use client'
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import Modal from '@mui/material/Modal';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import { useProfileByIdStore } from "@/store/pages/profile/profile-by-id/store"
-import Image from "next/image"
-import { useParams } from "next/navigation"
-import { useEffect, useRef } from "react"
-import defaultUser from '../../assets/img/pages/profile/profile/instauser (2).jpg'
-import { RxHamburgerMenu } from 'react-icons/rx'
-import { useRouter } from 'next/navigation'
-import { ArrowLeft, ArrowRight, Loader, Search, User, X, XCircle } from "lucide-react"
-import { usegetUserStore } from "@/store/pages/search/store"
-import Stack from '@mui/material/Stack'
-import { useState } from 'react'
-import Skeleton from '@mui/material/Skeleton'
 
-import './style.css'
+import { useProfileByIdStore } from '@/store/pages/profile/profile-by-id/store'
+import { usegetUserStore } from '@/store/pages/search/store'
+import Image from 'next/image'
+import { useParams } from 'next/navigation'
+import { useEffect, useState, useRef } from 'react'
+import { FaComments } from 'react-icons/fa'
+import { useUserStore } from "@/store/pages/explore/explorestore"
+import Box from '@mui/material/Box'
+import Modal from '@mui/material/Modal'
+import { Bookmark, CircleUserRound, Heart, MessageCircle, SendHorizontal, Volume2, VolumeX } from "lucide-react"
+import BasicModal from "@/components/pages/explore/BasicModal"
+import CommentInput from "@/components/pages/explore/Emogi"
+import { useUserId } from "@/hook/useUserId"
 
 const style = {
-	position: 'absolute',
-	top: '50%',
-	left: '50%',
-	transform: 'translate(-50%, -50%)',
-	width: 560,
-	bgcolor: 'background.paper',
-	border: 'none',
-	boxShadow: 24,
-	borderRadius: "20px",
-	padding: "8px",
-	height: '400px'
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: '90%',
+    maxWidth: 1000,
+    bgcolor: '#272727',
+    color: 'white',
+    borderRadius: 4,
+    overflow: 'hidden'
 }
 
-const ProfileById = () => {
-	const { 'profile-by-id': profileId } = useParams()
-	let { users: suggestedUser, getUsers } = usegetUserStore()
-	let sixUsers = suggestedUser?.data?.slice(0, 12)
-	const getProfileById = useProfileByIdStore(state => state.getProfileById)
-	const users = useProfileByIdStore(state => state.users)
-	const [open, setOpen] = useState(false)
-	const handleOpen = () => setOpen(true)
-	const handleClose = () => setOpen(false)
-	const [focused, setFocused] = useState(false)
-	const [loading, setLoading] = useState(false)
-	const [search, setSearch] = useState('')
-	const [filteredUsers, setFilteredUsers] = useState([])
-	let router = useRouter()
+const Posts = () => {
+    const { 'profile-by-id': profileId } = useParams()
+    const { getProfileById, getPosts, posts } = useProfileByIdStore()
+    const { users: infoUsers, getUsers } = usegetUserStore()
+    const { user, fechUser, postById, getPostById, deletComit, AddComit } = useUserStore()
 
-	let user = users?.data
+    const [open, setOpen] = useState(false)
+    const [userPosts, setUserPosts] = useState([])
+    const [newcomit, setnewComit] = useState("")
+    const [isMuted, setIsMuted] = useState(false)
+    const videoRef = useRef(null)
 
-	const containerRef = useRef(null)
-	let width = 320
+    const getId = infoUsers?.data?.find(e => e.id === profileId)?.id
 
-	const scrollRight = () => {
-		containerRef.current.scrollBy({ left: width, behavior: 'smooth' });
-	}
+    useEffect(() => {
+        if (profileId) getProfileById(profileId)
+    }, [profileId, getProfileById])
 
-	const scrollLeft = () => {
-		containerRef.current.scrollBy({ left: -width, behavior: 'smooth' });
-	}
+    useEffect(() => {
+        getUsers()
+        getPosts()
+    }, [getUsers, getPosts])
 
-	const SkeletonRow = () => (
-		<Stack direction="row" spacing={2} alignItems="center" className="p-3">
-			<Skeleton variant="circular" width={44} height={44} />
-			<Stack spacing={0.5} flex={1}>
-				<Skeleton variant="text" width="60%" height={14} />
-				<Skeleton variant="text" width="40%" height={12} />
-			</Stack>
-		</Stack>
-	)
+    useEffect(() => {
+        if (!getId || !Array.isArray(posts?.data) || posts.data.length === 0) return
+        const filtered = posts.data.filter(p => p.userId === getId)
+        setUserPosts(filtered)
+    }, [posts?.data, getId])
 
-	useEffect(() => {
-		if (!search.trim()) {
-			setFilteredUsers([])
-			setLoading(false)
-			return
-		}
+    useEffect(() => {
+        fechUser()
+    }, [])
 
-		setLoading(true)
-		const delayDebounce = setTimeout(() => {
-			const results = users?.data?.filter(u =>
-				u.userName?.toLowerCase().includes(search.toLowerCase())
-			) || []
-			setFilteredUsers(results)
-			setLoading(false)
-		}, 500)
+    const handleOpen = async (id) => {
+        await getPostById(id)
+        setOpen(true)
+    }
 
-		return () => clearTimeout(delayDebounce)
-	}, [search, users])
+    const handleClose = () => setOpen(false)
 
+    const toggleMute = () => {
+        const video = videoRef.current
+        if (video) {
+            video.muted = !video.muted
+            setIsMuted(video.muted)
+        }
+    }
 
-	useEffect(() => {
-		if (profileId) {
-			getProfileById(profileId)
-		}
-	}, [profileId, getProfileById])
+    const handleAddComment = async () => {
+        if (newcomit.trim() === "") return
+        await AddComit(newcomit, postById.data?.postId)
+        setnewComit("")
+    }
 
-	useEffect(() => { getUsers() }, [])
-	return (
-		<div className='pl-[8%] p-[8%]'>
-			<section className='flex gap-[20px] '>
-				<div className='hidden md:flex'>
-					<Image
-						src={user?.image ? `http://37.27.29.18:8003/images/${user?.image}` : defaultUser}
-						alt='profile picture'
-						width={500}
-						height={500}
-						className={`w-[160px] h-[160px] rounded-[50%] overflow-hidden`}
-					/>
-				</div>
-				<div className='flex flex-col gap-[20px]'>
-					<div className='flex items-center gap-[40px]'>
-						<h1 className='font-bold text-[#1E293B] text-[20px]'>
-							{user?.userName}
-						</h1>
-						<div className='flex items-center gap-[10px]'>
-							<button
-								className='text-[#334155] bg-[#F3F4F6] text-[12px] md:text-[16px] px-[10px] md:px-[20px] py-[5px] md:py-[10px] rounded-xl md:rounded-2xl'
-							>
-								Follow
-							</button>
-							<button className='text-[#334155] bg-[#F3F4F6] text-[12px] md:text-[16px] px-[10px] md:px-[20px] py-[5px] md:py-[10px] rounded-xl md:rounded-2xl'>
-								View archive
-							</button>
-							<button>
-								<RxHamburgerMenu size={20} />
-							</button>
-						</div>
-					</div>
-					<div className='flex items-center gap-[20px]'>
-						<Modal
-							keepMounted
-							open={open}
-							onClose={handleClose}
-							aria-labelledby="keep-mounted-modal-title"
-							aria-describedby="keep-mounted-modal-description"
-						>
-							<Box sx={style}>
-								<div className="flex pb-2 border-b-1 border-gray-300 items-center justify-between">
-									<div></div>
-									<h3 className='font-semibold text-[18px]'>Followers</h3>
-									<button onClick={handleClose}><X /></button>
-								</div>
-								<div className="relative mt-5">
-									{!focused && (
-										<Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
-									)}
-									<input
-										type="text"
-										value={search}
-										onChange={(e) => setSearch(e.target.value)}
-										placeholder="Search"
-										className={`py-2 w-full rounded-lg bg-[rgb(239,239,239)] pr-10 ${!focused ? 'pl-10' : 'pl-4'}`}
-										onFocus={() => setFocused(true)}
-										onBlur={() => setFocused(false)}
-									/>
+    const RemoveComit = async (postCommentId) => {
+        await deletComit(postCommentId)
+        fechUser()
+    }
 
-									{loading ? (
-										<Loader className="absolute right-3 top-6 -translate-y-1/2 text-gray-400 animate-spin" size={18} />
-									) : (
-										search && (
-											<button
-												type="button"
-												onClick={() => setSearch('')}
-												className="absolute right-3 top-6 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-											>
-												<XCircle size={18} />
-											</button>
-										)
-									)}
-								</div>
-								<div className="flex flex-col">
-									{search ? (
-										loading ? (
-											Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)
-										) : filteredUsers.length > 0 ? (
-											filteredUsers.map(e => (
-												<div onClick={() => addUserHistory(e.id)} key={e.id}>
-													<div onClick={() => linkToProfile(e.id)} className='flex hover:bg-[#eeeeee] rounded p-3 items-center gap-5'>
-														{e.avatar == '' ? <User size={44} /> : <Image src={`http://37.27.29.18:8003/images/${e.avatar}`} width={44} height={44} alt="avatar" />}
-														<div>
-															<p>{e.userName}</p>
-															<p>{e.fullName}</p>
-														</div>
-													</div>
-												</div>
-											))
-										) : (
-											<p className="text-center text-gray-500 py-5">No users found with this name</p>
-										)
-									) : ("")}
-								</div>
-							</Box>
-						</Modal>
-						<div className='flex md:hidden'>
-							<Image
-								src={user?.image ? `http://37.27.29.18:8003/images/${user?.image}` : defaultUser}
-								alt='profile picture'
-								width={500}
-								height={500}
-								className={`w-[160px] h-[160px] rounded-[50%] overflow-hidden`}
-							/>
-						</div>
-						<p className='text-[#1E293B] block md:flex'>
-							{user?.postCount}
-							<span className='text-[#64748B] block md:flex md:ml-[2px]'>
-								{' '}
-								posts
-							</span>
-						</p>
-						<p onClick={handleOpen} className='text-[#1E293B] block md:flex'>
-							{user?.subscribersCount}
-							<span className='text-[#64748B] block md:flex md:ml-[2px]'>{' '}followers{' '}</span>
-						</p>
-						<p className='text-[#1E293B] block md:flex'>
-							{user?.subscriptionsCount}
-							<span className='text-[#64748B] block md:flex md:ml-[2px]'>
-								{' '}
-								following
-							</span>
-						</p>
-					</div>
-					<div className='flex'>
-						<p className='font-bold text-[#1E293B] text-[20px]'>
-							{user?.firstName}
-						</p>
-						{user?.lastName && (
-							<p className='font-bold text-[#1E293B] text-[20px]'>
-								{user?.userName}
-							</p>
-						)}
-					</div>
-				</div>
-			</section>
-			<section className="mt-15">
-				<div className="flex mb-10 justify-between">
-					<h3 className="font-medium text-[18px]">Suggested for you</h3>
-					<button className="text-[#4262ff]">See all</button>
-				</div>
-				<div className="flex items-center gap-5">
-					<button onClick={scrollLeft}><ArrowLeft /></button>
-					<div ref={containerRef} className="flex items-stretch gap-2.5 mb-10 overscroll-x-none overflow-x-scroll hide-scrollbar">
-						{sixUsers?.map(e => (
-							<div key={e.id}>
-								<div onClick={() => router.push(`/${e.id}`)} className='flex rounded-t text-center h-[165px] w-[155px] border-1 border-gray-300 flex-col items-center hover:bg-[#eeeeee] p-3'>
-									{e.avatar == '' ? <Image alt='image' src={defaultUser} className="rounded-full w-[74px] object-cover h-[74px]" width={74} height={74} /> : <Image src={`http://37.27.29.18:8003/images/${e.avatar}`} width={74} height={74} className="rounded-full w-[74px] object-cover h-[74px]" alt="avatar" />}
-									<p className="font-semibold">{e.userName}</p>
-									<p>{e.fullName}</p>
-								</div>
-								<div className="border-1 border-gray-300 rounded-b border-t-0 flex justify-center p-3">
-									<button>Follow</button>
-								</div>
-							</div>
-						))}
-					</div>
-					<button onClick={scrollRight}><ArrowRight /></button>
-				</div>
-			</section>
-		</div>
-	);
+    if (!userPosts.length) return <p className="text-gray-500">No posts found for this user.</p>
+
+    return (
+        <div className="grid grid-cols-3 gap-[1px]">
+            {userPosts.map(post => (
+                <div key={post.postId}>
+                    {post.images?.map((media, i) => (
+                        <div
+                            key={i}
+                            className="relative overflow-hidden group cursor-pointer"
+                            onClick={() => handleOpen(post.postId)}
+                        >
+                            {media.endsWith('.mp4') ? (
+                                <video
+                                    src={`http://37.27.29.18:8003/images/${media}`}
+                                    className="h-[414px] w-full object-cover"
+                                    muted
+                                    controls
+                                />
+                            ) : (
+                                <Image
+                                    src={`http://37.27.29.18:8003/images/${media}`}
+                                    alt={`Post media ${i}`}
+                                    height={414}
+                                    width={310}
+                                    quality={100}
+                                    className="h-[414px] w-full object-cover"
+                                />
+                            )}
+
+                            <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-50 transition-opacity duration-300"></div>
+
+                            <div className="absolute inset-0 flex justify-center items-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-white text-lg font-semibold">
+                                <div className="flex items-center gap-1">
+                                    <Heart fill="white" /> {post.postLikeCount}
+                                </div>
+                                <div className="flex items-center gap-1">
+                                    <FaComments /> {post.commentCount}
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            ))}
+            <Modal
+                open={open}
+                onClose={handleClose}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Box sx={style}>
+                    {postById?.data ? (
+                        <div className="flex flex-col md:flex-row h-[80vh]">
+                            <div className="md:w-2/5 w-full relative bg-black flex items-center justify-center">
+                                {postById.data.images?.[0] && postById.data.images[0].endsWith('.mp4') ? (
+                                    <div className="relative w-full h-full">
+                                        <video
+                                            ref={videoRef}
+                                            src={`http://37.27.29.18:8003/images/${postById.data.images[0]}`}
+                                            className="w-full h-full object-cover"
+                                            autoPlay
+                                            muted={isMuted}
+                                            loop
+                                            playsInline
+                                        />
+                                        <button
+                                            onClick={toggleMute}
+                                            className="absolute top-4 right-4 text-white bg-black/50 p-2 rounded-full"
+                                        >
+                                            {isMuted ? <VolumeX size={24} /> : <Volume2 size={24} />}
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <img
+                                        src={`http://37.27.29.18:8003/images/${postById.data.images[0]}`}
+                                        alt="Post"
+                                        className="w-full h-full object-cover"
+                                    />
+                                )}
+                            </div>
+                            <div className="md:w-3/5 w-full flex flex-col p-4 overflow-hidden">
+                                <div className="flex justify-between items-center mb-4">
+                                    <div className="flex items-center gap-4">
+                                        <img
+                                            src={`http://37.27.29.18:8003/images/${postById.data.userImage}`}
+                                            className="w-10 h-10 rounded-full"
+                                            alt="user"
+                                        />
+                                        <p className="text-lg font-semibold">{postById.data.userName}</p>
+                                    </div>
+                                    <button className="text-blue-500 font-bold">Follow</button>
+                                </div>
+
+                                <div className="flex-1 overflow-y-auto space-y-3 mb-4">
+                                    {postById.data.comments?.length > 0 ? (
+                                        postById.data.comments.map(c => (
+                                            <div key={c.postCommentId} className="flex justify-between items-start">
+                                                <div className="flex items-center gap-3">
+                                                    {c.userImage ? (
+                                                        <img src={`http://37.27.29.18:8003/images/${c.userImage}`} className="w-10 h-10 rounded-full" />
+                                                    ) : (
+                                                        <CircleUserRound size={40} color="#ffffff" />
+                                                    )}
+                                                    <div>
+                                                        <p className="text-sm">{c.comment}</p>
+                                                        {c.dateCommented && (
+                                                            <span className="text-[10px] text-gray-400">
+                                                                {new Date(c.dateCommented).toLocaleString([], {
+                                                                    year: "numeric",
+                                                                    month: "2-digit",
+                                                                    day: "2-digit",
+                                                                    hour: "2-digit",
+                                                                    minute: "2-digit"
+                                                                })}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                {c.userId === useUserId() ? (
+                                                    <button onClick={() => RemoveComit(c.postCommentId)}>
+                                                        <Heart />
+                                                    </button>
+                                                ) : (
+                                                    <Heart />
+                                                )}
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <p className="text-gray-400">Нет комментариев</p>
+                                    )}
+                                </div>
+                                <div className="flex gap-2 items-center border-t border-gray-700 pt-2">
+                                    <CommentInput value2={newcomit} onChange2={e => setnewComit(e.target.value)} />
+                                    <button onClick={handleAddComment}>
+                                        <SendHorizontal />
+                                    </button>
+                                </div>
+
+                                <div className="flex justify-between mt-4">
+                                    <div className="flex gap-3">
+                                        <BasicModal />
+                                        <MessageCircle />
+                                        <SendHorizontal />
+                                    </div>
+                                    <Bookmark />
+                                </div>
+                                <p className="mt-2 font-bold">{postById.data.postLikeCount} отметок "Нравится"</p>
+                            </div>
+                        </div>
+                    ) : (
+                        <p className="text-center text-white p-4">Загрузка...</p>
+                    )}
+                </Box>
+            </Modal>
+        </div>
+    )
 }
 
-export default ProfileById;
+export default Posts

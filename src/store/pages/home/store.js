@@ -4,6 +4,7 @@ import { create } from 'zustand'
 
 export const useHome = create((set, get) => ({
 	data: [],
+	users: [],
 	posts: [],
 	isLoading: false,
 	isLoading2: false,
@@ -17,6 +18,15 @@ export const useHome = create((set, get) => ({
 			set({ isLoading: true })
 		} finally {
 			set({ isLoading: false })
+		}
+	},
+	getUser: async () => {
+		try {
+			let { data: data2 } = await axiosRequest('User/get-users')
+			set(state => ({ users: data2 }))
+		} catch (error) {
+			console.error(error)
+		} finally {
 		}
 	},
 	getUserPosts: async () => {
@@ -33,8 +43,6 @@ export const useHome = create((set, get) => ({
 	},
 	likePost: async postId => {
 		const prevPosts = get().posts
-
-    // Оптимистичное обновление
     set(state => ({
       posts: {
         ...state.posts,
@@ -53,6 +61,23 @@ export const useHome = create((set, get) => ({
     }))
     try {
       await axiosRequest.post(`/Post/like-post?postId=${postId}`, {})
+    } catch (error) {
+      console.error('Error in Like', error)
+      set({ posts: prevPosts })
+    }
+	},
+	LikeStory: async postId => {
+    try {
+      await axiosRequest.post(`/Story/LikeStory?storyId=${postId}`, {})
+    } catch (error) {
+      console.error('Error in Like', error)
+      set({ posts: prevPosts })
+    }
+	},
+	commentPost: async (comment) => {
+		const prevPosts = get().posts
+    try {
+      await axiosRequest.post(`/Post/add-comment`, comment)
     } catch (error) {
       console.error('Error in Like', error)
       set({ posts: prevPosts })

@@ -18,22 +18,18 @@ const Layout = ({ children }) => {
 
 	useEffect(() => {
 		getProfileData()
-		// console.log(decodeToken);
-		console.log(pathname)
 		console.log(user ? user : 'error')
 	}, [])
 	return (
-		<div className='pl-[8%] pt-[8%]'>
-			<section className='flex gap-[20px] '>
-				<div className='hidden md:flex'>
+		<div className='pl-[8%] pt-[8%] h-[100vh]'>
+			<section className='flex gap-[20px]'>
+				<div className='hidden md:flex overflow-hidden items-center justify-center w-[100px] md:w-[160px] h-[100px] md:h-[160px] rounded-[50%]'>
 					<Image
 						src={`http://37.27.29.18:8003/images/${user.image}`}
 						alt='profile picture'
 						width={500}
 						height={500}
-						className={`${
-							user.image ? 'flex' : 'hidden'
-						} w-[160px] h-[160px] rounded-[50%] overflow-hidden`}
+						className={`${user.image ? 'flex' : 'hidden'} `}
 					/>
 					<Image
 						src={defaultUser}
@@ -50,29 +46,30 @@ const Layout = ({ children }) => {
 						</h1>
 						<div className='flex items-center gap-[10px]'>
 							<button
-								className='text-[#334155] bg-[#F3F4F6] text-[12px] md:text-[16px] px-[10px] md:px-[20px] py-[5px] md:py-[10px] rounded-xl md:rounded-2xl'
+								className='text-[#334155] bg-[#F0F2F5] hover:bg-gray-200 text-[10px] md:text-[16px] px-[10px] md:px-[20px] py-[5px] md:py-[10px] rounded-xl md:rounded-2xl active:scale-95 transition-transform duration-100 ease-in'
 								onClick={() => router.push('/editprofile')}
 							>
 								Edit profile
 							</button>
-							<button className='text-[#334155] bg-[#F3F4F6] text-[12px] md:text-[16px] px-[10px] md:px-[20px] py-[5px] md:py-[10px] rounded-xl md:rounded-2xl'>
+							<button className='text-[#334155] bg-[#F0F2F5] hover:bg-gray-200 text-[10px] md:text-[16px] px-[10px] md:px-[20px] py-[5px] md:py-[10px] rounded-xl md:rounded-2xl active:scale-95 transition-transform duration-100 ease-in'>
 								View archive
 							</button>
 							<button>
-								<RxHamburgerMenu size={20} />
+								<RxHamburgerMenu
+									size={20}
+									className='active:scale-95 transition-transform duration-100 ease-in'
+								/>
 							</button>
 						</div>
 					</div>
 					<div className='flex items-center gap-[20px]'>
-						<div className='flex md:hidden'>
+						<div className='flex md:hidden overflow-hidden  items-center justify-center w-[100px] md:w-[160px] h-[100px] md:h-[160px] rounded-[50%]'>
 							<Image
 								src={`http://37.27.29.18:8003/images/${user.image}`}
 								alt='profile picture'
 								width={500}
 								height={500}
-								className={`${
-									user.image ? 'flex' : 'hidden'
-								} w-[70px] h-[70px] rounded-[50%]`}
+								className={`${user.image ? 'flex' : 'hidden'}`}
 							/>
 							<Image
 								src={defaultUser}
@@ -82,7 +79,10 @@ const Layout = ({ children }) => {
 								} w-[70px] rounded-[50%]`}
 							/>
 						</div>
-						<p className='text-[#1E293B] block md:flex'>
+						<p
+							className='text-[#1E293B] block md:flex cursor-pointer'
+							onClick={() => router.push('/profile')}
+						>
 							{user.postCount}
 							<span className='text-[#64748B] block md:flex md:ml-[2px]'>
 								{' '}

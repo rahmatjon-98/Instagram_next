@@ -29,6 +29,7 @@ import {
 } from '@/assets/icon/layout/svg'
 import Modal from '../Modal'
 import { usegetUserStore } from '@/store/pages/search/store'
+import SideBar from '../side-bar/side-bar'
 
 const LightTooltip = styled(({ className, ...props }) => (
 	<Tooltip {...props} classes={{ popper: className }} />
@@ -147,6 +148,7 @@ const MiniSideBar = ({ children }) => {
 									</div>
 								</Link>
 							</LightTooltip>
+
 						</div>
 					</div>
 				</div>

@@ -3,6 +3,7 @@ import { FiMoreVertical } from 'react-icons/fi'
 import { useTodoAsyncStore } from '@/store/pages/notification/store'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 export default function UsersList() {
 	const {
@@ -16,6 +17,7 @@ export default function UsersList() {
 		error,
 	} = useTodoAsyncStore()
 	const [openMenuId, setOpenMenuId] = useState(null)
+	const {t} = useTranslation()
 
 	useEffect(() => {
 		getUsers()
@@ -42,12 +44,12 @@ export default function UsersList() {
 
 	return (
 		<div className='max-w-2xl mx-auto px-4 sm:px-0 py-6 min-h-screen'>
-			<div className='sticky top-0 z-10 bg-white bg-opacity-80 backdrop-blur-md py-4 border-b border-gray-200'>
-				<h1 className='text-2xl font-bold'>Уведомления</h1>
+			<div className=' top-0 z-10  bg-opacity-80 backdrop-blur-md py-4 border-b border-gray-200'>
+				<h1 className='text-2xl font-bold'>{t("setting.notification")}</h1>
 			</div>
 
 			<div className='mt-6'>
-				<h2 className='text-lg font-semibold mb-4'>На этой неделе</h2>
+				<h2 className='text-lg font-semibold mb-4'>{t("notice.week")}</h2>
 
 				{users.length === 0 ? (
 					<div className='flex flex-col items-center justify-center py-10'>
@@ -98,7 +100,7 @@ export default function UsersList() {
 												{user.userName}
 											</p>
 											<span className='text-gray-500 text-xs'>
-												подписался(-ась)
+												{t("notice.follow")}
 											</span>
 										</div>
 										<p className='text-gray-500 text-xs truncate'>
@@ -147,7 +149,7 @@ export default function UsersList() {
 			</div>
 
 			<div className='mt-8'>
-				<h2 className='text-lg font-semibold mb-4'>Комментарии</h2>
+				<h2 className='text-lg font-semibold mb-4'>{t("notice.comment")}</h2>
 
 				{comments.length === 0 ? (
 					<div className='flex flex-col items-center justify-center py-10'>
@@ -202,8 +204,8 @@ export default function UsersList() {
 									</div>
 									<p className='text-sm mt-1'>{comment.comment}</p>
 									<div className='flex items-center mt-2 space-x-4'>
-										<button className='text-xs text-gray-500'>Ответить</button>
-										<button className='text-xs text-gray-500'>Нравится</button>
+										<button className='text-xs text-gray-500'>{t("notice.answer")}</button>
+										<button className='text-xs text-gray-500'>{t("notice.like")}</button>
 									</div>
 								</div>
 							</div>

@@ -7,15 +7,18 @@ import { useEffect, useRef, useState } from 'react'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
-import { Keyboard, Pagination } from 'swiper/modules'
+import { EffectCube, Keyboard, Pagination } from 'swiper/modules'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import image2 from '../assets/img/pages/home/image 69.svg'
 import userIMG from '../assets/img/pages/home/userDefault.png'
 import './globals.css'
 import { useRealsStore } from './reels/store'
+import Link from 'next/link'
+import StoryComponent from '@/components/pages/home/stories'
+import SwiperStories from '@/components/pages/home/stories'
 
 export default function Main() {
-	const videoRefs = useRef({});
+	const videoRefs = useRef({})
 	let {
 		getUserStories,
 		data,
@@ -24,12 +27,16 @@ export default function Main() {
 		getUserPosts,
 		isLoading2,
 		likePost,
+		commentPost,
+		getUser,
+		users,
 	} = useHome()
-	let {} = useRealsStore()
 	const [mutedMap, setMutedMap] = useState({})
 	const [stopMap, setStopMap] = useState({})
+	const [commentsMap, setCommentsMap] = useState({})
 	useEffect(() => {
 		getUserPosts()
+		getUser()
 	}, [])
 	const scrollRef = useRef(null)
 	let isDown = false
@@ -39,6 +46,7 @@ export default function Main() {
 		getUserStories()
 	}, [])
 	let [stories, setStories] = useState(false)
+	let [idUser, setIdUser] = useState(0)
 	let [muted, setMuted] = useState(true)
 	let [comment, setComment] = useState('')
 	const onMouseDown = e => {
@@ -56,9 +64,23 @@ export default function Main() {
 		if (!isDown) return
 		e.preventDefault()
 		const x = e.pageX - scrollRef.current.offsetLeft
-		const walk = (x - startX) * 1.5 // скорость прокрутки
+		const walk = (x - startX) * 2
 		scrollRef.current.scrollLeft = scrollLeft - walk
 	}
+	let [theme, setTheme] = useState(
+		typeof window !== 'undefined' ? localStorage.getItem('theme') : ''
+	)
+	useEffect(() => {
+		const handleStorageChange = event => {
+			if (event.key === 'theme') {
+				setTheme(event.newValue)
+			}
+		}
+		window.addEventListener('storage', handleStorageChange)
+		return () => {
+			window.removeEventListener('storage', handleStorageChange)
+		}
+	}, [])
 	return (
 		<div className='flex w-full items-start'>
 			{stories && (
@@ -89,7 +111,12 @@ export default function Main() {
 							strokeWidth='3'
 						/>
 					</svg>
-					<Image src={image2} className='w-auto' alt='' />
+					<Link href={'/'}>
+						<Image src={image2} className='w-auto' alt='' />
+					</Link>
+					<div className='flex items-center justify-center'>
+						<SwiperStories indexUser={idUser} />
+					</div>
 				</section>
 			)}
 			<div className='px-[40px] pt-[40px] w-[100%] md:w-[70%]'>
@@ -102,7 +129,7 @@ export default function Main() {
 					className='pb-[20px] border-b border-b-[#E2E8F0] flex overflow-x-hidden overflow-y-hidden whitespace w-full select-none'
 				>
 					{(isLoading &&
-						Array.from({ length: 9 }).map((_, i) => (
+						Array.from({ length: 10 }).map((_, i) => (
 							<div
 								key={`skeleton-${i}`}
 								className='flex flex-col items-center px-[3px]'
@@ -110,7 +137,7 @@ export default function Main() {
 								<Skeleton
 									variant='circular'
 									width={66}
-									className='mx-[6px]'
+									className='mx-[3px] md:mx-[6px]'
 									height={66}
 								/>
 								<Skeleton variant='text' sx={{ fontSize: '12px' }} width={66} />
@@ -120,7 +147,10 @@ export default function Main() {
 							{data?.map((e, i) => {
 								return (
 									<div
-										onClick={() => setStories(!stories)}
+										onClick={() => {
+											setIdUser(i)
+											setStories(!stories)
+										}}
 										key={e.id || `story-${i}`}
 										className='size-[80px] flex flex-col items-center'
 									>
@@ -134,7 +164,9 @@ export default function Main() {
 											{(e.userImage == '' && (
 												<Image
 													draggable={false}
-													className='object-cover bg-white rounded-full p-[2.5px]'
+													className={`object-cover ${
+														theme == 'dark' ? 'bg-black' : 'bg-white'
+													} rounded-full p-[2.5px]`}
 													src={userIMG}
 													alt=''
 													width={66}
@@ -143,7 +175,9 @@ export default function Main() {
 											)) || (
 												<Image
 													draggable={false}
-													className='object-cover bg-white rounded-full p-[2.5px]'
+													className={`w-[64px] h-[64px] object-cover ${
+														theme == 'dark' ? 'bg-black' : 'bg-white'
+													} rounded-full p-[2.5px]`}
 													src={`http://37.27.29.18:8003/images/${e.userImage}`}
 													alt=''
 													width={66}
@@ -151,9 +185,7 @@ export default function Main() {
 												/>
 											)}
 										</div>
-										<p className='text-[#1F2937] text-[14px] font-[400]'>
-											{e.userName}
-										</p>
+										<p className='text-[14px] font-[400]'>{e.userName}</p>
 									</div>
 								)
 							})}
@@ -225,8 +257,7 @@ export default function Main() {
 							{posts?.data?.map((e, i) => {
 								const muted = mutedMap[e.postId] ?? true
 								const stop = stopMap[e.postId] ?? true
-								console.log(e)
-
+								const comments = commentsMap[e.postId] ?? true
 								const toggleMuted = () => {
 									setMutedMap(prev => ({
 										...prev,
@@ -249,6 +280,12 @@ export default function Main() {
 											[postId]: !prev[postId],
 										}
 									})
+								}
+								const toggleComments = () => {
+									setCommentsMap(prev => ({
+										...prev,
+										[e.postId]: !comments,
+									}))
 								}
 								return (
 									<div className='flex py-[10px] flex-col' key={e.postId || i}>
@@ -273,7 +310,7 @@ export default function Main() {
 													)) || (
 														<Image
 															draggable={false}
-															className='size-[37px] rounded-full bg-white p-[2px] object-cover'
+															className='w-[34px] h-[34px]  size-[37px] rounded-full bg-white p-[2px] object-cover'
 															src={`http://37.27.29.18:8003/images/${e.userImage}`}
 															alt=''
 															width={37}
@@ -282,9 +319,7 @@ export default function Main() {
 													)}
 												</div>
 												<div className='flex flex-col'>
-													<p className='text-[#1E293B] font-[600] text-[14px]'>
-														{e.userName}
-													</p>
+													<p className='font-[600] text-[14px]'>{e.userName}</p>
 												</div>
 											</div>
 											<svg
@@ -311,7 +346,9 @@ export default function Main() {
 										{e.images[0].endsWith('.mp4') ? (
 											<div className='flex bg-black rounded-2xl justify-end items-baseline-last'>
 												<svg
-													className={`my-[18%] mx-[22%] ${stopMap[e.postId] ? 'hidden' : "inline"} duration-1000 absolute`}
+													className={`md:my-[18%] my-[70%] mx-[28%] md:mx-[22%] ${
+														stopMap[e.postId] ? 'hidden' : 'inline'
+													} duration-1000 absolute`}
 													xmlns='http://www.w3.org/2000/svg'
 													width='76'
 													height='76'
@@ -407,7 +444,7 @@ export default function Main() {
 																	width={900}
 																	height={200}
 																	style={{ width: '100%', height: 'auto' }}
-																	className='rounded-2xl'
+																	className='max-h-[90vh] rounded-2xl w-[34px] max-w- h-[34px]'
 																	draggable={false}
 																	alt='omg sory'
 																/>
@@ -427,16 +464,17 @@ export default function Main() {
 															'--swiper-pagination-color': '#ffffff',
 														}}
 														modules={[Pagination, Keyboard]}
-														className='w-full h-[300px] rounded-xl overflow-hidden'
+														className='w-full h-[70vh] rounded-xl overflow-hidden'
 													>
 														{e.images.map((e, i) => (
 															<SwiperSlide key={i}>
-																<div className='relative w-full h-full'>
+																<div className='relative w-full flex justify-center items-center bg-black h-full'>
 																	<Image
 																		src={`http://37.27.29.18:8003/images/${e}`}
 																		alt={`Slide ${i + 1}`}
-																		fill
-																		style={{ objectFit: 'cover' }}
+																		width={610}
+																		height={600}
+																		className='m-auto w-auto h-full'
 																		priority={i === 0}
 																	/>
 																</div>
@@ -536,7 +574,7 @@ export default function Main() {
 												)) || (
 													<Image
 														draggable={false}
-														className='size-[24px] rounded-full bg-white p-[2px] object-cover'
+														className='w-[34px] h-[34px]  size-[24px] rounded-full bg-white p-[2px] object-cover'
 														src={`http://37.27.29.18:8003/images/${e.userImage}`}
 														alt=''
 														width={24}
@@ -551,9 +589,7 @@ export default function Main() {
 											</div>
 											{e.content != null && (
 												<div className='flex items-center gap-[10px]'>
-													<p className='text-[#1E293B] font-bold'>
-														{e.userName}
-													</p>
+													<p className='font-bold'>{e.userName}</p>
 													{(e.content.length > 90 && (
 														<p className='text-[#262626] text-[14px] font-[400]'>
 															{e.content.slice(0, 87)}...
@@ -571,13 +607,73 @@ export default function Main() {
 												</div>
 											)}
 											{e.commentCount != 0 && (
-												<p className='text-[#94A3B8] text-[14px] hover:underline font-[400]'>
-													View all {e.commentCount} comments
+												<p
+													onClick={toggleComments}
+													className='text-[#94A3B8] text-[14px] hover:underline font-[400]'
+												>
+													{comments ? 'Vie' : 'Close'} all {e.commentCount}{' '}
+													comments
 												</p>
 											)}
+											{!comments && (
+												<div className='flex flex-col overflow-y-auto h-[150px] gap-[4px]'>
+													{e.comments.map((com, index) => {
+														return (
+															<div
+																key={com.id || index}
+																className='flex flex-col gap-[10px] w-full'
+															>
+																<div className='flex items-center gap-[7px]'>
+																	{(e.userImage == '' && (
+																		<Image
+																			draggable={false}
+																			className='object-cover bg-white rounded-full p-[2.5px]'
+																			src={userIMG}
+																			alt=''
+																			width={34}
+																			height={34}
+																		/>
+																	)) || (
+																		<Image
+																			draggable={false}
+																			className='w-[34px] h-[34px]  object-cover bg-white rounded-full p-[2.5px]'
+																			src={`http://37.27.29.18:8003/images/${com.userImage}`}
+																			alt=''
+																			width={34}
+																			height={34}
+																		/>
+																	)}
+																	<p className='text-[14px] font-[600]'>
+																		{com.userName}
+																	</p>
+																</div>
+																<p className='ml-[10px] text-[14px] font-[400]'>
+																	{com.comment}
+																</p>
+															</div>
+														)
+													})}
+												</div>
+											)}
 											<div className='flex w-[100%] items-center justify-between'>
-												<input type='text' value={comment} onChange={(e) => setComment(e.target.value)} className='w-[90%] outline-none text-black text-[15px] placeholder:text-[16px]' placeholder='Add a comment...' />
-												<p className='hover:underline text-[16px] text-[#64748B]'>
+												<input
+													type='text'
+													value={comment}
+													onChange={e => setComment(e.target.value)}
+													className='w-[90%] outline-none text-black text-[15px] placeholder:text-[16px]'
+													placeholder='Add a comment...'
+												/>
+												<p
+													onClick={async () => {
+														await commentPost({
+															comment: comment,
+															postId: e.postId,
+														})
+														setComment('')
+														toggleComments()
+													}}
+													className='hover:underline text-[16px] text-[#64748B]'
+												>
 													public
 												</p>
 											</div>
@@ -589,7 +685,101 @@ export default function Main() {
 					)}
 				</div>
 			</div>
-			<div className='w-[30%] h-[100vh] right-0 py-[28px] hidden md:flex flex-col gap-[20px] sticky top-0'></div>
+			<div className='w-[30%] h-[100vh] right-0 py-[28px] hidden md:flex flex-col gap-[20px] sticky top-0'>
+				<div>
+					{(isLoading &&
+						Array.from({ length: 1 }).map((_, i) => (
+							<div
+								key={`skeleton-${i}`}
+								className='flex gap-[8px] items-center px-[3px]'
+							>
+								<Skeleton
+									variant='circular'
+									width={48}
+									className='mx-[3px] md:mx-[6px]'
+									height={48}
+								/>
+								<Skeleton variant='text' sx={{ fontSize: '12px' }} width={36} />
+							</div>
+						))) || (
+						<div className='flex gap-[14px]'>
+							<div
+								onClick={() => {
+									setIdUser(0)
+									setStories(!stories)
+								}}
+								key={data[0]?.id || `story-${0}`}
+								className='size-[80px] flex gap-[8px] items-center'
+							>
+								{(data[0]?.userImage == '' && (
+									<Image
+										draggable={false}
+										className={`object-cover ${
+											theme == 'dark' ? 'bg-black' : 'bg-white'
+										} rounded-full p-[2.5px]`}
+										src={userIMG}
+										alt=''
+										width={48}
+										height={48}
+									/>
+								)) || (
+									<Image
+										draggable={false}
+										className={`w-[48px] h-[48px] object-cover rounded-full`}
+										src={`http://37.27.29.18:8003/images/${data[0]?.userImage}`}
+										alt=''
+										width={48}
+										height={48}
+									/>
+								)}
+								<p className='text-[14px] font-[400]'>{data[0]?.userName}</p>
+							</div>
+						</div>
+					)}
+				</div>
+				<div className='w-full flex flex-col'>
+					<p className='block text-[#64748B] text-[14px] font-[500] '>
+						Suggested for you
+					</p>
+					{users?.data?.slice(0, 5).map((e,i) => {
+						return (
+							<div key={i} className='py-[12px] pr-[8px] flex justify-between'>
+								<div className='flex gap-[8px] items-center'>
+									{(e.avatar == '' && (
+										<Image
+											draggable={false}
+											className={`object-cover ${
+												theme == 'dark' ? 'bg-black' : 'bg-white'
+											} rounded-full p-[2.5px]`}
+											src={userIMG}
+											alt=''
+											width={48}
+											height={48}
+										/>
+									)) || (
+										<Image
+											draggable={false}
+											className={`w-[48px] h-[48px] object-cover rounded-full`}
+											src={`http://37.27.29.18:8003/images/${e.avatar}`}
+											alt=''
+											width={48}
+											height={48}
+										/>
+									)}
+									<div className='flex flex-col'>
+										<p className='text-[16px] font-[500]'>
+											{e.userName}
+										</p>
+										<p className='text-[12px] font-[400]'>
+											{e.fullName}
+										</p>
+									</div>
+								</div>
+							</div>
+						)
+					})}
+				</div>
+			</div>
 		</div>
 	)
 }

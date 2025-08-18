@@ -4,14 +4,12 @@ import Image from "next/image"
 import { useEffect } from "react"
 import * as React from 'react'
 import Box from '@mui/material/Box'
-import Typography from '@mui/material/Typography'
 import Modal from '@mui/material/Modal'
-import { colors } from "@mui/material"
-import axios from "axios"
-import { Bookmark, CircleUserRound, Heart, MessageCircle, Send, SendHorizontal, Smile, Volume2, VolumeX } from "lucide-react"
-import BasicModal from "@/components/pages/explore/BasicModal"
+import { Bookmark, CircleUserRound, Heart, MessageCircleMore, Send, SendHorizontal, Smile, Volume2, VolumeX, X } from "lucide-react"
 import CommentInput from "@/components/pages/explore/Emogi"
 import { useUserId } from "@/hook/useUserId"
+import { useRouter } from "next/navigation"
+import { useTodoAsyncStore } from "@/store/pages/notification/store"
 
 
 const style = {
@@ -19,10 +17,8 @@ const style = {
 	top: '50%',
 	left: '50%',
 	transform: 'translate(-50%, -50%)',
-	width: 1000,
-	// height: "50vh",
-	// backgroundColor: "#272727",
-	color: "white"
+	width: 900,
+	color: "white",
 
 }
 
@@ -36,7 +32,7 @@ const mediaStyle = {
 }
 const mediaStyleModal = {
 	width: '100%',
-	height: '80vh',
+	height: '85vh',
 	objectFit: 'cover',
 	borderRadius: '2px',
 	cursor: 'pointer',
@@ -46,21 +42,37 @@ const mediaStyleModal = {
 
 
 export default function Explore() {
-	let { user, fechUser, postById, getPostById, deletComit, AddComit } = useUserStore()
+	let { user, fechUser, postById, getPostById, deletComit, AddComit, unfollowUser, Follow, getUsersFollow, FolowUser, likePost,f } = useUserStore()
+	console.log(postById)
 	const [open, setOpen] = React.useState(false)
 	let cnt = 3
+	let router = useRouter()
 
 	async function RemoveComit(postCommentId) {
 		await deletComit(postCommentId)
-		fechUser()
 	}
 
 	useEffect(() => {
 		fechUser()
+		const saved = JSON.parse(localStorage.getItem("bookmarks")) || []
+		setwishLix(saved)
 	}, [])
 
+
 	const handleOpen = async (id) => {
+		// подтягиваем пост
+		const isFollowed = FolowUser?.data?.some(e => e.userShortInfo.userId == postById.data?.userId);
+		console.log(isFollowed)
 		await getPostById(id);
+		// убедимся, что список подписок свежий
+		try {
+			await getUsersFollow(userId);
+		} catch (err) {
+			// если getUsersFollow может упасть — всё равно продолжаем
+			console.error("Ошибка при обновлении списка подписок в handleOpen:", err);
+		}
+		// вычисляем, подписаны ли на автора поста
+		setFollow(Boolean(isFollowed));
 		setOpen(true);
 	};
 
@@ -81,213 +93,285 @@ export default function Explore() {
 	const handleAddComment = async () => {
 		if (newcomit.trim() === "") return;
 		await AddComit(newcomit, postById.data?.postId);
+		await getPostById(postById.data?.postId);
 		setnewComit("");
 	};
+
+	const [likedComments, setLikedComments] = React.useState({});
+
+
+	const handleLikeComment = (commentId) => {
+		setLikedComments(prev => ({
+			...prev,
+			[commentId]: !prev[commentId]
+		}));
+	};
+
+	let [wishLix, setwishLix] = React.useState([])
+
+	function AddwishLix(postId) {
+		let upDated;
+		if (wishLix.includes(postId)) {
+			upDated = wishLix.filter(id => id != postId)
+		}
+		else {
+			upDated = [...wishLix, postId]
+		}
+		setwishLix(upDated)
+		localStorage.setItem("bookmarks", JSON.stringify(upDated))
+	}
+	let userId = useUserId()
+	let [follow, setFollow] = React.useState(false)
+
+	// console.log();
+	useEffect(() => {
+		getUsersFollow(userId)
+
+	}, [])
+	// console.log(FolowUser);
+
+
+	// console.log(follow);
+
+
+	// console.log(FolowUser?.data[0]?.userShortInfo.userId);
+
+
+	async function HendlFollow(id) {
+		// вычислим текущее состояние подписки из стора
+		const currentlyFollowed = FolowUser?.data?.some(e => e.userShortInfo.userId == id);
+		
+		try {
+			if (currentlyFollowed) {
+				await unfollowUser(id);
+			setFollow(true);
+
+				
+			} else {
+				await Follow(id);
+			setFollow(false);
+
+			}
+			
+			// Обновляем список подписок, чтобы стор стал актуальным
+			try {
+				await getUsersFollow(userId);
+			} catch (err) {
+				console.error("Ошибка при getUsersFollow в HendlFollow:", err);
+			}
+			
+			// Теперь пересчитаем follow исходя из обновлённого FolowUser
+			const updatedFollow = FolowUser?.data?.some(e => e.userShortInfo.userId == id);
+			// setFollow(updatedFollow ? false : true);
+			
+			
+			
+			// setFollow(e=> !e)
+			
+		} catch (error) {
+			console.error("Ошибка при подписке/отписке:", error);
+		}
+	}
 
 
 	return (
 		<div>
-			<Modal
-				open={open}
-				onClose={handleClose}
-				aria-labelledby="modal-modal-title"
-				aria-describedby="modal-modal-description"
-			>
-				<Box sx={style}>
-					<div className="flex gap-[40px] h-[80vh] bg-[#272727]">
-						{postById ? (
+			<div>
 
-							<div className="flex w-full gap-[20px]">
-								<div className="w-[40%] ">
-									{/* {postById.data?.images.map(el => {
-										const mediaUrl = `http://37.27.29.18:8003/images/${el}`
-										return (
-											<div key={el.id}>
-												{el.endsWith('.mp4') ? (
-													<div>
-														<video ref={videoRef} src={mediaUrl} className="w-full h-[80vh] object-cover" playsInline autoPlay muted={isMuted} loop />
-														<button onClick={toggleMute} className="absolute z-10 mt-[-40px] ml-[270px] text-white ">
-															{isMuted ? <VolumeX size={30} /> : <Volume2 size={30} />}
-														</button>
-													</div>
-												) : (
-													<img src={mediaUrl} alt={`Post by ${el.userName}`}  style={mediaStyleModal} />
-												)}
-												<button className="absolute z-10 mt-[-40px] ml-[30px] text-white">
-													<CircleUserRound size={30} />
-												</button>
-											</div>
-										)
-									})} */}
-									{postById.data?.images?.[0] && (() => {
-										const el = postById.data.images[0];
-										const mediaUrl = `http://37.27.29.18:8003/images/${el}`;
-										return (
-											<div key={el}>
-												{el.endsWith('.mp4') ? (
-													<div>
-														<video
-															ref={videoRef}
-															src={mediaUrl}
-															className="w-full h-[80vh] object-cover"
-															playsInline
-															autoPlay
-															muted={isMuted}
-															loop
-														/>
-														<button
-															onClick={toggleMute}
-															className="absolute z-10 mt-[-40px] ml-[270px] text-white"
-														>
-															{isMuted ? <VolumeX size={30} /> : <Volume2 size={30} />}
-														</button>
-													</div>
-												) : (
-													<img src={mediaUrl} alt={`Post by ${el.userName}`} style={mediaStyleModal} />
-												)}
-												<button className="absolute z-10 mt-[-40px] ml-[30px] text-white">
-													<CircleUserRound size={30} />
-												</button>
-											</div>
-										);
-									})()}
+				<Modal open={open} onClose={handleClose} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
+					<Box sx={style}>
+						<div className="flex gap-[40px] h-[85vh] bg-[#272727]">
+							{postById ? (
 
-								</div>
-								<div className="w-[68%] p-[20px]">
-									<div className="flex  w-full justify-between pb-[20px]  items-center">
-										<div className="flex gap-[20px]">
-											<img src={`http://37.27.29.18:8003/images/${postById.data?.userImage}`} className="w-[40px] h-[40px] rounded-full" alt="test" />
-											<p className="font-medium cursor-pointer text-[25px]">{postById.data?.userName}</p> <br />
-										</div>
-										<button className="font-bold text-2xl text-blue-500 cursor-pointer hover:duration-500 hover:scale-120 ">Follow</button>
-
-									</div>
-									<div className="overflow-y-auto overflow-x-hidden whitespace-nowrap select-none max-h-[35vh] space-y-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-										{postById.data?.comments?.length > 0 ? (
-											postById.data.comments.map(c => (
-												<div className="flex items-center justify-between">
-													<div className="flex items-center gap-3">
-														{c.userImage
-															? (
-																<img src={`http://37.27.29.18:8003/images/${c.userImage}`} alt="" className="w-[40px] h-[40px] rounded-full border-2" />
-															)
-															: (
-																<CircleUserRound size={40} color="#ffffff" />
-															)
-														}
+								<div className="flex w-full gap-[20px]">
+									<div className="w-[47%] ">
+										{postById.data?.images?.[0] && (() => {
+											const el = postById.data.images[0];
+											const mediaUrl = `http://37.27.29.18:8003/images/${el}`;
+											return (
+												<div key={el}>
+													{el.endsWith('.mp4') ? (
 														<div>
-															<p className="text-[20px] cursor-pointer">{c.comment}</p>
-															{c.dateCommented && (
-
-																<span className="text-[10px] leading-0 self-end">
-																	{new Date(c.dateCommented).toLocaleString([], {
-																		year: "numeric",
-																		month: "2-digit",
-																		day: "2-digit",
-																		hour: "2-digit",
-																		minute: "2-digit"
-																	})}
-																</span>
-															)}
-
+															<video
+																ref={videoRef}
+																src={mediaUrl}
+																className="w-full h-[85vh] object-cover"
+																playsInline
+																autoPlay
+																muted={isMuted}
+																loop
+															/>
+															<button
+																onClick={toggleMute}
+																className="absolute z-10 mt-[-40px] ml-[380px] text-white"
+															>
+																{isMuted ? <VolumeX size={30} /> : <Volume2 size={30} />}
+															</button>
 														</div>
-													</div>
-													{
-														c.userId == useUserId() ? <button className="flex gap-[10px]" onClick={() => RemoveComit(c.postCommentId)}>
-															<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-																<path strokeLinecap="round" strokeLinejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-															</svg>
-															<Heart />
-														</button>
-															: <Heart />
-													}
+													) : (
+														<img src={mediaUrl} alt={`Post by ${el.userName}`} style={mediaStyleModal} />
+													)}
 												</div>
-											))
-										) : (
-											<p className="text-gray-400">Нет комментариев</p>
-										)}
+											);
+										})()}
+
 									</div>
-									<div className="border-t sticky bottom-0 bg-[#272727] h-[180px] z-10 w-full mt-[300px] pt-[10px]">
-										<div className="flex justify-between">
+									<div className="w-[51%] p-[20px]">
+										<div className="flex  w-full justify-between pb-[20px]  items-center">
 											<div className="flex gap-[20px]">
-												<button>
-													{/* <Heart size={34} color="#ffffff" /> */}
-													<BasicModal />
-												</button>
-												<button>
-													<MessageCircle size={30} color="#ffffff" />
-												</button>
-												<button>
-													<Send size={30} color="#ffffff" />
+												<div>
+													<img src={`http://37.27.29.18:8003/images/${postById.data?.userImage}`} className="w-[40px] h-[40px] rounded-full" alt="test" />
+												</div>
+
+												<p onClick={() => router.push(`/${postById.data?.userId}`)} className="font-medium cursor-pointer  min-w-20 max-w-40 text-[25px] truncate">{postById.data?.userName}</p> <br />
+											</div>
+											<button
+												className="px-3 py-1 ml-4 text-sm cursor-pointer text-black bg-white rounded-full"
+												onClick={() => HendlFollow(postById.data?.userId)}
+											>
+												{postById?.data?.isFollowing ? "Вы подписаны" : "Подписаться"}
+											</button>
+
+											<button className="cursor-pointer" onClick={() => setOpen(false)}>
+												<X />
+											</button>
+
+										</div>
+										<div className="overflow-y-auto overflow-x-hidden break-words select-none max-h-[53vh] space-y-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+											{postById.data?.comments?.length > 0 ? (
+												postById.data.comments.map(comment => (
+													<div key={comment.id} className="flex items-center justify-between">
+														<div className="flex  gap-3 items-center flex-1 min-w-0">
+															{comment.userImage
+																? (
+																	<img
+																		src={comment.userImage ? `http://37.27.29.18:8003/images/${comment.userImage}` : "https://via.placeholder.com/40"}
+																		alt={comment.userName}
+																		className="w-8 h-8 border border-gray-300 rounded-full"
+																	/>
+																)
+																: (
+																	<div>
+																		<CircleUserRound className="cursor-pointer" size={34} onClick={() => router.push(`/${comment.userId}`)} color="#ffffff" />
+
+																	</div>
+																)
+															}
+															<div className="min-w-120">
+																<p className="text-[15px]  w-[90%] ">{comment.comment}</p>
+																{comment.dateCommented && (
+
+																	<span className="text-[10px] text-gray-400 leading-0 self-end">
+																		{new Date(comment.dateCommented).toLocaleString([], {
+																			year: "numeric",
+																			month: "2-digit",
+																			day: "2-digit",
+																			hour: "2-digit",
+																			minute: "2-digit"
+																		})}
+																	</span>
+																)}
+
+															</div>
+														</div>
+														{
+															comment.userId == useUserId() ?
+																<div className="flex gap-[10px]">
+
+																	<button className="cursor-pointer hover:text-red-500" onClick={() => RemoveComit(comment.postCommentId)}>
+																		<X />
+																	</button>
+																	<Heart
+																		className="cursor-pointer"
+																		onClick={() => handleLikeComment(comment.postCommentId)}
+																		size={20}
+																		color="#ffffff"
+																		fill={likedComments[comment.postCommentId] ? 'red' : 'nane'}
+																		stroke={likedComments[comment.postCommentId] ? 'red' : 'white'}
+																	/>
+																</div>
+																: <Heart
+																	className="cursor-pointer"
+																	onClick={() => handleLikeComment(comment.postCommentId)}
+																	size={20}
+																	color="#ffffff"
+																	fill={likedComments[comment.postCommentId] ? 'red' : 'none'}
+																	stroke={likedComments[comment.postCommentId] ? 'red' : 'white'}
+																/>
+														}
+													</div>
+												))
+											) : (
+												<p className="text-gray-400">Нет комментариев</p>
+											)}
+										</div>
+
+										<div className="border-t fixed bottom-0 bg-[#272727] h-[120px] z-10 w-[47%] mt-[300px] pt-[10px]">
+											<div className="flex justify-between mb-2">
+												<div className="flex gap-4">
+													<button
+														onClick={async () => await likePost(postById.data?.postId)}
+														className="cursor-pointer"
+													>
+														<Heart
+															size={24}
+															color="#ffffff"
+															fill={postById.data?.postLike ? 'red' : 'none'}
+															stroke={postById.data?.postLike ? 'red' : 'white'}
+														/>
+													</button>
+													<MessageCircleMore size={24} color="#ffffff" />
+													<Send size={24} color="#ffffff" />
+												</div>
+												<button onClick={() => AddwishLix(postById.data?.postId)}>
+													<Bookmark
+														fill={wishLix.includes(postById.data?.postId) ? "white" : "none"}
+														size={24}
+														color="#ffffff"
+													/>
 												</button>
 											</div>
-											<button>
-												<Bookmark size={30} color="#ffffff" />
-											</button>
-										</div>
-										<div>
-											<span className="font-bold text-[20px]">
-												{postById.data?.postLikeCount} отметок "Нравится"
-											</span>
-										</div>
-										<div className="border-2 min-h-12 max-h-12 mt-[40px] p-2 rounded border-[#E2E8F0] flex justify-between gap-1 items-center">
-											<button>
-												<CommentInput value2={newcomit} onChange2={(e) => setnewComit(e.target.value)} />
-											</button>
-											{/* <input type="text" value={newcomit} onChange={(e) => setnewComit(e.target.value)} className="w-1/1 outline-none" /> */}
-											<button onClick={handleAddComment}>
-												<SendHorizontal />
-											</button>
-										</div>
-									</div>
 
+											<div className="mb-2">
+												<span className="font-bold">
+													{postById.data?.postLikeCount} отметок "Нравится"
+												</span>
+											</div>
+
+											<div className="flex gap-2">
+												<CommentInput
+													value2={newcomit}
+													onChange2={(e) => setnewComit(e.target.value)}
+												/>
+												<button
+													onClick={handleAddComment}
+													disabled={!newcomit.trim()}
+													className="text-blue-500 disabled:text-gray-500"
+												>
+													<SendHorizontal size={24} />
+												</button>
+											</div>
+										</div>
+
+									</div>
 								</div>
-							</div>
 
-						) : (
-							<div>
-								<p>Загрузка...</p>
-							</div>
-						)
-						}
-
-
-					</div>
-				</Box>
-			</Modal>
-
-			{/* <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 md:gap-4 mt-[10px]">
-				{user && user?.data?.map(el => (
-					<div className="bg-black rounded-2xl" key={el.postId}>
-						{el.images.map((item, index) => {
-							const mediaUrl = `http://37.27.29.18:8003/images/${item}`
-
-							return (
-								<div className=" hover:opacity-[50%] hover:duration-1000  relative group" key={index} style={mediaStyle} onClick={() => handleOpen(el.postId)} >
-									<div className="absolute inset-0 flex items-center justify-center gap-[30px] text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
-										<div className="flex gap-[10px] font-bold text-4xl items-center">
-											<Heart size={46} color="#ffffff" />
-											<span>{el.postLikeCount}</span>
-										</div>
-										<div className="flex gap-[10px] font-bold text-4xl items-center">
-											<MessageCircle size={46} color="#ffffff" />
-											<span>{el.commentCount}</span>
-										</div>
-									</div>
-									{item.endsWith('.mp4') ? (
-										<video src={mediaUrl} style={mediaStyle} controls />
-									) : (
-										<Image src={mediaUrl} alt={`Post by ${el.userName}`} width={300} height={300} style={mediaStyle} />
-									)}
+							) : (
+								<div>
+									<p>Загрузка...</p>
 								</div>
 							)
-						})}
-					</div>
-				))}
-			</div> */}
+							}
 
-			<div className="flex justify-end">
-				<div className="grid grid-cols-2 sm:grid-cols-3 gap-2 md:gap-4 mt-[10px] mx-[10px]  max-w-[1240px]">
+
+						</div>
+					</Box>
+				</Modal>
+			</div>
+
+
+			<div className="flex justify-center">
+				<div className="grid grid-cols-3 gap-2 md:gap-4 my-[10px] mx-[10px]  max-w-[1240px]">
 					{user?.data?.map((el, i) => {
 						if (i == 15) {
 							cnt = 4;
@@ -299,6 +383,11 @@ export default function Explore() {
 						if (i == 23) {
 							isFifth = false
 						}
+						if (i == 25) { isFifth = true }
+						if (i == 31) { isFifth = false }
+						if (i == 32) { isFifth = true }
+						if (i == 35) { isFifth = true }
+						// if(i==42){ isFifth=true}
 						if ((i + 1) % cnt === 0) {
 							if (i == 11) {
 								cnt = cnt + 1
@@ -308,7 +397,7 @@ export default function Explore() {
 							}
 						}
 						return (
-							<div key={el.postId} className={`relative ${isFifth ? "row-span-2 h-[100%] min-w-[100%] max-w-[53%]" : ""} group aspect-square w-[100%] overflow-hidden rounded-xl  bg-black cursor-pointer`} onClick={() => handleOpen(el.postId)}>
+							<div key={el.postId} className={`relative ${isFifth ? "row-span-2 h-[100%] min-w-[100%] max-w-[53%]" : ""} group aspect-square w-[100%] overflow-hidden rounded  bg-black cursor-pointer`} onClick={() => handleOpen(el.postId)}>
 								{el.images[0].endsWith(".mp4") ? (
 									<div>
 										<div className="z-[10] absolute top-2 left-2 text-white  rounded-full p-1">
@@ -369,7 +458,7 @@ export default function Explore() {
 										</div>
 										<video
 											src={`http://37.27.29.18:8003/images/${el.images[0]}`}
-											className={`  ${isFifth ? "h-[1000px]" : ""}  w-full object-cover transition-transform duration-500 group-hover:scale-105`}
+											className={`  ${isFifth ? "h-[1000px]" : ""}  w-full object-cover transition-transform duration-500 group-hover:scale-101`}
 											muted
 											loop
 											playsInline
@@ -381,19 +470,19 @@ export default function Explore() {
 										alt={`Post by ${el.userName}`}
 										width={500}
 										height={500}
-										className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+										className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-101"
 									/>
 								)}
 
 								<div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-300"></div>
 
-								<div className="absolute inset-0 flex items-center justify-center gap-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-white z-10">
+								<div className="absolute inset-0 hidden lg:flex items-center justify-center gap-2 lg:gap-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-white z-10">
 									<div className="flex gap-2 items-center font-bold text-xl">
 										<Heart size={28} color="white" />
 										<span>{el.postLikeCount}</span>
 									</div>
 									<div className="flex gap-2 items-center font-bold text-xl">
-										<MessageCircle size={28} color="white" />
+										<MessageCircleMore size={28} color="white" />
 										<span>{el.commentCount}</span>
 									</div>
 								</div>

@@ -8,6 +8,8 @@ import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
 import { motion } from "framer-motion"
 import { useRouter } from 'next/navigation'
+import defaultUser from '../../assets/img/pages/profile/profile/instauser (2).jpg'
+
 
 const Modal = () => {
     const [focused, setFocused] = useState(false)
@@ -16,8 +18,6 @@ const Modal = () => {
     const [loading, setLoading] = useState(false)
 
     let { users, getUsers, searchHistories, getSearchHistories, deleteUserHistory, addUserHistory, clearUserHistory, openModal, setOpenModal } = usegetUserStore()
-
-    let myFollowers = []
 
     useEffect(() => {
         getUsers()
@@ -33,7 +33,7 @@ const Modal = () => {
 
         setLoading(true)
         const delayDebounce = setTimeout(() => {
-            const results = myFollowers?.filter(u =>
+            const results = users?.data?.filter(u =>
                 u.userName?.toLowerCase().includes(search.toLowerCase())
             ) || []
             setFilteredUsers(results)
@@ -42,6 +42,7 @@ const Modal = () => {
 
         return () => clearTimeout(delayDebounce)
     }, [search, users])
+
 
     const SkeletonRow = () => (
         <Stack direction="row" spacing={2} alignItems="center" className="p-3">
@@ -52,8 +53,6 @@ const Modal = () => {
             </Stack>
         </Stack>
     )
-
-    const id = users?.data?.map(e => e.id)
 
     let navigate = useRouter()
 
@@ -117,8 +116,8 @@ const Modal = () => {
                     ) : filteredUsers.length > 0 ? (
                         filteredUsers.map(e => (
                             <div onClick={() => addUserHistory(e.id)} key={e.id}>
-                                <div onClick={() => linkToProfile(e.id)} className='flex hover:bg-[#eeeeee] rounded p-3 items-center gap-5'>
-                                    {e.avatar == '' ? <User size={44} /> : <Image src={`http://37.27.29.18:8003/images/${e.avatar}`} width={44} height={44} alt="avatar" />}
+                                <div onClick={() => linkToProfile(e.id)} className='flex cursor-pointer hover:bg-[#eeeeee] rounded p-3 items-center gap-5'>
+                                    {e.avatar == '' ? <Image src={defaultUser} className='object-cover w-[44px] h-[44px] rounded-full' height={44} width={44} /> : <Image src={`http://37.27.29.18:8003/images/${e.avatar}`} className='object-cover w-[44px] h-[44px] rounded-full' width={44} height={44} alt="avatar" />}
                                     <div>
                                         <p>{e.userName}</p>
                                         <p>{e.fullName}</p>
@@ -131,9 +130,9 @@ const Modal = () => {
                     )
                 ) : (
                     searchHistories?.data?.map(e => (
-                        <div onClick={() => linkToProfile(e?.users.id)} className="flex items-center cursor-pointer hover:bg-[#eeeeee] rounded p-3 w-full justify-between">
-                            <div className='flex items-center gap-5'>
-                                {e?.users?.avatar == '' ? <User size={44} /> : <Image src={`http://37.27.29.18:8003/images/${e?.users?.avatar}`} width={44} height={44} alt="avatar" />}
+                        <div key={e.id} className="flex items-center cursor-pointer hover:bg-[#eeeeee] rounded p-3 w-full justify-between">
+                            <div onClick={() => linkToProfile(e?.users.id)} className='flex cursor-pointer items-center gap-5'>
+                                {e?.users?.avatar == '' ? <Image src={defaultUser} className='object-cover w-[44px] h-[44px] rounded-full' height={44} width={44} alt='image' /> : <Image src={`http://37.27.29.18:8003/images/${e?.users?.avatar}`} className='object-cover w-[44px] h-[44px] rounded-full' width={44} height={44} alt="avatar" />}
                                 <div>
                                     <p>{e?.users?.userName}</p>
                                     <p>{e?.users?.fullName}</p>
