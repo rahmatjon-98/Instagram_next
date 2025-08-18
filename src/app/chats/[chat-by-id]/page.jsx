@@ -368,7 +368,7 @@ export default function ChatById() {
         </Box>
       </Drawer>
 
-      <div className="w-full mx-auto p-4 h-[76vh] overflow-y-auto gap-2 ">
+      <div className="w-full mx-auto p-4 h-[76vh] overflow-y-auto gap-2 hidscrol">
         {loadingDelChat ? (
           <SkeletonChat />
         ) : (
