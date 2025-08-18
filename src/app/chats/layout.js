@@ -169,9 +169,13 @@ export default function Layout({ children }) {
         {openModalUsers && (
           <section
             style={{ backdropFilter: "blur(6px)" }}
-            className="fixed inset-0 z-20 flex items-center justify-center bg-[rgba(0,0,0,0.6)]"
+            className="fixed inset-0 z-20 flex items-center justify-center bg-[rgba(0,0,0,0.3)] "
           >
-            <article className="w-[600px] bg-white rounded-2xl space-y-2.5 shadow py-5">
+            <article
+              className={`w-[600px]  rounded-2xl space-y-2.5 shadow py-5 border-2 ${
+                theme == "dark" ? "bg-black text-white" : "bg-white text-black"
+              }`}
+            >
               <div className="relative">
                 <p className="text-center font-bold text-xl pb-5">
                   Новое сообщение
@@ -196,7 +200,7 @@ export default function Layout({ children }) {
                 </div>
               </div>
 
-              <div className="flex flex-col overflow-y-auto h-[50vh] py-3">
+              <div className="flex flex-col overflow-y-auto h-[50vh] py-3 hidscrol">
                 <p className="pb-2 px-5 text-left font-bold">Рекомендуемые</p>
 
                 <div className="flex flex-col">
@@ -285,8 +289,7 @@ export default function Layout({ children }) {
           </button>
         </section>
 
-        <section className="overflow-y-scroll h-[75vh] scrollbar-thin scrollbar-track-white scrollbar-thumb-gray-400 
-        dark:scrollbar-track-black dark:scrollbar-thumb-gray-700">
+        <section className="overflow-y-scroll h-[75vh] hidscrol">
           {loadingChat
             ? Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)
             : chats &&
@@ -299,7 +302,13 @@ export default function Layout({ children }) {
                 )
                 .map((e) => (
                   <Link key={e.chatId} href={`/chats/${e.chatId}`}>
-                    <div className="flex items-center gap-3 hover:bg-gray-200 p-2">
+                    <div
+                      className={`flex items-center gap-3  ${
+                        theme == "dark"
+                          ? "hover:bg-gray-800"
+                          : "hover:bg-gray-100"
+                      } p-2`}
+                    >
                       {(
                         e.receiveUserId === userId
                           ? e.sendUserImage
