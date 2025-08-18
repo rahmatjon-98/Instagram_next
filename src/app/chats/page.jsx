@@ -422,7 +422,13 @@ export default function DefaultChat() {
               style={{ backdropFilter: "blur(6px)" }}
               className="fixed inset-0 z-20 flex items-center justify-center bg-[rgba(0,0,0,0.6)]"
             >
-              <article className="w-[600px] bg-white rounded-2xl shadow py-5">
+              <article
+                className={`w-[600px] rounded-2xl shadow py-5  border-2 ${
+                  theme == "dark"
+                    ? "bg-black text-white"
+                    : "bg-white text-black"
+                }`}
+              >
                 <div className="relative">
                   <p className="text-center font-bold text-xl pb-5">
                     Новое сообщение
@@ -447,7 +453,7 @@ export default function DefaultChat() {
                   </div>
                 </div>
 
-                <div className="flex flex-col overflow-y-auto h-[50vh] py-3">
+                <div className="flex flex-col overflow-y-auto hidscrol h-[50vh] py-3">
                   <p className="pb-2 px-5 text-left font-bold">Рекомендуемые</p>
 
                   <div className="flex flex-col">

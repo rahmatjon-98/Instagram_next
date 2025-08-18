@@ -5,24 +5,9 @@
 	font-family: 'Inter', sans-serif;
 }
 
-::-webkit-scrollbar {
-	width: 8px;
+.hidscrol::-webkit-scrollbar {
+	display: none;
 }
-
-::-webkit-scrollbar-track {
-	background: #000;
-}
-
-::-webkit-scrollbar-thumb {
-	background: #111;
-	border-radius: 6px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-	background: #333;
-}
-
-
 
 @keyframes flyAnimation {
 	0% {

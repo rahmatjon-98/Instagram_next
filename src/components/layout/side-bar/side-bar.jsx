@@ -33,13 +33,12 @@ import useDarkSide from "@/hook/useDarkSide";
 import { usegetUserStore } from "@/store/pages/search/store";
 
 const NavLink = ({ href, icon, activeIcon, label, isActive }) => {
-  const [theme] = useDarkSide();
   return (
     <Link
       href={href}
-      className={`flex items-center gap-4 w-[90%] m-auto rounded-md h-[52px] px-4 ${
-        theme == "dark" ? "hover:bg-gray-800" : "hover:bg-gray-100"
-      }  ${isActive(href)}`}
+      className={`flex items-center gap-4 w-[90%] m-auto rounded-md h-[52px] px-4 ${isActive(
+        href
+      )}`}
     >
       {isActive(href) ? activeIcon : icon}
       <p className="text-lg">{label}</p>
@@ -135,14 +134,26 @@ export default function SideBar({ children }) {
 
           <div className="flex flex-col justify-between h-full">
             <div className="flex flex-col gap-2 mt-4">
-              <NavLink
-                href="/"
-                icon={homeIcon}
-                activeIcon={homeIconActive}
-                label={t("layout.home")}
-                isActive={isActive}
-              />
-              <button onClick={setOpenModal}>
+              <div
+                className={`${
+                  theme == "dark" ? "hover:bg-gray-800" : "hover:bg-gray-100"
+                }`}
+              >
+                <NavLink
+                  href="/"
+                  icon={homeIcon}
+                  activeIcon={homeIconActive}
+                  label={t("layout.home")}
+                  isActive={isActive}
+                />{" "}
+              </div>
+
+              <button
+                className={`${
+                  theme == "dark" ? "hover:bg-gray-800" : "hover:bg-gray-100"
+                }`}
+                onClick={setOpenModal}
+              >
                 <NavLink
                   href="#"
                   icon={searchIcon}
@@ -151,34 +162,63 @@ export default function SideBar({ children }) {
                   isActive={isActive}
                 />
               </button>
-              <NavLink
-                href="/explore"
-                icon={compas}
-                activeIcon={compasActive}
-                label={t("layout.explore")}
-                isActive={isActive}
-              />
-              <NavLink
-                href="/reels"
-                icon={video}
-                activeIcon={videoActive}
-                label={t("layout.reels")}
-                isActive={isActive}
-              />
-              <NavLink
-                href="/chats"
-                icon={message}
-                activeIcon={messageActive}
-                label={t("layout.message")}
-                isActive={isActive}
-              />
-              <NavLink
-                href="/notification"
-                icon={like}
-                activeIcon={likeActive}
-                label={t("layout.notification")}
-                isActive={isActive}
-              />
+
+              <div
+                className={`${
+                  theme == "dark" ? "hover:bg-gray-800" : "hover:bg-gray-100"
+                }`}
+              >
+                <NavLink
+                  href="/explore"
+                  icon={compas}
+                  activeIcon={compasActive}
+                  label={t("layout.explore")}
+                  isActive={isActive}
+                />
+              </div>
+
+              <div
+                className={`${
+                  theme == "dark" ? "hover:bg-gray-800" : "hover:bg-gray-100"
+                }`}
+              >
+                <NavLink
+                  href="/reels"
+                  icon={video}
+                  activeIcon={videoActive}
+                  label={t("layout.reels")}
+                  isActive={isActive}
+                />
+              </div>
+
+              <div
+                className={`${
+                  theme == "dark" ? "hover:bg-gray-800" : "hover:bg-gray-100"
+                }`}
+              >
+                <NavLink
+                  href="/chats"
+                  icon={message}
+                  activeIcon={messageActive}
+                  label={t("layout.message")}
+                  isActive={isActive}
+                />
+              </div>
+
+              <div
+                className={`${
+                  theme == "dark" ? "hover:bg-gray-800" : "hover:bg-gray-100"
+                }`}
+              >
+                <NavLink
+                  href="/notification"
+                  icon={like}
+                  activeIcon={likeActive}
+                  label={t("layout.notification")}
+                  isActive={isActive}
+                />{" "}
+              </div>
+
               <div
                 className={`flex items-center gap-4 w-[90%] m-auto rounded-md h-[52px] px-4 hover:bg-gray-100 ${
                   theme == "dark" ? "hover:bg-gray-800" : "hover:bg-gray-100"
@@ -187,22 +227,29 @@ export default function SideBar({ children }) {
                 {action}
                 <p className="text-lg">{t("layout.create")}</p>
               </div>
-              <NavLink
-                href="/profile"
-                icon={
-                  <Image
-                    className={`${
-                      pathname === "/profile"
-                        ? "border-2 border-black rounded-full"
-                        : ""
-                    } h-10 w-10`}
-                    src={Profile}
-                    alt="Profile"
-                  />
-                }
-                label={t("layout.profile")}
-                isActive={isActive}
-              />
+
+              <div
+                className={`${
+                  theme == "dark" ? "hover:bg-gray-800" : "hover:bg-gray-100"
+                }`}
+              >
+                <NavLink
+                  href="/profile"
+                  icon={
+                    <Image
+                      className={`${
+                        pathname === "/profile"
+                          ? "border-2 border-black rounded-full"
+                          : ""
+                      } h-10 w-10`}
+                      src={Profile}
+                      alt="Profile"
+                    />
+                  }
+                  label={t("layout.profile")}
+                  isActive={isActive}
+                />
+              </div>
             </div>
 
             <div
