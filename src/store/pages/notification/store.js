@@ -62,41 +62,48 @@ export const useTodoAsyncStore = create(set => ({
 	},
 
 	getComments: async () => {
-		set({ loading: true, error: null })
-		try {
-			const token = localStorage.getItem('access_token')
-			if (!token) throw new Error('Токен не найден')
+  set({ loading: true, error: null });
+  try {
+    const token = localStorage.getItem('access_token');
+    if (!token) throw new Error('Токен не найден');
 
-			// Получаем ID текущего пользователя из токена
-			const payload = JSON.parse(atob(token.split('.')[1]))
-			const currentUserId = payload.sid
+    // Получаем ID текущего пользователя из токена
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const currentUserId = payload.sid; // Убедитесь, что это правильное поле!
 
-			// Запрашиваем посты
-			const response = await fetch(
-				'http://37.27.29.18:8003/Post/get-reels?PageNumber=1',
-				{
-					headers: {
-						Authorization: `Bearer ${token}`,
-						accept: '*/*',
-					},
-				}
-			)
+    const response = await fetch(
+      'http://37.27.29.18:8003/Post/get-reels?PageNumber=1',
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accept: '*/*',
+        },
+      }
+    );
 
-			if (!response.ok) throw new Error('Ошибка при получении данных')
+    if (!response.ok) throw new Error('Ошибка при получении данных');
+    
+    const data = await response.json();
+    console.log('Полученные данные:', data); // Для отладки
 
-			const data = await response.json()
+    // 1. Вариант: Все комментарии из всех постов (без фильтрации)
+    const allComments = data.data.flatMap(post => post.comments || []);
+    
+    // 2. Вариант: Только комментарии к постам текущего пользователя
+    const myPostsComments = data.data
+      .filter(post => post.userId?.toString() === currentUserId.toString())
+      .flatMap(post => post.comments || []);
 
-			// Фильтруем посты, оставляя только посты текущего пользователя
-			const myPosts = data.data.filter(post => post.userId === currentUserId)
+    console.log('Все комментарии:', allComments);
+    console.log('Комментарии к моим постам:', myPostsComments);
 
-			// Собираем все комментарии из постов текущего пользователя
-			const myComments = myPosts.flatMap(post => post.comments || [])
-
-			set({ comments: myComments, loading: false })
-		} catch (err) {
-			set({ error: err.message, loading: false })
-		}
-	},
+    // Выбираем что показывать (в примере - все комментарии)
+    set({ comments: allComments, loading: false });
+  } catch (err) {
+    console.error('Ошибка:', err);
+    set({ error: err.message, loading: false });
+  }
+},
 
 	toggleFollow: async userId => {
 		try {

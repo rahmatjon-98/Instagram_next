@@ -398,7 +398,7 @@ export default function Explore() {
 
 
 			<div className="flex justify-center lg:pt-0 pt-[50px]">
-				<div className="grid grid-cols-3 gap-2 md:gap-4 my-[10px] mx-[10px]  max-w-[1240px]">
+				<div className="grid grid-cols-3 gap-0.5  my-[10px] mx-[10px]  max-w-[1240px]">
 					{user?.data?.map((el, i) => {
 						if (i == 15) {
 							cnt = 4;
