@@ -2,12 +2,15 @@
 import { useProfileStore } from '@/store/pages/profile/profile/store'
 import Image from 'next/image'
 import React, { useEffect } from 'react'
-import savedIcon from '@/assets/img/pages/profile/profile/image 78.svg'
+import savedIcon from '@/assets/img/pages/profile/profile/image_78-removebg-preview.png'
 import { BookmarkIcon, Heart } from 'lucide-react'
 import { FaComments } from 'react-icons/fa'
+import useDarkSide from '@/hook/useDarkSide'
 
 const Saved = () => {
 	let { favorites, getFavorites } = useProfileStore()
+
+	const [theme] = useDarkSide()
 
 	useEffect(() => {
 		getFavorites()
@@ -16,7 +19,7 @@ const Saved = () => {
 
 	return (
 		<div>
-			<div className='flex flex-wrap gap-[4%] gap-y-[5vh] pb-[10vh] pt-[5vh]'>
+			<div className='flex flex-wrap gap-[0.5%] gap-y-[1vh] pb-[10vh] pt-[5vh]'>
 				{favorites?.data?.length > 0 ? (
 					favorites.data.map((e, i) => (
 						// <div
@@ -30,18 +33,22 @@ const Saved = () => {
 						// </div>
 						<div
 							key={i}
-							className='group relative w-[30%] h-[150px] lg:h-[300px] overflow-hidden flex items-center bg-black'
+							className='group relative w-[33%] h-[150px] lg:h-[300px] overflow-hidden flex items-center'
+							style={{ backgroundColor: theme === 'dark' ? 'white' : 'black' }}
 						>
-							<div className='absolute top-2 right-2 z-10 p-1 bg-black bg-opacity-50 rounded-full'>
+							<div className='absolute top-2 right-2 z-10 p-1 text-black rounded-full'>
 								<BookmarkIcon className='text-white w-5 h-5' />{' '}
-								{/* Replace with your icon component */}
 							</div>
-							<Image
-								src={`http://37.27.29.18:8003/images/${e.images[0]}`}
-								alt='post'
-								width={300}
-								height={300}
-							/>
+							{e.images[0].endsWith('.mp4') ? (
+								<video src={`http://37.27.29.18:8003/images/${e.images[0]}`} />
+							) : (
+								<Image
+									src={`http://37.27.29.18:8003/images/${e.images[0]}`}
+									alt='post'
+									width={300}
+									height={300}
+								/>
+							)}
 							<div className='absolute inset-0 bg-black opacity-0 group-hover:opacity-50 transition-opacity duration-300'></div>
 
 							<div className='absolute inset-0 flex justify-center items-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-white text-lg font-semibold'>
