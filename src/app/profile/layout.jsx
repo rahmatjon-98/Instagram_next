@@ -18,7 +18,6 @@ const Layout = ({ children }) => {
 
 	useEffect(() => {
 		getProfileData()
-		console.log(user ? user : 'error')
 	}, [])
 	return (
 		<div className='pl-[8%] pt-[8%] h-[100vh]'>
