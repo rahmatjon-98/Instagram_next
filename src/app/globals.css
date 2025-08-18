@@ -5,6 +5,10 @@
 	font-family: 'Inter', sans-serif;
 }
 
+.hidscrol::-webkit-scrollbar {
+	display: none;
+}
+
 @keyframes flyAnimation {
 	0% {
 		transform: translate(0, 0) rotate(0deg);
