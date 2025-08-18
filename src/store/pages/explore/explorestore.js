@@ -5,8 +5,8 @@ import { create } from "zustand";
 export const useUserStore = create((set, get) => ({
   user: [],
   postById: {},
-  FolowUser:[],
-  f:false,
+  FolowUser: [],
+  f: false,
   fechUser: async () => {
     try {
       let res = await axiosRequest.get(`/Post/get-posts?PageSize=10000`, {});
@@ -20,8 +20,8 @@ export const useUserStore = create((set, get) => ({
       const res = await axiosRequest.get(
         `/FollowingRelationShip/get-subscriptions?UserId=${id}`
       );
-      console.log(res.data)
-      set({FolowUser:res.data});
+      console.log(res.data);
+      set({ FolowUser: res.data });
     } catch (err) {
       console.error(err);
     }
@@ -34,9 +34,11 @@ export const useUserStore = create((set, get) => ({
           ...data,
           data: {
             ...data.data,
-            isFollowing:state.FolowUser?.data?.some(e => e.userShortInfo.userId==data.data.userId)
+            isFollowing: state.FolowUser?.data?.some(
+              (e) => e.userShortInfo.userId == data.data.userId
+            ),
           },
-        }
+        },
       }));
     } catch (error) {
       console.error(error);
@@ -109,7 +111,7 @@ export const useUserStore = create((set, get) => ({
 
       const currentPost = get().postById;
       if (!currentPost?.data) return;
- 
+
       set({
         postById: {
           ...currentPost,
@@ -119,7 +121,7 @@ export const useUserStore = create((set, get) => ({
             subscribersCount: (currentPost.data.subscribersCount || 0) + 1,
           },
         },
-        f:true
+        f: true,
       });
 
       await fetch(
@@ -145,7 +147,7 @@ export const useUserStore = create((set, get) => ({
 
       const currentPost = get().postById;
       if (!currentPost?.data) return;
- 
+
       set({
         postById: {
           ...currentPost,
@@ -158,7 +160,7 @@ export const useUserStore = create((set, get) => ({
             ),
           },
         },
-        f:false
+        f: false,
       });
 
       await fetch(
@@ -218,4 +220,33 @@ export const useUserStore = create((set, get) => ({
       set({ user: prevPosts, postById: prevPostById });
     }
   },
+
+
+  postSaved: async (postId) => {
+  try {
+   let res= await axiosRequest.post(`/Post/add-post-favorite`, { postId });
+   
+    set((state) => ({
+      user: {
+        ...state.user,
+        data: state.user.data.map((post) =>
+          post.postId === postId ? { ...post, postFavorite: true } : post
+        ),
+      },
+      postById:
+        state.postById?.data?.postId === postId
+          ? {
+              ...state.postById,
+              data: {
+                ...state.postById.data,
+                postFavorite: true,
+              },
+            }
+          : state.postById,
+    }));
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 }));
