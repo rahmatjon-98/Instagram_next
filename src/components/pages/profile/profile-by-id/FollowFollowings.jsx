@@ -4,17 +4,19 @@ import { useProfileByIdStore } from '@/store/pages/profile/profile-by-id/store'
 import { Loader } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 
-const FollowFollowers = ({ id, checkMyFollowings = true }) => {
+const FollowFollowings = ({ id }) => {
     const userId = useUserId()
+
     const { follow, unfollow, getFollowings, followings } = useProfileByIdStore()
+
     const [changeFollow, setChangeFollow] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
 
     useEffect(() => {
-        if (userId && checkMyFollowings) {
-            getFollowings(userId) // fetch your own followings
+        if (userId) {
+            getFollowings(userId)
         }
-    }, [userId, checkMyFollowings, getFollowings])
+    }, [userId, getFollowings])
 
     useEffect(() => {
         if (followings?.data) {
@@ -58,4 +60,4 @@ const FollowFollowers = ({ id, checkMyFollowings = true }) => {
     )
 }
 
-export default FollowFollowers
+export default FollowFollowings
