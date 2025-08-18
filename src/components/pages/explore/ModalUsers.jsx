@@ -14,29 +14,22 @@ import { useUserId } from "@/hook/useUserId";
 import { usegetUserStore } from "@/store/pages/search/store";
 import { Skeleton, Stack } from "@mui/material";
 import { useRouter } from "next/navigation";
-import useDarkSide from "@/hook/useDarkSide";
-import Link from "next/link";
+import { useChatById } from "@/store/pages/chat/pages/chat-by-id/store";
 
-const ModalUsers = () => {
-
+const ModalUsers = ({ media }) => {
     const router = useRouter();
     const userId = useUserId();
 
     const { chats, get, loadingChat } = useDefaultChat();
-    const {
-        getMyProfil,
-        createChat,
-        loadingCreateChat,
-    } = useMyProfile();
-
-
-
+    const { getMyProfil, createChat, loadingCreateChat } = useMyProfile();
+    const { sendMessage } = useChatById();
     const { users, getUsers, getSearchHistories } = usegetUserStore();
 
     const [openModalUsers, setOpenModalUsers] = useState(false);
     const [search, setSearch] = useState("");
     const [filteredUsers, setFilteredUsers] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [idx, setIdx] = useState(null);
 
     useEffect(() => {
         get();
@@ -58,9 +51,7 @@ const ModalUsers = () => {
         const t = setTimeout(() => {
             const q = search.toLowerCase();
             const results = allUsers.filter((u) =>
-                String(u.userName ?? "")
-                    .toLowerCase()
-                    .includes(q)
+                String(u.userName ?? "").toLowerCase().includes(q)
             );
             setFilteredUsers(results);
             setLoading(false);
@@ -79,11 +70,10 @@ const ModalUsers = () => {
         </Stack>
     );
 
-    let [idx, setIdx] = useState(null);
-
     async function handleCreateChat(id) {
         try {
             setIdx(id);
+
             await createChat(id);
             await get();
 
@@ -93,12 +83,26 @@ const ModalUsers = () => {
                     (e) => e.receiveUserId === id || e.sendUserId === id
                 );
 
-            setOpenModalUsers(false);
-
-            console.log(chats?.chatId);
-
             if (chat?.chatId) {
-                router.push(`/chats/${chat.chatId}`);
+                if (media) {
+                    const formData = new FormData();
+                    formData.append("chatId", chat.chatId);
+
+                    // Если это строка → это просто текст
+                    if (typeof media === "string") {
+                        formData.append("MessageText", media);
+                    }
+                    // Если это файл (image/video) → прикладываем как файл
+                    else if (media instanceof File) {
+                        formData.append("file", media);
+                    }
+
+                    await sendMessage(formData);
+                    console.log(formData);
+                    
+                }
+
+                setOpenModalUsers(false);
             } else {
                 console.error("Chat not found for this user");
             }
@@ -110,10 +114,6 @@ const ModalUsers = () => {
     }
 
 
-
-
-
-
     return (
         <div>
             <button
@@ -123,7 +123,6 @@ const ModalUsers = () => {
                 className="cursor-pointer hover:text-blue-500 text-gray-500"
             >
                 <Send />
-
             </button>
             <div className={` bg-white text-black`}>
                 {openModalUsers && (
@@ -202,70 +201,51 @@ const ModalUsers = () => {
                                         )
                                     ) : (
                                         chats.data?.map((e) => (
-                                            <Link
-                                                key={e.chatId}
-                                                href={`/chats/${e.chatId}`}
-                                                onClick={() => setLocale(e)}
-                                            >
-                                                <div className="flex items-center gap-1 hover:bg-gray-200 p-2">
-                                                    {(
+                                            <div
+                                                key={e.id}
+                                                className="flex items-center gap-1 hover:bg-gray-200 p-2"
+                                                onClick={() =>
+                                                    handleCreateChat(
                                                         e.receiveUserId === userId
-                                                            ? e.sendUserImage
-                                                            : e.receiveUserImage
-                                                    ) ? (
-                                                        <Image
-                                                            alt=""
-                                                            src={`http://37.27.29.18:8003/images/${e.receiveUserId === userId
-                                                                    ? e.sendUserImage
-                                                                    : e.receiveUserImage
-                                                                }`}
-                                                            width={40}
-                                                            height={40}
-                                                            className="w-10 h-10 rounded-full object-cover object-center"
-                                                            priority
-                                                        />
-                                                    ) : (
-                                                        <Image
-                                                            alt=""
-                                                            src={img}
-                                                            width={40}
-                                                            height={40}
-                                                            className="w-10 h-10 rounded-full object-cover"
-                                                            priority
-                                                        />
-                                                    )}
+                                                            ? e.sendUserId
+                                                            : e.receiveUserId
+                                                    )
+                                                }
+                                            >
+                                                {(e.receiveUserId === userId
+                                                    ? e.sendUserImage
+                                                    : e.receiveUserImage) ? (
+                                                    <Image
+                                                        alt=""
+                                                        src={`http://37.27.29.18:8003/images/${e.receiveUserId === userId
+                                                                ? e.sendUserImage
+                                                                : e.receiveUserImage
+                                                            }`}
+                                                        width={40}
+                                                        height={40}
+                                                        className="w-10 h-10 rounded-full object-cover object-center"
+                                                        priority
+                                                    />
+                                                ) : (
+                                                    <User size={40} />
+                                                )}
 
-                                                    <div>
-                                                        {e.receiveUserId === userId
-                                                            ? e.sendUserName
-                                                            : e.receiveUserName}
-                                                    </div>
+                                                <div>
+                                                    {e.receiveUserId === userId
+                                                        ? e.sendUserName
+                                                        : e.receiveUserName}
                                                 </div>
-                                            </Link>
+                                            </div>
                                         ))
                                     )}
                                 </div>
                             </div>
-                            {/* <div className="flex justify-center">
-                <button
-                  className="w-9/10 text-center bg-blue-500 mx-5 text-white rounded py-1"
-                  onClick={() => setOpenModalUsers(false)}
-                >
-                  Close
-                </button>
-              </div> */}
                         </article>
                     </section>
                 )}
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default ModalUsers
-
-
-
-
-
-
+export default ModalUsers;

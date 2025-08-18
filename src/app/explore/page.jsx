@@ -344,8 +344,9 @@ export default function Explore() {
 													/>
 												</button>
 												<MessageCircleMore size={24} color="#ffffff" />
+												
 												<div>
-													<ModalUsers />
+													<ModalUsers media={postById?.data?.images?.[0]} postId={postById.data?.postId} />
 												</div>
 											</div>
 											<button onClick={() => {
