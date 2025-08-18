@@ -10,7 +10,6 @@ import { useUserStore } from "@/store/pages/explore/explorestore"
 import Box from '@mui/material/Box'
 import Modal from '@mui/material/Modal'
 import { Bookmark, CircleUserRound, Heart, MessageCircle, SendHorizontal, Volume2, VolumeX } from "lucide-react"
-import BasicModal from "@/components/pages/explore/BasicModal"
 import CommentInput from "@/components/pages/explore/Emogi"
 import { useUserId } from "@/hook/useUserId"
 
@@ -29,36 +28,21 @@ const style = {
 
 const Posts = () => {
     const { 'profile-by-id': profileId } = useParams()
-    const { getProfileById, getPosts, posts } = useProfileByIdStore()
-    const { users: infoUsers, getUsers } = usegetUserStore()
-    const { user, fechUser, postById, getPostById, deletComit, AddComit } = useUserStore()
+    const { getPosts, posts } = useProfileByIdStore()
+    const { getUsers } = usegetUserStore()
+    const { fechUser, postById, getPostById, deletComit, AddComit } = useUserStore()
 
     const [open, setOpen] = useState(false)
-    const [userPosts, setUserPosts] = useState([])
     const [newcomit, setnewComit] = useState("")
     const [isMuted, setIsMuted] = useState(false)
     const videoRef = useRef(null)
 
-    const getId = infoUsers?.data?.find(e => e.id === profileId)?.id
-
     useEffect(() => {
-        if (profileId) getProfileById(profileId)
-    }, [profileId, getProfileById])
+        if (profileId) getPosts(profileId)
+    }, [profileId, getPosts])
 
-    useEffect(() => {
-        getUsers()
-        getPosts()
-    }, [getUsers, getPosts])
-
-    useEffect(() => {
-        if (!getId || !Array.isArray(posts?.data) || posts.data.length === 0) return
-        const filtered = posts.data.filter(p => p.userId === getId)
-        setUserPosts(filtered)
-    }, [posts?.data, getId])
-
-    useEffect(() => {
-        fechUser()
-    }, [])
+    useEffect(() => { getUsers() }, [getUsers])
+    useEffect(() => { fechUser() }, [])
 
     const handleOpen = async (id) => {
         await getPostById(id)
@@ -86,56 +70,48 @@ const Posts = () => {
         fechUser()
     }
 
-    if (!userPosts.length) return <p className="text-gray-500">No posts found for this user.</p>
-
     return (
         <div className="grid grid-cols-3 gap-[1px]">
-            {userPosts.map(post => (
-                <div key={post.postId}>
-                    {post.images?.map((media, i) => (
-                        <div
-                            key={i}
-                            className="relative overflow-hidden group cursor-pointer"
-                            onClick={() => handleOpen(post.postId)}
-                        >
-                            {media.endsWith('.mp4') ? (
-                                <video
-                                    src={`http://37.27.29.18:8003/images/${media}`}
-                                    className="h-[414px] w-full object-cover"
-                                    muted
-                                    controls
-                                />
-                            ) : (
-                                <Image
-                                    src={`http://37.27.29.18:8003/images/${media}`}
-                                    alt={`Post media ${i}`}
-                                    height={414}
-                                    width={310}
-                                    quality={100}
-                                    className="h-[414px] w-full object-cover"
-                                />
-                            )}
-
-                            <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-50 transition-opacity duration-300"></div>
-
-                            <div className="absolute inset-0 flex justify-center items-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-white text-lg font-semibold">
-                                <div className="flex items-center gap-1">
-                                    <Heart fill="white" /> {post.postLikeCount}
-                                </div>
-                                <div className="flex items-center gap-1">
-                                    <FaComments /> {post.commentCount}
-                                </div>
-                            </div>
-                        </div>
+            {posts?.data?.map(e => (
+                <div
+                    key={e.postId}
+                    className="relative overflow-hidden group cursor-pointer"
+                    onClick={() => handleOpen(e.postId)}>
+                    {e?.images?.map((media, i) => (
+                        media.endsWith('.mp4') ? (
+                            <video
+                                key={i}
+                                src={`http://37.27.29.18:8003/images/${media}`}
+                                className="h-[414px] w-full object-cover"
+                                muted
+                                controls
+                            />
+                        ) : (
+                            <Image
+                                key={i}
+                                src={`http://37.27.29.18:8003/images/${media}`}
+                                alt="image"
+                                height={414}
+                                width={310}
+                                className="h-[414px] w-full object-cover"
+                            />
+                        )
                     ))}
+
+                    <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-50 transition-opacity duration-300"></div>
+
+                    <div className="absolute inset-0 flex justify-center items-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-white text-lg font-semibold">
+                        <div className="flex items-center gap-1">
+                            <Heart fill="white" /> {e.postLikeCount}
+                        </div>
+                        <div className="flex items-center gap-1">
+                            <FaComments /> {e.commentCount}
+                        </div>
+                    </div>
                 </div>
             ))}
-            <Modal
-                open={open}
-                onClose={handleClose}
-                aria-labelledby="modal-modal-title"
-                aria-describedby="modal-modal-description"
-            >
+
+            <Modal open={open} onClose={handleClose}>
                 <Box sx={style}>
                     {postById?.data ? (
                         <div className="flex flex-col md:flex-row h-[80vh]">
@@ -166,6 +142,7 @@ const Posts = () => {
                                     />
                                 )}
                             </div>
+
                             <div className="md:w-3/5 w-full flex flex-col p-4 overflow-hidden">
                                 <div className="flex justify-between items-center mb-4">
                                     <div className="flex items-center gap-4">
@@ -185,7 +162,10 @@ const Posts = () => {
                                             <div key={c.postCommentId} className="flex justify-between items-start">
                                                 <div className="flex items-center gap-3">
                                                     {c.userImage ? (
-                                                        <img src={`http://37.27.29.18:8003/images/${c.userImage}`} className="w-10 h-10 rounded-full" />
+                                                        <img
+                                                            src={`http://37.27.29.18:8003/images/${c.userImage}`}
+                                                            className="w-10 h-10 rounded-full"
+                                                        />
                                                     ) : (
                                                         <CircleUserRound size={40} color="#ffffff" />
                                                     )}
@@ -217,6 +197,7 @@ const Posts = () => {
                                         <p className="text-gray-400">Нет комментариев</p>
                                     )}
                                 </div>
+
                                 <div className="flex gap-2 items-center border-t border-gray-700 pt-2">
                                     <CommentInput value2={newcomit} onChange2={e => setnewComit(e.target.value)} />
                                     <button onClick={handleAddComment}>
@@ -226,7 +207,6 @@ const Posts = () => {
 
                                 <div className="flex justify-between mt-4">
                                     <div className="flex gap-3">
-                                        <BasicModal />
                                         <MessageCircle />
                                         <SendHorizontal />
                                     </div>
