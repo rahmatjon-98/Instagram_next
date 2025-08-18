@@ -274,14 +274,6 @@ export default function Layout({ children }) {
                   )}
                 </div>
               </div>
-              {/* <div className="flex justify-center">
-                <button
-                  className="w-9/10 text-center bg-blue-500 mx-5 text-white rounded py-1"
-                  onClick={() => setOpenModalUsers(false)}
-                >
-                  Close
-                </button>
-              </div> */}
             </article>
           </section>
         )}
