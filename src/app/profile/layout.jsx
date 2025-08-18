@@ -18,19 +18,13 @@ const Layout = ({ children }) => {
 	let pathname = usePathname()
 
 	// const [theme] = useDarkSide()
+	const [mounted, setMounted] = useState(false)
 
 	useEffect(() => {
 		getProfileData()
 	}, [])
 
 	const [theme, setTheme] = useDarkSide()
-	const [mounted, setMounted] = useState(false)
-
-	useEffect(() => {
-		setMounted(true)
-	}, [])
-
-	const resolvedTheme = mounted ? theme : 'light'
 
 	return (
 		<div className='pl-[8%] pt-[8%]'>
@@ -58,30 +52,24 @@ const Layout = ({ children }) => {
 						</h1>
 						<div className='flex items-center gap-[10px]'>
 							<button
-								className={` text-[10px] md:text-[16px] px-[10px] md:px-[20px] py-[5px] md:py-[10px] rounded-xl md:rounded-2xl ${
-									mounted &&
-									'active:scale-95 transition-transform duration-100 ease-in'
-								} ${
-									resolvedTheme === 'dark'
-										? 'bg-[#25292E] text-[#F4F4F4] hover:bg-gray-800'
-										: 'bg-[#F0F2F5] text-[#334155] hover:bg-gray-200'
+								className={` text-[10px] md:text-[16px] px-[10px] md:px-[20px] py-[5px] md:py-[10px] rounded-xl md:rounded-2xl active:scale-95 transition-transform duration-100 ease-in ${
+									theme == 'light'
+										? 'bg-[#F0F2F5] text-[#334155] hover:bg-gray-200'
+										: 'bg-[#25292E] text-[#F4F4F4] hover:bg-gray-800'
 								}`}
 								onClick={() => router.push('/editprofile')}
 							>
 								Edit profile
 							</button>
 							<button
-								className={`hover:bg-gray-200 text-[10px] md:text-[16px] px-[10px] md:px-[20px] py-[5px] md:py-[10px] rounded-xl md:rounded-2xl ${
-									mounted &&
-									'active:scale-95 transition-transform duration-100 ease-in'
-								} ${
-									resolvedTheme === 'dark'
-										? 'bg-[#25292E] text-[#F4F4F4] hover:bg-gray-800'
-										: 'bg-[#F0F2F5] text-[#334155] hover:bg-gray-200'
+								className={`hover:bg-gray-200 text-[10px] md:text-[16px] px-[10px] md:px-[20px] py-[5px] md:py-[10px] rounded-xl md:rounded-2xl active:scale-95 transition-transform duration-100 ease-in
+								${
+									theme == 'light'
+										? 'bg-[#F0F2F5] text-[#334155] hover:bg-gray-200'
+										: 'bg-[#25292E] text-[#F4F4F4] hover:bg-gray-800'
 								}`}
-								onClick={() => router.push('/editprofile')}
 							>
-								Edit profile
+								View archive
 							</button>
 							<button>
 								<RxHamburgerMenu
@@ -148,7 +136,7 @@ const Layout = ({ children }) => {
 			<section className='h-[70px] md:h-[100px] w-[95%] md:w-[80%] overflow-x-hidden'></section>
 			<div className='border-t-[#E2E8F0] border-t w-[95%] md:w-[80%] flex justify-center gap-[10px] md:gap-[50px]'>
 				<button
-					className='flex items-center gap-[10px] py-[10px]'
+					className='flex items-center gap-[10px] py-[10px] cursor-pointer '
 					style={{
 						color: pathname === '/profile' ? '#2563EB' : '#64748B',
 						borderTop: pathname === '/profile' ? '2px solid #2563EB' : 'none',
@@ -159,7 +147,7 @@ const Layout = ({ children }) => {
 					<p className='text-[16px] md:text-[22px]'>Posts</p>
 				</button>
 				<button
-					className='flex items-center gap-[10px] py-[10px]'
+					className='flex items-center gap-[10px] py-[10px] cursor-pointer '
 					style={{
 						color: pathname === '/profile/saved' ? '#2563EB' : '#64748B',
 						borderTop:
@@ -171,7 +159,7 @@ const Layout = ({ children }) => {
 					<p className='text-[16px] md:text-[22px]'>Saved</p>
 				</button>
 				<button
-					className='flex items-center gap-[10px] py-[10px]'
+					className='flex items-center gap-[10px] py-[10px] cursor-pointer '
 					style={{
 						color: pathname === '/profile/tagged' ? '#2563EB' : '#64748B',
 						borderTop:

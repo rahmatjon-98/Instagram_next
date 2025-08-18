@@ -14,7 +14,7 @@ const Profile = () => {
 
 	useEffect(() => {
 		getFavorites()
-		console.log(favorites)
+		
 	}, [])
 
 	return (

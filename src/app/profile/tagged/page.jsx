@@ -4,7 +4,7 @@ import Image from 'next/image'
 
 const Tagged = () => {
 	return (
-		<div className='flex flex-col gap-[10px] text-center items-center pt-[7vh] m-auto '>
+		<div className='flex flex-col gap-[10px] text-center items-center pt-[7vh] m-auto pb-[11vh]'>
 			<Image src={savedIcon} alt='savedIcon' />
 			<h1 className='text-[#1E293B] text-[18px] font-bold'>
 				You have not tagged
