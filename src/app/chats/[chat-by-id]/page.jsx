@@ -99,6 +99,7 @@ export default function ChatById() {
   const [recording, setRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const [audioChunks, setAudioChunks] = useState([]);
+  const [mediaStream, setMediaStream] = useState(null);
 
   useEffect(() => {
     return () => {
@@ -214,9 +215,11 @@ export default function ChatById() {
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream);
+      setMediaStream(stream);
 
+      const recorder = new MediaRecorder(stream);
       const chunks = [];
+
       recorder.ondataavailable = (e) => {
         if (e.data.size > 0) {
           chunks.push(e.data);
@@ -232,6 +235,9 @@ export default function ChatById() {
         setinpFile(audioFile);
         setOpenImg(URL.createObjectURL(audioBlob));
         setOpenIsAudio(true);
+
+        stream.getTracks().forEach((track) => track.stop());
+        setMediaStream(null);
       };
 
       recorder.start();
@@ -247,6 +253,11 @@ export default function ChatById() {
     if (mediaRecorder) {
       mediaRecorder.stop();
       setRecording(false);
+
+      if (mediaStream) {
+        mediaStream.getTracks().forEach((track) => track.stop());
+        setMediaStream(null);
+      }
     }
   };
 

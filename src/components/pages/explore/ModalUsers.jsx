@@ -85,14 +85,8 @@ const ModalUsers = ({ media }) => {
           const formData = new FormData();
           formData.append("chatId", chat.chatId);
 
-          formData.append("MessageText", media);
-          formData.append("file", media);
-          // Если это строка → это просто текст
-          if (typeof media === "string") {
-          }
-          // Если это файл (image/video) → прикладываем как файл
-          else if (media instanceof File) {
-          }
+          formData.append("MessageText", { postImage: `${media}` });
+          //   formData.append("file", media);
 
           await sendMessage(formData);
           console.log(media);
