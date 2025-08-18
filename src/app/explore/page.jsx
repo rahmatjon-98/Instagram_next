@@ -297,7 +297,7 @@ export default function Explore() {
 															</div>
 														</div>
 														{
-															comment.userId == useUserId() ?
+															comment?.userId == useUserId() ?
 																<div className="flex gap-[10px]">
 
 																	<button className="cursor-pointer hover:text-red-500" onClick={() => RemoveComit(comment.postCommentId)}>
@@ -308,7 +308,7 @@ export default function Explore() {
 																		onClick={() => handleLikeComment(comment.postCommentId)}
 																		size={20}
 																		color="#ffffff"
-																		fill={likedComments[comment.postCommentId] ? 'red' : 'nane'}
+																		fill={likedComments[comment.postCommentId] ? 'red' : 'none'}
 																		stroke={likedComments[comment.postCommentId] ? 'red' : 'white'}
 																	/>
 																</div>
@@ -414,7 +414,7 @@ export default function Explore() {
 						if (i == 31) { isFifth = false }
 						if (i == 32) { isFifth = true }
 						if (i == 35) { isFifth = true }
-						if(i==42){ isFifth=true}
+						if (i == 42) { isFifth = true }
 						if ((i + 1) % cnt === 0) {
 							if (i == 11) {
 								cnt = cnt + 1

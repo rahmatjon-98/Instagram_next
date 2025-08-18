@@ -10,18 +10,18 @@ import defaultUser from '../../assets/img/pages/profile/profile/instauser (2).jp
 import Stack from '@mui/material/Stack'
 import { useState } from 'react'
 import Skeleton from '@mui/material/Skeleton'
-import { ArrowRight, Calendar, Loader, Search, User, UserPlusIcon, X, XCircle } from "lucide-react"
+import { ArrowRight, Calendar, Loader, Search, User, UserPlusIcon, Video, X, XCircle } from "lucide-react"
 import Suggetions from '@/components/pages/profile/profile-by-id/Suggetions';
 import { useRouter } from 'next/navigation'
 import { usegetUserStore } from '@/store/pages/search/store';
 import { MdOutlineGridOn, MdOutlinePhotoCameraFront } from 'react-icons/md';
-import { FaRegBookmark } from 'react-icons/fa';
-import './style.css'
-import { useRegisterStore } from '@/store/pages/auth/registration/registerStore';
 import { useUserId } from '@/hook/useUserId'
 import FollowUser from '@/components/pages/profile/profile-by-id/FollowUser';
 import FollowFollowers from '@/components/pages/profile/profile-by-id/FollowFollowers';
 import FollowFollowings from '@/components/pages/profile/profile-by-id/FollowFollowings';
+import Reel from '../../../public/reelIcon.jpg'
+
+import './style.css'
 
 const style = {
 	position: 'absolute',
@@ -172,6 +172,7 @@ const ProfileById = ({ children }) => {
 						alt='profile picture'
 						width={500}
 						height={500}
+						className='rounded-full'
 					/>
 				</div>
 				<div className='flex flex-col gap-[20px]'>
@@ -270,6 +271,7 @@ const ProfileById = ({ children }) => {
 									</div>
 								</Box>
 							</Modal> : null}
+							
 						{user?.subscriptionsCount ?
 							<Modal
 								keepMounted
@@ -329,7 +331,6 @@ const ProfileById = ({ children }) => {
 																<p>{e?.userShortInfo?.fullname}</p>
 															</div>
 														</div>
-														<FollowFollowings id={e?.userShortInfo?.userId} checkMyFollowings={true} />
 													</div>
 												))
 											)}
@@ -345,7 +346,6 @@ const ProfileById = ({ children }) => {
 																<p>{e?.userShortInfo?.fullname}</p>
 															</div>
 														</div>
-														<FollowFollowings id={e?.userShortInfo?.userId} checkMyFollowings={true} />
 													</div>
 												))
 											)}
@@ -449,14 +449,14 @@ const ProfileById = ({ children }) => {
 				<button
 					className='flex items-center gap-[10px] py-[10px]'
 					style={{
-						color: pathname === `/${profileId}/saved` ? '#2563EB' : '#64748B',
+						color: pathname === `/${profileId}/Reels` ? '#2563EB' : '#64748B',
 						borderTop:
-							pathname === `/${profileId}/saved` ? '2px solid #2563EB' : 'none',
+							pathname === `/${profileId}/Reels` ? '2px solid #2563EB' : 'none',
 					}}
-					onClick={() => router.push(`/${profileId}/saved`)}
+					onClick={() => router.push(`/${profileId}/Reels`)}
 				>
-					<FaRegBookmark size={20} />
-					<p className='text-[16px] md:text-[22px]'>Saved</p>
+					<Image src={Reel} alt='reel icon' width={20} height={20} />
+					<p className='text-[16px] md:text-[22px]'>Reels</p>
 				</button>
 				<button
 					className='flex items-center gap-[10px] py-[10px]'

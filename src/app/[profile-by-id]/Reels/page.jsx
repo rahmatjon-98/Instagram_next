@@ -7,15 +7,15 @@ import { usegetUserStore } from '@/store/pages/search/store'
 import Image from 'next/image'
 import { useParams } from 'next/navigation'
 import { useEffect, useState, useRef } from 'react'
-import { FaCamera, FaComments } from 'react-icons/fa'
+import { FaComments } from 'react-icons/fa'
 import { useUserStore } from "@/store/pages/explore/explorestore"
 import Box from '@mui/material/Box'
 import Modal from '@mui/material/Modal'
-import { Bookmark, Camera, CircleUserRound, Copy, Heart, MessageCircle, SendHorizontal, Volume2, VolumeX, X } from "lucide-react"
+import { Bookmark, CircleUserRound, Heart, MessageCircle, SendHorizontal, Volume2, VolumeX, X } from "lucide-react"
 import CommentInput from "@/components/pages/explore/Emogi"
 import { useUserId } from "@/hook/useUserId"
 import DefaultUser from "@/assets/img/pages/profile/profile/instauser (2).jpg"
-import Reel from '../../../public/reel.png'
+import Reel from '../../../../public/reel.png'
 
 const style = {
     position: 'absolute',
@@ -40,7 +40,7 @@ const mediaStyleModal = {
     // height: 100%
 }
 
-const Posts = () => {
+const Reels = () => {
     const { 'profile-by-id': profileId } = useParams()
     const { getPosts, posts } = useProfileByIdStore()
     const { getUsers } = usegetUserStore()
@@ -88,19 +88,6 @@ const Posts = () => {
         console.log('Toggle bookmark for post', postById.data?.postId)
     }
 
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const fetchPosts = async () => {
-            setLoading(true);
-            await getPosts(profileId);
-            setLoading(false);
-        };
-
-        if (profileId) fetchPosts();
-    }, [profileId, getPosts]);
-
-
     useEffect(() => { if (profileId) getPosts(profileId) }, [profileId, getPosts])
     useEffect(() => { getUsers() }, [getUsers])
     useEffect(() => { fechUser() }, [])
@@ -108,89 +95,40 @@ const Posts = () => {
     return (
         <>
             <div className="grid grid-cols-3 gap-4">
-                {loading ? (
-                    Array.from({ length: 9 }).map((_, i) => (
-                        <div key={i} className="relative h-[414px] w-full overflow-hidden rounded-lg">
-                            <Skeleton
-                                variant="rectangular"
-                                animation="wave"
-                                sx={{ width: '100%', height: '100%', bgcolor: 'grey.900' }}
-                            />
-                        </div>
-                    ))
-                ) : posts?.data?.length ? (
-                    posts.data
-                        .slice()
-                        .sort((a, b) => new Date(b.datePublished) - new Date(a.datePublished))
-                        .map(post => {
-                            const reels = post?.images?.find(media => media.endsWith(".mp4"));
-                            return (
-                                <div
-                                    key={post?.postId}
-                                    className="relative overflow-hidden group cursor-pointer h-[414px] w-full"
-                                    onClick={() => handleOpen(post?.postId)}
-                                >
-                                    {post?.images?.map((media, i) =>
-                                        media.endsWith(".mp4") ? (
-                                            <video
-                                                key={i}
-                                                src={`http://37.27.29.18:8003/images/${media}`}
-                                                className="h-full w-full object-cover"
-                                                muted
-                                                controls
-                                            />
-                                        ) : (
-                                            <Image
-                                                key={i}
-                                                src={`http://37.27.29.18:8003/images/${media}`}
-                                                alt="image"
-                                                height={414}
-                                                width={330}
-                                                className="h-full w-full object-cover"
-                                            />
-                                        )
-                                    )}
+                {posts?.data
+                    ?.slice()
+                    .sort((a, b) => new Date(b.datePublished) - new Date(a.datePublished))
+                    .map(post => {
+                        const video = post?.images?.find(media => media.endsWith(".mp4"));
+                        if (!video) return null
 
-                                    <div className="absolute inset-0 hover:bg-[#000000b3] bg-opacity-40 flex justify-center items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                        <div className="flex items-center gap-1 text-white">
-                                            <Heart fill="white" /> {post.postLikeCount}
-                                        </div>
-                                        <div className="flex items-center gap-1 text-white">
-                                            <FaComments /> {post.commentCount}
-                                        </div>
+                        return (
+                            <div
+                                key={post.postId}
+                                className="relative overflow-hidden group cursor-pointer h-[414px] w-full"
+                                onClick={() => handleOpen(post.postId)}
+                            >
+                                <video
+                                    src={`http://37.27.29.18:8003/images/${video}`}
+                                    className="h-full w-full object-cover"
+                                    muted
+                                    controls
+                                />
+
+                                <div className="absolute inset-0 hover:bg-[#000000b3] bg-opacity-40 flex justify-center items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                    <div className="flex items-center gap-1 text-white">
+                                        <Heart fill="white" /> {post.postLikeCount}
                                     </div>
-
-                                    {reels ? (
-                                        <div className="top-3 right-3 absolute">
-                                            <Image src={Reel} alt="reel icon" width={20} height={20} />
-                                        </div>
-                                    ) : (
-                                        <div className="top-3 right-3 absolute">
-                                            <Copy size={20} />
-                                        </div>
-                                    )}
+                                    <div className="flex items-center gap-1 text-white">
+                                        <FaComments /> {post.commentCount}
+                                    </div>
                                 </div>
-                            );
-                        })
-                ) : (
-                    <div className="col-span-3 flex flex-col font-extrabold items-center gap-5 text-center text-[30px] py-10">
-                        <div
-                            style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                width: '48px',
-                                height: '48px',
-                                borderRadius: '50%',
-                                backgroundColor: '#f0f0f0',
-                            }}
-                        >
-                            <FaCamera size={62} color="#333" />
-                        </div>
-                        <h1>No Posts Yet</h1>
-                    </div>
-                )}
-
+                                <div className="top-3 right-3 absolute">
+                                    <Image src={Reel} alt='reel icon' width={20} height={20} />
+                                </div>
+                            </div>
+                        )
+                    })}
                 <Modal open={open} onClose={handleClose}>
                     <Box sx={style} className="flex flex-col md:flex-row h-full">
 
@@ -220,7 +158,7 @@ const Posts = () => {
                                                 </button>
                                             </div>
                                         ) : (
-                                            <Image src={mediaUrl} width={348} height={463} alt="Post" className="w-full h-full object-cover" />
+                                            ""
                                         )}
                                     </div>
                                 )
@@ -339,4 +277,4 @@ const Posts = () => {
     )
 }
 
-export default Posts
+export default Reels
