@@ -7,6 +7,7 @@ let api = 'http://37.27.29.18:8003'
 
 export const useProfileStore = create((set, get) => ({
 	user: {},
+	favorites: {},
 	// decodeToken: {},
 	// jwtDecode: () => {
 	// 	try {
@@ -65,6 +66,16 @@ export const useProfileStore = create((set, get) => ({
 				}
 			)
 			await get().getProfileData()
+		} catch (error) {
+			console.error(error)
+		}
+	},
+	getFavorites: async () => {
+		try {
+			const { data } = await axiosRequest.get(
+				'http://37.27.29.18:8003/UserProfile/get-post-favorites'
+			)
+			set({ favorites: data })
 		} catch (error) {
 			console.error(error)
 		}

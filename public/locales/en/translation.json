@@ -66,5 +66,12 @@
 		"english": "English",
 		"lang": "Language Preferences",
 		"text": "Text on buttons, headings, and other text will be shown in the language you prefer."
+	},
+	"notice":{
+		"week":"This week",
+		"comment":"Comments",
+		"follow":"Followed",
+		"like":"Like",
+		"answer":"To answer"
 	}
 }
