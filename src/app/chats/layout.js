@@ -285,7 +285,8 @@ export default function Layout({ children }) {
           </button>
         </section>
 
-        <section className="py-5 flex flex-col overflow-y-scroll h-[75vh]">
+        <section className="overflow-y-scroll h-[75vh] scrollbar-thin scrollbar-track-white scrollbar-thumb-gray-400 
+        dark:scrollbar-track-black dark:scrollbar-thumb-gray-700">
           {loadingChat
             ? Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)
             : chats &&
