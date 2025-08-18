@@ -96,10 +96,10 @@ export default function UsersList() {
 									</div>
 									<div className='flex-1 min-w-0'>
 										<div className='flex items-center space-x-1'>
-											<p className='font-semibold text-sm truncate'>
+											<p className='font-semibold text-sm truncate cursor-pointer'>
 												{user.userName}
 											</p>
-											<span className='text-gray-500 text-xs'>
+											<span className='text-gray-500 text-xs '>
 												{t("notice.follow")}
 											</span>
 										</div>
@@ -192,7 +192,7 @@ export default function UsersList() {
 								/>
 								<div className='flex-1 min-w-0'>
 									<div className='flex items-center space-x-2'>
-										<p className='font-semibold text-sm'>{comment.userName}</p>
+										<p className='font-semibold text-sm cursor-pointer '>{comment.userName}</p>
 										<span className='text-gray-500 text-xs'>
 											{new Date(comment.dateCommented).toLocaleString('ru-RU', {
 												day: 'numeric',
