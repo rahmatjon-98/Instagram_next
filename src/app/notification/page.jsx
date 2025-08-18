@@ -4,6 +4,8 @@ import { useTodoAsyncStore } from '@/store/pages/notification/store'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 export default function UsersList() {
 	const {
@@ -23,6 +25,8 @@ export default function UsersList() {
 		getUsers()
 		getComments()
 	}, [])
+
+	let router = useRouter()
 
 	if (loading)
 		return (
@@ -96,10 +100,11 @@ export default function UsersList() {
 									</div>
 									<div className='flex-1 min-w-0'>
 										<div className='flex items-center space-x-1'>
-											<p className='font-semibold text-sm truncate'>
+											
+											<p onClick={()=>router.push(`${user.userId}`)} className='font-semibold text-sm truncate cursor-pointer'>
 												{user.userName}
 											</p>
-											<span className='text-gray-500 text-xs'>
+											<span className='text-gray-500 text-xs '>
 												{t("notice.follow")}
 											</span>
 										</div>
@@ -192,7 +197,7 @@ export default function UsersList() {
 								/>
 								<div className='flex-1 min-w-0'>
 									<div className='flex items-center space-x-2'>
-										<p className='font-semibold text-sm'>{comment.userName}</p>
+										<p onClick={()=>router.push(`${comment.userId}`)}  className='font-semibold text-sm cursor-pointer '>{comment.userName}</p>
 										<span className='text-gray-500 text-xs'>
 											{new Date(comment.dateCommented).toLocaleString('ru-RU', {
 												day: 'numeric',
