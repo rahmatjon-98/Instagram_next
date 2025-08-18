@@ -35,12 +35,6 @@ export default function Layout({ children }) {
     loadingCreateChat,
   } = useMyProfile();
 
-  // const { addChats, getChats, chats } = useProfileByIdStore()
-
-  function setLocale(user) {
-    localStorage.setItem("userData", JSON.stringify(user));
-  }
-
   const { users, getUsers, getSearchHistories } = usegetUserStore();
 
   const [openModalUsers, setOpenModalUsers] = useState(false);
@@ -95,6 +89,7 @@ export default function Layout({ children }) {
     try {
       setIdx(id);
       await createChat(id);
+      setOpenModalUsers(false);
       await get();
 
       const chat = useDefaultChat
@@ -102,10 +97,6 @@ export default function Layout({ children }) {
         .chats?.data?.find(
           (e) => e.receiveUserId === id || e.sendUserId === id
         );
-
-      setOpenModalUsers(false);
-
-      console.log(chats?.chatId);
 
       if (chat?.chatId) {
         router.push(`/chats/${chat.chatId}`);
@@ -119,12 +110,16 @@ export default function Layout({ children }) {
     }
   }
 
-  const [theme, setTheme] = useDarkSide();
+  const [theme] = useDarkSide();
 
   return (
-    <div className={`flex ${theme == "dark" ? "bg-black text-white" : "bg-white text-black"}`}>
-      <div className=" border-r-2 h-[100vh] border-gray-300 w-[40%]">
-        <section className="flex items-center justify-between gap-5 p-5">
+    <div
+      className={`flex ${
+        theme == "dark" ? "bg-black text-white" : "bg-white text-black"
+      }`}
+    >
+      <div className="lg:block hidden border-r-2 h-[100vh] border-gray-300 w-[40%]">
+        <section className="flex items-center justify-between gap-5 pt-5 px-5">
           <div className="flex items-center gap-2 text-xl font-bold">
             {loadingMyProfil ? (
               <Skeleton variant="text" width={100} height={30} />
@@ -154,6 +149,21 @@ export default function Layout({ children }) {
               />
             </svg>
           </button>
+        </section>
+
+        <section
+          className={`m-2 rounded p-2  flex items-center gap-2 my-3 ${
+            theme == "dark" ? "bg-gray-600" : "bg-neutral-100"
+          }`}
+        >
+          <Search className="text-gray-400 text-sm" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search"
+            className={` w-9/10 `}
+          />
         </section>
 
         {openModalUsers && (
@@ -276,60 +286,63 @@ export default function Layout({ children }) {
           </section>
         )}
 
-        <section className="flex items-center justify-between font-medium text-sm px-5">
+        <section className="flex items-center justify-between font-medium text-sm px-5 py-3">
           <p className="text-[#64748B]">Messages</p>
           <button type="button" className="text-[#1780C2]">
             Requests
           </button>
         </section>
 
-        <section className="py-5 flex flex-col overflow-y-scroll h-[85vh]">
+        <section className="py-5 flex flex-col overflow-y-scroll h-[75vh]">
           {loadingChat
             ? Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)
             : chats &&
-              chats.data?.map((e) => (
-                <Link
-                  key={e.chatId}
-                  href={`/chats/${e.chatId}`}
-                  onClick={() => setLocale(e)}
-                >
-                  <div className="flex items-center gap-1 hover:bg-gray-200 p-2">
-                    {(
-                      e.receiveUserId === userId
-                        ? e.sendUserImage
-                        : e.receiveUserImage
-                    ) ? (
-                      <Image
-                        alt=""
-                        src={`http://37.27.29.18:8003/images/${
-                          e.receiveUserId === userId
-                            ? e.sendUserImage
-                            : e.receiveUserImage
-                        }`}
-                        width={40}
-                        height={40}
-                        className="w-10 h-10 rounded-full object-cover object-center"
-                        priority
-                      />
-                    ) : (
-                      <Image
-                        alt=""
-                        src={img}
-                        width={40}
-                        height={40}
-                        className="w-10 h-10 rounded-full object-cover"
-                        priority
-                      />
-                    )}
+              chats.data
+                ?.filter((e) =>
+                  (e.receiveUserId === userId
+                    ? e.sendUserName
+                    : e.receiveUserName
+                  ).includes(search.toLowerCase())
+                )
+                .map((e) => (
+                  <Link key={e.chatId} href={`/chats/${e.chatId}`}>
+                    <div className="flex items-center gap-3 hover:bg-gray-200 p-2">
+                      {(
+                        e.receiveUserId === userId
+                          ? e.sendUserImage
+                          : e.receiveUserImage
+                      ) ? (
+                        <Image
+                          alt=""
+                          src={`http://37.27.29.18:8003/images/${
+                            e.receiveUserId === userId
+                              ? e.sendUserImage
+                              : e.receiveUserImage
+                          }`}
+                          width={40}
+                          height={40}
+                          className="w-14 h-14 rounded-full object-cover object-center"
+                          priority
+                        />
+                      ) : (
+                        <Image
+                          alt=""
+                          src={img}
+                          width={40}
+                          height={40}
+                          className="w-14 h-14 rounded-full object-cover"
+                          priority
+                        />
+                      )}
 
-                    <div>
-                      {e.receiveUserId === userId
-                        ? e.sendUserName
-                        : e.receiveUserName}
+                      <div>
+                        {e.receiveUserId === userId
+                          ? e.sendUserName
+                          : e.receiveUserName}
+                      </div>
                     </div>
-                  </div>
-                </Link>
-              ))}
+                  </Link>
+                ))}
         </section>
       </div>
 
