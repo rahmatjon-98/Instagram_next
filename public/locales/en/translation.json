@@ -53,6 +53,15 @@
       "download": "Get the app."
     }
   },
+
+  "notice": {
+    "week": "This week",
+    "comment": "Comments",
+    "follow": "Followed",
+    "like": "Like",
+    "answer": "To answer"
+  },
+
   "setting": {
     "settings": "Settings",
     "center": "Accounts Center",
@@ -65,26 +74,51 @@
     "tajik": "Tajik",
     "english": "English",
     "lang": "Language Preferences",
-    "text": "Text on buttons, headings, and other text will be shown in the language you prefer."
-  },
-  "notice": {
-    "week": "This week",
-    "comment": "Comments",
-    "follow": "Followed",
-    "like": "Like",
-    "answer": "To answer"
+    "text": "Text on buttons, headings, and other text will be shown in the language you prefer.",
+    "profile_en": "Profile",
+    "lich": "Personal Information",
+    "pass": "Password and Security",
+    "news": "Advertising Preferences",
+    "silka": "More settings in Accounts Center",
+    "acc": "Account Privacy",
+    "lizki": "Close Friends",
+    "skrit": "Hide Story",
+    "vami": "Interactions with You",
+    "soob": "Messages and Story Replies",
+    "metki": "Tags and Mentions",
+    "blocked": "Blocked",
+    "repost": "Repost and reuse",
+    "ogr": "Restricted accounts",
+    "slova": "Hidden words",
+    "comment": "Comment",
+    "accskrit": "Hidden accounts",
+    "nastoyka": "Content settings",
+    "nravista": "Number of Likes and Reposts",
+    "platni": "Paid subscriptions",
+    "vawe": "Your app and media files",
+    "arxiv": "Archiving and downloading",
+    "spet": "Accessibility features",
+    "yazik": "Language",
+    "sayt": "Site permissions",
+    "semya": "Family center",
+    "setAccount": "Switch account",
+    "rejim": "Switch mode",
+    "vidite": "What you see",
+    "log": "Log out",
+    "for": "Forgot password?",
+    "noch": "Night mode"
   },
 
   "chat": {
-      "messages": "Messages",
-      "requests": "Requests",
-      "defaultTitle": "Your messages",
-      "defaultDescription": "Send private messages to friends",
-      "newMessageButton": "New message",
-      "newMessageTitle": "New message",
-      "toLabel": "To:",
-      "searchPlaceholder": "Search",
-      "recommendedLabel": "Recommended",
-      "noUsersFound": "No users found"
-    }
+    "messages": "Messages",
+    "requests": "Requests",
+    "defaultTitle": "Your messages",
+    "defaultDescription": "Send private messages to friends",
+    "newMessageButton": "New message",
+    "newMessageTitle": "New message",
+    "toLabel": "To:",
+    "searchPlaceholder": "Search",
+    "recommendedLabel": "Recommended",
+    "noUsersFound": "No users found"
+  }
 }
