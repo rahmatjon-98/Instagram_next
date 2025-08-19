@@ -191,6 +191,12 @@
     "kontent iz akauntov": "Мундариҷа аз ҳисобҳое, ки шумо пайравӣ намекунед",
     "potensialno nepriemlimiy content": "Мундариҷаи эҳтимолан номуносиб"
   },
+   "home":{
+    "follow":"Обуна шавед",
+    "likes":"Дустошта",
+    "Loading_history":"Таърихи боркунӣ",
+    "Suggested_for_you" : "Барои шумо пешниҳод шудааст"
+  },
   "chat": {
     "messages": "Паёмҳо",
     "requests": "Дархостҳо",
@@ -201,6 +207,11 @@
     "toLabel": "Ба:",
     "searchPlaceholder": "Ҷустуҷӯ",
     "recommendedLabel": "Тавсияшуда",
-    "noUsersFound": "Истифодабарандагон ёфт нашуд"
+    "noUsersFound": "Истифодабарандагон ёфт нашуд",
+    "removeChat": "Нест кардани чат",
+    "seeProfile": "Дидани профил",
+    "deleteMessage": "Нест кардани паём",
+    "cancel": "Бекор кардан",
+    "messagePlaceholder": "Паёми худро нависед..."
   }
 }

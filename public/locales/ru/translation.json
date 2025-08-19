@@ -192,9 +192,13 @@
     "kontent iz akauntov": "Контент из аккаунтов, на которые вы не подписаны",
     "potensialno nepriemlimiy content": "Потенциално неприемлимый контент"
   },
+  "home": {
+    "follow": "Подписатся",
+    "likes": "Нравится",
+    "Loading_history": "Загрузка истрории",
+    "Suggested_for_you": "Предлагается для вас"
+  },
 
-
-  
   "chat": {
     "messages": "Сообщения",
     "requests": "Запросы",
@@ -205,6 +209,11 @@
     "toLabel": "Кому:",
     "searchPlaceholder": "Поиск",
     "recommendedLabel": "Рекомендуемые",
-    "noUsersFound": "Пользователи не найдены"
+    "noUsersFound": "Пользователи не найдены",
+    "removeChat": "Удалить чат",
+    "seeProfile": "Посмотреть профиль",
+    "deleteMessage": "Удалить сообщение",
+    "cancel": "Отмена",
+    "messagePlaceholder": "Напишите сообщение..."
   }
 }
