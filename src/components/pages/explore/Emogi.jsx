@@ -1,6 +1,7 @@
 import { Smile } from "lucide-react";
 import EmojiPicker from "emoji-picker-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function CommentInput({ value2, onChange2 }) {
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -11,7 +12,7 @@ export default function CommentInput({ value2, onChange2 }) {
         });
         setShowEmojiPicker(false);
     };
-
+    let {t}=useTranslation()
     return (
         <div className=" flex w-[100%] gap-2 items-center">
             <button
@@ -26,7 +27,7 @@ export default function CommentInput({ value2, onChange2 }) {
                 value={value2}
                 onChange={onChange2}
                className="w-1/1 outline-none"
-                placeholder="Добавить комментарий..."
+                placeholder={t("exlpore.7")}
             />
 
             {showEmojiPicker && (
