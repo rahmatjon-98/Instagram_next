@@ -145,7 +145,18 @@ export default function ChatById() {
     const date = new Date(dateString);
     const hours = String(date.getHours()).padStart(2, "0");
     const minutes = String(date.getMinutes()).padStart(2, "0");
-    return `${hours}:${minutes}`;
+    const day = String(date.getDay());
+    const week = {
+      1: "Sun",
+      2: "Mon",
+      3: "Tue",
+      4: "Wed",
+      5: "Thu",
+      6: "Fri",
+      7: "Sat",
+    };
+
+    return ` ${hours}:${minutes}`;
   }
 
   async function handleDelChat(chatId) {
@@ -163,8 +174,7 @@ export default function ChatById() {
     /\.(mp4|webm|ogg|mov)$/i.test(String(name || ""));
 
   const isImageFileName = (name) =>
-  /\.(jpg|jpeg|png|gif|bmp|webp|svg)$/i.test(String(name || ""));
-
+    /\.(jpg|jpeg|png|gif|bmp|webp|svg)$/i.test(String(name || ""));
 
   const isAudioFileName = (name) =>
     /\.(mp3|wav|ogg|m4a)$/i.test(String(name || ""));
@@ -421,18 +431,6 @@ export default function ChatById() {
         </div>
 
         <div>
-          {/* <div>
-            {userData && (
-              <PeerCall
-                myId={userId}
-                herId={
-                  userData?.receiveUserId === userId
-                    ? userData.sendUserImage
-                    : userData.receiveUserImage
-                }
-              />
-            )}
-          </div> */}
           <Button onClick={toggleDrawer(true)}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -544,123 +542,123 @@ export default function ChatById() {
 
                   console.log(e.messageText);
                   return (
-                    <div
-                      key={e.messageId}
-                      className={`flex items-center gap-3  p-3 rounded-lg group w-full ${
-                        isCurrentUser
-                          ? " self-end rounded-tr-none flex-row-reverse"
-                          : " self-start rounded-tl-none "
-                      }`}
-                    >
+                    <section key={e.messageId}>
+                      <p className={`text-[10px] text-center  `}>
+                        {formatMessageTime(e.sendMassageDate)}
+                      </p>
+
                       <div
-                        className={`flex flex-col max-w-7/10  ${
-                          isCurrentUser ? " self-end" : " self-start"
+                        className={`flex items-center gap-3  p-3 rounded-lg group w-full ${
+                          isCurrentUser
+                            ? " self-end rounded-tr-none flex-row-reverse"
+                            : " self-start rounded-tl-none "
                         }`}
                       >
-                        {e.file && isVideoFileName(e.file) ? (
-                          <video
-                            src={`http://37.27.29.18:8003/images/${e.file}`}
-                            controls
-                            className="pb-2 rounded-xl  max-w-xs"
-                          />
-                        ) : e.file && isAudioFileName(e.file) ? (
-                          <audio
-                            src={`http://37.27.29.18:8003/images/${e.file}`}
-                            controls
-                            className="pb-2  max-w-xs"
-                          />
-                        ) : e.file ? (
-                          <Image
-                            src={`http://37.27.29.18:8003/images/${e.file}`}
-                            alt="image"
-                            width={1000}
-                            height={1000}
-                            className="pb-2 rounded-xl  max-w-xs"
-                          />
-                        ) : (
-                          ""
-                        )}
-
-                        {e.messageText &&
-                          (isVideoFileName(e.messageText) ? (
-                            <video
-                              src={`http://37.27.29.18:8003/images/${e.messageText}`}
-                              controls
-                              className="pb-2 rounded-xl max-w-xs"
-                            />
-                          ) : e.messageText && isImageFileName(e.messageText) ? (
-                            <img
-                              src={`http://37.27.29.18:8003/images/${e.messageText}`}
-                              alt="media"
-                              className="pb-2 rounded-xl max-w-xs"
-                            />
-                          ) : (
-                            <div
-                              className={`rounded-lg  ${
-                                isCurrentUser
-                                  ? "bg-blue-500 text-white self-end rounded-tr-none p-1.5 px-3"
-                                  : "bg-gray-100 text-[#475569] self-start rounded-tl-none p-1.5 px-3"
-                              }`}
-                            >
-                              <p>{e.messageText}</p>
-
-                              <span
-                                className={`text-[10px] self-end ${
-                                  isCurrentUser
-                                    ? "text-gray-200"
-                                    : "text-gray-700"
-                                }`}
-                              >
-                                {formatMessageTime(e.sendMassageDate)}
-                              </span>
-                            </div>
-                          ))}
-                      </div>
-
-                      <div className="relative">
-                        <button
-                          type="button"
-                          onClick={() => toggleDelModal(e.messageId)}
-                          className={` ${
-                            delMesModal === e.messageId ? "block" : ""
+                        <div
+                          className={`flex flex-col max-w-7/10  ${
+                            isCurrentUser ? " self-end" : " self-start"
                           }`}
                         >
-                          <EllipsisVertical size={15} />
-                        </button>
+                          {e.file && isVideoFileName(e.file) ? (
+                            <video
+                              src={`http://37.27.29.18:8003/images/${e.file}`}
+                              controls
+                              className="pb-2 rounded-xl  max-w-xs"
+                            />
+                          ) : e.file && isAudioFileName(e.file) ? (
+                            <audio
+                              src={`http://37.27.29.18:8003/images/${e.file}`}
+                              controls
+                              className="pb-2  max-w-xs"
+                            />
+                          ) : e.file ? (
+                            <Image
+                              src={`http://37.27.29.18:8003/images/${e.file}`}
+                              alt="image"
+                              width={1000}
+                              height={1000}
+                              className="pb-2 rounded-xl  max-w-xs"
+                            />
+                          ) : (
+                            ""
+                          )}
 
-                        {delMesModal === e.messageId && (
-                          <div
-                            className={`absolute flex flex-col justify-center items-center gap-2 shadow rounded bg-white w-[200px] ${
-                              isCurrentUser
-                                ? "lg:-ml-60 lg:-mt-30 -mx-20 -mt-32 "
-                                : "lg:ml-5 lg:-mt-30  -mx-10 -mt-32"
+                          {e.messageText &&
+                            (isVideoFileName(e.messageText) ? (
+                              <div>
+                                <video
+                                  src={`http://37.27.29.18:8003/images/${e.messageText}`}
+                                  controls
+                                  className="pb-2 rounded-xl max-w-xs"
+                                />
+                              </div>
+                            ) : e.messageText &&
+                              isImageFileName(e.messageText) ? (
+                              <div>
+                                <img
+                                  src={`http://37.27.29.18:8003/images/${e.messageText}`}
+                                  alt="media"
+                                  className="pb-2 rounded-xl max-w-xs"
+                                />
+                              </div>
+                            ) : (
+                              <div
+                                className={`rounded-lg  ${
+                                  isCurrentUser
+                                    ? "bg-blue-500 text-white self-end rounded-tr-none p-1.5 px-3"
+                                    : "bg-gray-100 text-[#475569] self-start rounded-tl-none p-1.5 px-3"
+                                }`}
+                              >
+                                <p>{e.messageText}</p>
+                              </div>
+                            ))}
+                        </div>
+
+                        <div className="relative">
+                          <button
+                            type="button"
+                            onClick={() => toggleDelModal(e.messageId)}
+                            className={` ${
+                              delMesModal === e.messageId ? "block" : ""
                             }`}
                           >
-                            <button
-                              type="button"
-                              onClick={() => handleDelMessage(e.messageId)}
-                              className="text-red-500 p-2 rounded"
-                            >
-                              {loading ? (
-                                <Loader2 className="animate-spin w-5 h-5" />
-                              ) : (
-                                <p className="flex items-center gap-2">
-                                  Delete messege <Trash size={18} />
-                                </p>
-                              )}
-                            </button>
+                            <EllipsisVertical size={15} />
+                          </button>
 
-                            <button
-                              type="button"
-                              onClick={() => setdelMesModal(null)}
-                              className="p-2"
+                          {delMesModal === e.messageId && (
+                            <div
+                              className={`absolute flex flex-col justify-center items-center gap-2 shadow rounded bg-white w-[200px] ${
+                                isCurrentUser
+                                  ? "lg:-ml-60 lg:-mt-30 -mx-20 -mt-32 "
+                                  : "lg:ml-5 lg:-mt-30  -mx-10 -mt-32"
+                              }`}
                             >
-                              Cancel
-                            </button>
-                          </div>
-                        )}
+                              <button
+                                type="button"
+                                onClick={() => handleDelMessage(e.messageId)}
+                                className="text-red-500 p-2 rounded"
+                              >
+                                {loading ? (
+                                  <Loader2 className="animate-spin w-5 h-5" />
+                                ) : (
+                                  <p className="flex items-center gap-2">
+                                    Delete messege <Trash size={18} />
+                                  </p>
+                                )}
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => setdelMesModal(null)}
+                                className="p-2"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
+                    </section>
                   );
                 })}
             </div>
