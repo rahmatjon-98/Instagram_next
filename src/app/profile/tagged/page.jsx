@@ -13,9 +13,7 @@ const Tagged = () => {
 			<p className='text-[#64748B]'>
 				Here show the photos and videos in which you have been tagged
 			</p>
-			<PostModal/>
 		</div>
-		
 	)
 }
 

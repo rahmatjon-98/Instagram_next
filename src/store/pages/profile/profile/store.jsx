@@ -108,4 +108,13 @@ export const useProfileStore = create((set, get) => ({
 			console.error(error)
 		}
 	},
+	deletePost: async postId => {
+		try {
+			await axiosRequest.delete(`${api}/Post/delete-post?id=${postId}`)
+			await get().getProfileData()
+			await get().getPosts()
+		} catch (error) {
+			console.error('Could not delete post', error)
+		}
+	},
 }))
