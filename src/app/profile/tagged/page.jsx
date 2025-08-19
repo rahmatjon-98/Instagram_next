@@ -1,6 +1,7 @@
 import React from 'react'
 import savedIcon from '@/assets/img/pages/profile/profile/image_79-removebg-preview.png'
 import Image from 'next/image'
+import PostModal from '@/components/pages/profile/profile/postModal/postModal'
 
 const Tagged = () => {
 	return (
@@ -12,7 +13,9 @@ const Tagged = () => {
 			<p className='text-[#64748B]'>
 				Here show the photos and videos in which you have been tagged
 			</p>
+			<PostModal/>
 		</div>
+		
 	)
 }
 

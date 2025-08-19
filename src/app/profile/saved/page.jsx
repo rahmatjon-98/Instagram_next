@@ -19,7 +19,7 @@ const Saved = () => {
 
 	return (
 		<div className='w-full'>
-			<div className='flex flex-wrap gap-[0.5%] gap-y-[1vh] pb-[10vh] pt-[5vh] w-full'>
+			<div className='flex flex-wrap gap-[0.5%] gap-y-[0.2vh] md:gap-y-[1vh] pb-[10vh] pt-[5vh] w-full'>
 				{favorites?.data?.length > 0 ? (
 					favorites.data.map((e, i) => (
 						// <div

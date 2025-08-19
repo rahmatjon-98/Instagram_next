@@ -9,6 +9,7 @@ export const useProfileStore = create((set, get) => ({
 	user: {},
 	favorites: {},
 	posts: {},
+	userById: {},
 	// decodeToken: {},
 	// jwtDecode: () => {
 	// 	try {
@@ -85,6 +86,24 @@ export const useProfileStore = create((set, get) => ({
 		try {
 			const { data } = await axiosRequest.get(`${api}/Post/get-my-posts`)
 			set({ posts: data })
+		} catch (error) {
+			console.error(error)
+		}
+	},
+	getUserById: async id => {
+		try {
+			const { data } = await axiosRequest.get(
+				`${api}/UserProfile/get-user-profile-by-id?id=${id}`
+			)
+			set({ userById: data })
+		} catch (error) {
+			console.error(error)
+		}
+	},
+	addPost: async formData => {
+		try {
+			await axiosRequest.post(`${api}/Post/add-post`, formData)
+			await get().getProfileData()
 		} catch (error) {
 			console.error(error)
 		}
