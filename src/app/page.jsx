@@ -617,7 +617,7 @@ export default function Main() {
 						<div className='flex gap-[14px]'>
 							{data?.map((e, i) => {
 								return (
-									<div className='flex items-end'>
+									<div key={i} className='flex items-end'>
 										<div
 											onClick={() => {
 												if (e.stories.length > 0) {
@@ -1221,7 +1221,6 @@ export default function Main() {
 						{t("home.Suggested_for_you")}
 					</p>
 					{users?.data?.slice(0, 5).map((e, i) => {
-						console.log(e)
 						return (
 							<div key={i} className='py-[12px] pr-[8px] flex justify-between'>
 								<Link href={`/${e.id}`} className='flex gap-[8px] items-center'>

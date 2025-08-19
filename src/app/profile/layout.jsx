@@ -263,11 +263,13 @@ const Layout = ({ children }) => {
 						</h1>
 						<div className='flex items-center gap-[5px] md:gap-[10px]'>
 							<button
+
 								className={`cursor-pointer text-[10px] md:text-[16px] px-[10px] md:px-[20px] py-[5px] md:py-[10px] rounded-xl md:rounded-2xl active:scale-95 transition-transform duration-100 ease-in ${
 									theme == 'light'
 										? 'bg-[#F0F2F5] text-[#334155] hover:bg-gray-200'
 										: 'bg-[#25292E] text-[#F4F4F4] hover:bg-gray-800'
 								}`}
+
 								onClick={() => router.push('/editprofile')}
 							>
 								Edit profile
