@@ -124,7 +124,7 @@ const ModalUsers = ({ media }) => {
                 type="button"
                 onClick={() => setOpenModalUsers((s) => !s)}
                 aria-label="New message"
-                className="cursor-pointer text-white transition-colors duration-200"
+                className="cursor-pointer transition-colors duration-200"
             >
                 <Send />
             </button>
