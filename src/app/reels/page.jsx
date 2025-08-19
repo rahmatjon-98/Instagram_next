@@ -9,6 +9,7 @@ import Box from "@mui/material/Box";
 import { Typography } from "@mui/material";
 import Link from "next/link";
 import ModalUsers from "@/components/pages/explore/ModalUsers";
+import { useTranslation } from 'react-i18next';
 
 const Reels = () => {
   const [rellIdx, setRellIdx] = useState(0);
@@ -31,6 +32,8 @@ const Reels = () => {
     deleteComment,
     currentUserId,
   } = useRealsStore();
+
+  const {t} = useTranslation()
 
   const currentReel = useMemo(() => rels[rellIdx] || {}, [rels, rellIdx]);
 
@@ -163,7 +166,7 @@ const Reels = () => {
       <Modal open={open} onClose={handleClose}>
         <Box sx={modalStyle}>
           <div className="flex items-center justify-between p-4 border-b border-gray-200">
-            <Typography className="text-lg font-semibold text-gray-800">Комментарии</Typography>
+            <Typography className="text-lg font-semibold text-gray-800">{t("rells.comments rels")}</Typography>
             <button onClick={handleClose} className="text-gray-500 hover:text-gray-700">
               <X />
             </button>
@@ -203,7 +206,7 @@ const Reels = () => {
                 </div>
               ))
             ) : (
-              <Typography className="text-sm text-gray-500">Комментариев нет</Typography>
+              <Typography className="text-sm text-gray-500">{t("rells.no coment rels")}</Typography>
             )}
           </div>
           <div className="p-3 border-t border-gray-200">
@@ -212,7 +215,7 @@ const Reels = () => {
                 type="text"
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
-                placeholder="Добавить комментарий..."
+                placeholder={t("rells.add new comnets rels")}
                 className="flex-1 px-4 py-2 text-sm border border-gray-300 rounded-full focus:outline-none focus:border-blue-500"
               />
               <button
@@ -313,7 +316,7 @@ const Reels = () => {
                 }
                 className="px-3 py-1 ml-4 text-sm text-black bg-white rounded-full"
               >
-                {currentReel.isSubscriber ? "Вы подписаны" : "Подписаться"}
+                {currentReel.isSubscriber ? t("rells.Unfollow Rels") : t("rells.Subcribe Rels")}
               </button>
             </div>
             {currentReel.content && (
@@ -328,13 +331,13 @@ const Reels = () => {
                     className="ml-2 text-sm text-gray-300 underline"
                     onClick={() => toggleFullText(currentReel.postId)}
                   >
-                    {fullText[currentReel.postId] ? "Меньше" : "Ещё"}
+                    {fullText[currentReel.postId] ? t("rells.menshe") : t("rells.ewe")}
                   </button>
                 )}
               </div>
             )}
             <div className="flex items-center gap-[15px]">
-              <span className="font-[500]">🎵 {currentReel.userName} Original audio</span>
+              <span className="font-[500]">🎵 {currentReel.userName} {t("rells.original audio")}</span>
               <div className="flex mt-[5px] flex-col items-center">
                 <button onClick={toggleMute}>{isMuted ? <VolumeX /> : <Volume2 />}</button>
               </div>
