@@ -76,7 +76,7 @@ export default function SwiperStories({ indexUser = 0 }) {
 				cubeEffect={{ shadow: false, slideShadows: false }}
 				modules={[EffectCube]}
 				onSwiper={swiper => (swiperRef.current = swiper)}
-				onSlideChange={swiper => setActiveIndex(swiper.activeIndex)} // обновляем активный слайд
+				onSlideChange={swiper => setActiveIndex(swiper.activeIndex)}
 				allowTouchMove={false}
 				className='w-[320px] h-[600px] rounded-2xl overflow-hidden shadow-lg'
 			>
@@ -86,7 +86,7 @@ export default function SwiperStories({ indexUser = 0 }) {
 							<Stories
 								stories={user.stories}
 								width={320}
-								height={600}
+								height={600}	
 								loop={false}
 								isPaused={paused}
 								onAllStoriesEnd={() => {
