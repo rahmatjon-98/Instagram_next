@@ -1,14 +1,6 @@
 "use client";
 
-import {
-  ChevronDown,
-  EllipsisVertical,
-  Loader2,
-  Search,
-  Trash,
-  User,
-  X,
-} from "lucide-react";
+import { ChevronDown, Loader2, Search, User, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
@@ -16,7 +8,6 @@ import img from "@/assets/img/pages/chat/layout/userFoto.jpg";
 import { useDefaultChat } from "@/store/pages/chat/pages/default-chat/store";
 import { useMyProfile } from "@/store/pages/chat/layout/store";
 import { useUserId } from "@/hook/useUserId";
-import { useChatById } from "@/store/pages/chat/pages/chat-by-id/store";
 import { usegetUserStore } from "@/store/pages/search/store";
 import { Skeleton, Stack } from "@mui/material";
 import { useRouter } from "next/navigation";
@@ -40,7 +31,6 @@ export default function Layout({ children }) {
   const [openModalUsers, setOpenModalUsers] = useState(false);
   const [search, setSearch] = useState("");
   const [filteredUsers, setFilteredUsers] = useState([]);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     get();
@@ -54,11 +44,9 @@ export default function Layout({ children }) {
   useEffect(() => {
     if (!search || !search.trim()) {
       setFilteredUsers(allUsers);
-      setLoading(false);
       return;
     }
 
-    setLoading(true);
     const t = setTimeout(() => {
       const q = search.toLowerCase();
       const results = allUsers.filter((u) =>
@@ -67,7 +55,6 @@ export default function Layout({ children }) {
           .includes(q)
       );
       setFilteredUsers(results);
-      setLoading(false);
     }, 500);
 
     return () => clearTimeout(t);
