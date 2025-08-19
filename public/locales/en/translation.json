@@ -111,6 +111,42 @@
     "noch": "Night mode"
   },
 
+  "exlpore": {
+    "1": "Follow",
+    "2": "UnFollow",
+    "3": "likes ",
+    "4": "Like",
+    "5": "Share",
+    "6": "To whom:",
+    "7": "Add a comment",
+    "8": "Search"
+  },
+
+  "Help": {
+    "1": "Help",
+    "2": "Help Center",
+    "3": "Account Status",
+    "4": "Privacy and Security",
+    "5": "Support Requests",
+    "8": "Blocked accounts",
+    "9": "You can always block people from their profile.",
+    "10": "You haven't blocked anyone.",
+    "11": "Hide stories and broadcasts",
+    "12": "Hide stories and broadcasts from…",
+    "13": "Tags and Mentions",
+    "14": "Who can tag you",
+    "15": "Select who can tag you in photos and videos. A user who tries to tag you will see whether you allow it or not.",
+    "16": "Allow tags for all favorite users",
+    "17": "Allow tags only for people you follow",
+    "18": "Disable tags",
+    "19": "Approve tags manually",
+    "20": "Who can @mention you",
+    "21": "Specify who can @mention you in stories, notes, comments, live videos, and post captions. People you have blocked from @mentioning you will see that you do not allow mentions.",
+    "22": "Allow mentions for everyone",
+    "23": "Allow mentions for people you follow",
+    "24": "Disable mentions"
+  },
+
   "chat": {
     "messages": "Messages",
     "requests": "Requests",
