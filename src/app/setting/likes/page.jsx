@@ -47,7 +47,7 @@ export default function UsersList() {
   }
 
   return (
-    <div className='max-w-2xl mx-auto px-4 sm:px-0 py-6 min-h-screen'>
+    <div className='max-w-3xl mx-auto px-4 sm:px-0 py-6 min-h-screen overflow-y-scroll h-[80vh]'>
       <div className=' top-0 z-10  bg-opacity-80 backdrop-blur-md py-4 border-b border-gray-200'>
         <h1 className='text-2xl font-bold'>{t("setting.notification")}</h1>
       </div>
