@@ -35,6 +35,7 @@ import { useRouter } from 'next/navigation'
 import { useTodoAsyncStore } from '@/store/pages/notification/store'
 import ModalUsers from '@/components/pages/explore/ModalUsers'
 import BasicModal from '@/components/pages/explore/BasicModal'
+import { useTranslation } from 'react-i18next'
 const style = {
 	position: 'absolute',
 	top: '50%',
@@ -247,6 +248,7 @@ export default function Main() {
 	let [commentStop, setCommentStop] = useState(false)
 	let [commentMuted, setCommentMuted] = useState(true)
 	let [Idx, setIdx] = useState('')
+	let {t} = useTranslation()
 	return (
 		<div className='flex w-full items-start'>
 			<Modal
@@ -1124,7 +1126,7 @@ export default function Main() {
 												<p>
 													{`${
 														e.postLike ? e.postLikeCount + 1 : e.postLikeCount
-													} Likes`}
+													} ${t("home.likes")}`}
 												</p>
 											</div>
 											{e.content != null && (
@@ -1216,7 +1218,7 @@ export default function Main() {
 				</div>
 				<div className='w-full flex flex-col'>
 					<p className='block text-[#64748B] text-[14px] font-[500] '>
-						Suggested for you
+						{t("home.Suggested_for_you")}
 					</p>
 					{users?.data?.slice(0, 5).map((e, i) => {
 						console.log(e)
@@ -1253,7 +1255,7 @@ export default function Main() {
 									onClick={() => followUser(e.id)}
 									className='px-4 h-[30px] text-[16px] font-[600] text-blue-600 ml-4 text-sm hover:text-blue-500 active:text-blue-400 bg-white rounded-full'
 								>
-									Follow
+									{t("home.follow")}
 								</button>
 							</div>
 						)
