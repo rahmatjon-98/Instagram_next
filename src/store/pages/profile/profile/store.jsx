@@ -74,7 +74,7 @@ export const useProfileStore = create((set, get) => ({
 	getFavorites: async () => {
 		try {
 			const { data } = await axiosRequest.get(
-				'http://37.27.29.18:8003/UserProfile/get-post-favorites'
+				`${api}/UserProfile/get-post-favorites`
 			)
 			set({ favorites: data })
 		} catch (error) {
@@ -83,7 +83,7 @@ export const useProfileStore = create((set, get) => ({
 	},
 	getPosts: async () => {
 		try {
-			const { data } = await axiosRequest.get('')
+			const { data } = await axiosRequest.get(`${api}/Post/get-my-posts`)
 			set({ posts: data })
 		} catch (error) {
 			console.error(error)

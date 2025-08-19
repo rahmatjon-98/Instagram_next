@@ -18,8 +18,8 @@ const Saved = () => {
 	}, [])
 
 	return (
-		<div>
-			<div className='flex flex-wrap gap-[0.5%] gap-y-[1vh] pb-[10vh] pt-[5vh]'>
+		<div className='w-full'>
+			<div className='flex flex-wrap gap-[0.5%] gap-y-[1vh] pb-[10vh] pt-[5vh] w-full'>
 				{favorites?.data?.length > 0 ? (
 					favorites.data.map((e, i) => (
 						// <div
@@ -33,7 +33,7 @@ const Saved = () => {
 						// </div>
 						<div
 							key={i}
-							className='group relative w-[33%] h-[150px] lg:h-[300px] overflow-hidden flex items-center'
+							className='group relative w-[33%] h-[150px] lg:h-[400px] overflow-hidden flex items-center'
 							style={{ backgroundColor: theme === 'dark' ? 'white' : 'black' }}
 						>
 							<div className='absolute top-2 right-2 z-10 p-1 text-black rounded-full'>

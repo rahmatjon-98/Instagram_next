@@ -3,25 +3,31 @@ import { useProfileStore } from '@/store/pages/profile/profile/store'
 import Image from 'next/image'
 import React, { useEffect } from 'react'
 import postIcon from '@/assets/img/pages/profile/profile/image_77-removebg-preview.png'
-import { BookmarkIcon, Heart } from 'lucide-react'
+import {
+	BookmarkIcon,
+	Heart,
+	Images,
+	ImagesIcon,
+	SquarePlay,
+} from 'lucide-react'
 import { FaComments } from 'react-icons/fa'
 import useDarkSide from '@/hook/useDarkSide'
 
 const Profile = () => {
-	let { favorites, getFavorites } = useProfileStore()
+	let { posts, getPosts } = useProfileStore()
 
 	const [theme] = useDarkSide()
 
 	useEffect(() => {
-		getFavorites()
-		
+		getPosts()
 	}, [])
+	console.log(posts ? posts : 'error couldnt find posts')
 
 	return (
-		<div>
-			<div className='flex flex-wrap gap-[0.5%] gap-y-[1vh] pb-[10vh] pt-[5vh]'>
-				{favorites?.data?.length > 0 ? (
-					favorites.data.map((e, i) => (
+		<div className='w-full'>
+			<div className='flex flex-wrap gap-[0.5%] gap-y-[1vh] pb-[10vh] pt-[5vh] w-full'>
+				{posts?.length > 0 ? (
+					posts.map((e, i) => (
 						// <div
 						// 	key={i}
 						// 	style={{
@@ -33,21 +39,40 @@ const Profile = () => {
 						// </div>
 						<div
 							key={i}
-							className='group relative w-[33%] h-[150px] lg:h-[300px] overflow-hidden flex items-center'
+							className='group relative w-[33%] h-[150px] lg:h-[400px] overflow-hidden flex items-center'
 							style={{ backgroundColor: theme === 'dark' ? 'white' : 'black' }}
 						>
 							<div className='absolute top-2 right-2 z-10 p-1 text-black rounded-full'>
-								<BookmarkIcon className='text-white w-5 h-5' />{' '}
+								<SquarePlay className='text-white w-5 h-5 text-[20px]' />
 							</div>
-							{e.images[0].endsWith('.mp4') ? (
-								<video src={`http://37.27.29.18:8003/images/${e.images[0]}`} />
+							{/* {e.images[0].endsWith('.mp4') ? (
+								console.log('hello')
 							) : (
-								<Image
-									src={`http://37.27.29.18:8003/images/${e.images[0]}`}
-									alt='post'
-									width={300}
-									height={300}
-								/>
+								<div className='absolute top-2 right-2 z-10 p-1 text-black rounded-full'>
+									<ImagesIcon className='text-white w-5 h-5 text-[20px]' />
+								</div>
+							)} */}
+							{e.images[0].endsWith('.mp4') ? (
+								<div>
+									<div className='absolute top-2 right-2 z-10 p-1 text-black rounded-full'>
+										<SquarePlay className='text-white w-5 h-5 text-[20px]' />
+									</div>
+									<video
+										src={`http://37.27.29.18:8003/images/${e.images[0]}`}
+									/>
+								</div>
+							) : (
+								<div>
+									<div className='absolute top-2 right-2 z-10 p-1 text-black rounded-full'>
+										<ImagesIcon className='text-white w-5 h-5 text-[20px]' />
+									</div>
+									<Image
+										src={`http://37.27.29.18:8003/images/${e.images[0]}`}
+										alt='post'
+										width={300}
+										height={300}
+									/>
+								</div>
 							)}
 
 							<div className='absolute inset-0 bg-black opacity-0 group-hover:opacity-50 transition-opacity duration-300'></div>
@@ -63,7 +88,7 @@ const Profile = () => {
 						</div>
 					))
 				) : (
-					<div className='flex flex-col gap-[10px] text-center items-center py-[10px] m-auto'>
+					<div className='flex flex-col gap-[10px] text-center items-center w-full pt-[2vh] '>
 						<Image src={postIcon} alt='postIcon' />
 						<h1 className='text-[#1E293B] text-[18px] font-bold'>
 							Share Photos
