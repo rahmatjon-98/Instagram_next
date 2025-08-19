@@ -1,7 +1,7 @@
 'use client'
 import { useHome } from '@/store/pages/home/store'
 import { Skeleton } from '@mui/material'
-import { Bookmark, Heart } from 'lucide-react'
+import { Bookmark, Heart, MessageCircleMore } from 'lucide-react'
 import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
 import 'swiper/css'
@@ -16,12 +16,171 @@ import { useRealsStore } from './reels/store'
 import Link from 'next/link'
 import SwiperStories from '@/components/pages/home/stories'
 import Commentory from '@/components/pages/home/Commentory'
-
+import { useUserStore } from '@/store/pages/explore/explorestore'
+import * as React from 'react'
+import Box from '@mui/material/Box'
+import Modal from '@mui/material/Modal'
+import {
+	CircleUserRound,
+	Send,
+	SendHorizontal,
+	Smile,
+	Volume2,
+	VolumeX,
+	X,
+} from 'lucide-react'
+import CommentInput from '@/components/pages/explore/Emogi'
+import { useUserId } from '@/hook/useUserId'
+import { useRouter } from 'next/navigation'
+import { useTodoAsyncStore } from '@/store/pages/notification/store'
+import ModalUsers from '@/components/pages/explore/ModalUsers'
+import BasicModal from '@/components/pages/explore/BasicModal'
+const style = {
+	position: 'absolute',
+	top: '50%',
+	left: '50%',
+	transform: 'translate(-50%, -50%)',
+	width: '100%',
+	maxWidth: 900,
+	color: 'white',
+	maxHeight: '90vh',
+	overflow: 'hidden',
+	borderRadius: '5px',
+	'@media (max-width:768px)': {
+		top: 0,
+		transform: 'translate(-50%, 0)',
+		height: '100vh',
+		maxHeight: '100vh',
+		borderRadius: 0,
+	},
+}
+const mediaStyle = {
+	width: 'full',
+	height: 'full',
+	objectFit: 'cover',
+	borderRadius: '8px',
+	cursor: 'pointer',
+	backgroundColor: '#f5f5f5',
+}
+const mediaStyleModal = {
+	width: '100%',
+	objectFit: 'cover',
+	borderRadius: '2px',
+	cursor: 'pointer',
+	backgroundColor: '#f5f5f5',
+}
 export default function Main() {
+	let {
+		user,
+		fechUser,
+		postById,
+		getPostById,
+		deletComit,
+		AddComit,
+		unfollowUser,
+		Follow,
+		getUsersFollow,
+		FolowUser,
+		f,
+	} = useUserStore()
+	console.log(postById)
+	const [open, setOpen] = React.useState(false)
+	let cnt = 3
+	let router = useRouter()
+	async function RemoveComit(postCommentId) {
+		await deletComit(postCommentId)
+	}
+	useEffect(() => {
+		fechUser()
+		const saved = JSON.parse(localStorage.getItem('bookmarks')) || []
+		setwishLix(saved)
+	}, [])
+	const handleOpen = async id => {
+		const isFollowed = FolowUser?.data?.some(
+			e => e.userShortInfo.userId == postById.data?.userId
+		)
+		console.log(isFollowed)
+		await getPostById(id)
+		try {
+			await getUsersFollow(userId)
+		} catch (err) {
+			console.error('Ошибка при обновлении списка подписок в handleOpen:', err)
+		}
+		setFollow(Boolean(isFollowed))
+		setOpen(true)
+	}
+	const handleClose = () => {
+		setOpen(false)
+	}
+	const [isMuted, setIsMuted] = React.useState(false)
+	const videoRef = React.useRef(null)
+	const toggleMute = () => {
+		const video = videoRef.current
+		if (video) {
+			video.muted = !video.muted
+			setIsMuted(video.muted)
+		}
+	}
+	let [newcomit, setnewComit] = React.useState('')
+	const handleAddComment = async () => {
+		if (newcomit.trim() === '') return
+		await AddComit(newcomit, postById.data?.postId)
+		await getPostById(postById.data?.postId)
+		setnewComit('')
+	}
+	const [likedComments, setLikedComments] = React.useState({})
+	const handleLikeComment = commentId => {
+		setLikedComments(prev => ({
+			...prev,
+			[commentId]: !prev[commentId],
+		}))
+	}
+	let [wishLix, setwishLix] = React.useState([])
+	function AddwishLix(postId) {
+		let upDated
+		if (wishLix.includes(postId)) {
+			upDated = wishLix.filter(id => id != postId)
+		} else {
+			upDated = [...wishLix, postId]
+		}
+		setwishLix(upDated)
+		localStorage.setItem('bookmarks', JSON.stringify(upDated))
+	}
+	let userId = useUserId()
+	let [follow, setFollow] = React.useState(false)
+	useEffect(() => {
+		getUsersFollow(userId)
+	}, [])
+	async function HendlFollow(id) {
+		const currentlyFollowed = FolowUser?.data?.some(
+			e => e.userShortInfo.userId == id
+		)
+		try {
+			if (currentlyFollowed) {
+				await unfollowUser(id)
+				setFollow(true)
+			} else {
+				await Follow(id)
+				setFollow(false)
+			}
+
+			try {
+				await getUsersFollow(userId)
+			} catch (err) {
+				console.error('Ошибка при getUsersFollow в HendlFollow:', err)
+			}
+
+			const updatedFollow = FolowUser?.data?.some(
+				e => e.userShortInfo.userId == id
+			)
+		} catch (error) {
+			console.error('Ошибка при подписке/отписке:', error)
+		}
+	}
 	const videoRefs = useRef({})
-	let { followUser, unfollowUser } = useRealsStore()
 	let {
 		getUserStories,
+		followUser,
 		data,
 		isLoading,
 		posts,
@@ -87,8 +246,283 @@ export default function Main() {
 	let [commentId, setCommentId] = useState({})
 	let [commentStop, setCommentStop] = useState(false)
 	let [commentMuted, setCommentMuted] = useState(true)
+	let [Idx, setIdx] = useState('')
 	return (
 		<div className='flex w-full items-start'>
+			<Modal
+				open={open}
+				onClose={handleClose}
+				className='border-none outline-none'
+				aria-labelledby='modal-modal-title'
+				aria-describedby='modal-modal-description'
+			>
+				<Box sx={style}>
+					<div className='flex flex-col lg:flex-row gap-[20px] h-[90vh] bg-[#272727]'>
+						{postById ? (
+							<div className='lg:flex w-full gap-[20px]'>
+								<div className='lg:w-[47%] '>
+									{postById.data?.images?.[0] &&
+										(() => {
+											const el = postById.data.images[0]
+											const mediaUrl = `http://37.27.29.18:8003/images/${el}`
+											return (
+												<div key={el}>
+													<div className=' flex justify-end pr-4'>
+														<button
+															className='cursor-pointer lg:hidden absolute z-10 top-[10px] text-red-500'
+															onClick={() => setOpen(false)}
+														>
+															<X size={30} />
+														</button>
+													</div>
+													{el.endsWith('.mp4') ? (
+														<div>
+															<video
+																ref={videoRef}
+																src={mediaUrl}
+																className='w-full lg:h-[90vh] h-[50vh] object-cover'
+																playsInline
+																autoPlay
+																muted={isMuted}
+																loop
+															/>
+															<div className=' flex justify-end pr-4'>
+																<button
+																	onClick={toggleMute}
+																	className='absolute z-10 mt-[-40px]  text-white'
+																>
+																	{isMuted ? (
+																		<VolumeX size={30} />
+																	) : (
+																		<Volume2 size={30} />
+																	)}
+																</button>
+															</div>
+														</div>
+													) : (
+														<img
+															src={mediaUrl}
+															alt={`Post by ${el.userName}`}
+															className='lg:h-[90vh] h-[50vh]'
+															style={mediaStyleModal}
+														/>
+													)}
+												</div>
+											)
+										})()}
+								</div>
+								<div className='lg:w-[51%] lg:p-[20px] '>
+									<div className='lg:p-0 p-[20px]'>
+										<div className='flex  w-full justify-between pb-[20px]  items-center'>
+											<div className='flex gap-[20px]'>
+												<div>
+													<img
+														src={`http://37.27.29.18:8003/images/${postById.data?.userImage}`}
+														className='w-[40px] h-[40px] rounded-full'
+														alt='test'
+													/>
+												</div>
+												<p
+													onClick={() =>
+														router.push(`/${postById.data?.userId}`)
+													}
+													className='font-medium cursor-pointer  min-w-20 max-w-40 text-[20px] lg:text-[25px] truncate'
+												>
+													{postById.data?.userName}
+												</p>{' '}
+												<br />
+											</div>
+											<button
+												className='px-3 py-1 ml-4 text-sm cursor-pointer text-black bg-white rounded-full'
+												onClick={() => HendlFollow(postById.data?.userId)}
+											>
+												{postById?.data?.isFollowing
+													? 'Вы подписаны'
+													: 'Подписаться'}
+											</button>
+
+											<button
+												className='cursor-pointer lg:block hidden'
+												onClick={() => setOpen(false)}
+											>
+												<X />
+											</button>
+										</div>
+										<div className='overflow-y-auto overflow-x-hidden break-words select-none max-h-[53vh] space-y-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
+											{postById.data?.comments?.length > 0 ? (
+												postById.data.comments.map(comment => (
+													<div
+														key={comment.id}
+														className='flex items-center justify-between'
+													>
+														<div className='flex  gap-3 items-center flex-1 min-w-0'>
+															{comment.userImage ? (
+																<img
+																	src={
+																		comment.userImage
+																			? `http://37.27.29.18:8003/images/${comment.userImage}`
+																			: 'https://via.placeholder.com/40'
+																	}
+																	alt={comment.userName}
+																	className='w-8 h-8 border border-gray-300 rounded-full'
+																/>
+															) : (
+																<div>
+																	<CircleUserRound
+																		className='cursor-pointer'
+																		size={34}
+																		onClick={() =>
+																			router.push(`/${comment.userId}`)
+																		}
+																		color='#ffffff'
+																	/>
+																</div>
+															)}
+															<div className='min-w-120'>
+																<p className='text-[15px]  w-[90%] '>
+																	{comment.comment}
+																</p>
+																{comment.dateCommented && (
+																	<span className='text-[10px] text-gray-400 leading-0 self-end'>
+																		{new Date(
+																			comment.dateCommented
+																		).toLocaleString([], {
+																			year: 'numeric',
+																			month: '2-digit',
+																			day: '2-digit',
+																			hour: '2-digit',
+																			minute: '2-digit',
+																		})}
+																	</span>
+																)}
+															</div>
+														</div>
+														{comment.userId == useUserId() ? (
+															<div className='flex gap-[10px]'>
+																<button
+																	className='cursor-pointer hover:text-red-500'
+																	onClick={() =>
+																		RemoveComit(comment.postCommentId)
+																	}
+																>
+																	<X />
+																</button>
+																<Heart
+																	className='cursor-pointer'
+																	onClick={() =>
+																		handleLikeComment(comment.postCommentId)
+																	}
+																	size={20}
+																	color='#ffffff'
+																	fill={
+																		likedComments[comment.postCommentId]
+																			? 'red'
+																			: 'nane'
+																	}
+																	stroke={
+																		likedComments[comment.postCommentId]
+																			? 'red'
+																			: 'white'
+																	}
+																/>
+															</div>
+														) : (
+															<Heart
+																className='cursor-pointer'
+																onClick={() =>
+																	handleLikeComment(comment.postCommentId)
+																}
+																size={20}
+																color='#ffffff'
+																fill={
+																	likedComments[comment.postCommentId]
+																		? 'red'
+																		: 'none'
+																}
+																stroke={
+																	likedComments[comment.postCommentId]
+																		? 'red'
+																		: 'white'
+																}
+															/>
+														)}
+													</div>
+												))
+											) : (
+												<p className='text-gray-400'>Нет комментариев</p>
+											)}
+										</div>
+									</div>
+
+									<div className='border-t fixed bottom-0 bg-[#272727] h-[120px] z-10 lg:w-[47%] w-[100%] lg:p-0 p-[20px] mt-[300px] pt-[10px]'>
+										<div className='flex justify-between mb-2 pt-[10px]'>
+											<div className='flex gap-4'>
+												<button
+													onClick={async () =>
+														await likePost(postById.data?.postId)
+													}
+													className='cursor-pointer'
+												>
+													<Heart
+														size={24}
+														color='#ffffff'
+														fill={postById.data?.postLike ? 'red' : 'none'}
+														stroke={postById.data?.postLike ? 'red' : 'white'}
+													/>
+												</button>
+												<MessageCircleMore size={24} color='#ffffff' />
+
+												<div>
+													<ModalUsers
+														media={postById?.data?.images?.[0]}
+														postId={postById.data?.postId}
+													/>
+												</div>
+											</div>
+											<button
+												onClick={() => {
+													postSaved(postById.data?.postId)
+													// AddwishLix(postById.data?.postId);
+												}}
+											>
+												<Bookmark
+													fill={postById.data?.postFavorite ? 'white' : 'none'}
+													size={24}
+													color='#ffffff'
+												/>
+											</button>
+										</div>
+
+										<div className='mb-2'>
+											<span className='font-bold'>
+												{postById.data?.postLikeCount} отметок "Нравится"
+											</span>
+										</div>
+
+										<div className='flex gap-2'>
+											<CommentInput
+												value2={newcomit}
+												onChange2={e => setnewComit(e.target.value)}
+											/>
+											<button
+												onClick={handleAddComment}
+												disabled={!newcomit.trim()}
+												className='text-blue-500 disabled:text-gray-500'
+											>
+												<SendHorizontal size={24} />
+											</button>
+										</div>
+									</div>
+								</div>
+							</div>
+						) : (
+							<div>
+								<p>Загрузка...</p>
+							</div>
+						)}
+					</div>
+				</Box>
+			</Modal>
 			{stories && (
 				<section className='fixed inset-0 p-[20px] w-[100%] z-[20] h-[100vh] bg-white'>
 					<svg
@@ -144,7 +578,7 @@ export default function Main() {
 					</svg>
 				</div>
 			)}
-			{comments && <Commentory />}
+			{comments && <Commentory UserId={Idx} />}
 			<div className='md:px-[11%] px-[10px] pt-[40px] w-[100%] md:w-[70%]'>
 				<div
 					ref={scrollRef}
@@ -184,8 +618,12 @@ export default function Main() {
 									<div className='flex items-end'>
 										<div
 											onClick={() => {
-												setIdUser(i)
-												setStories(!stories)
+												if (e.stories.length > 0) {
+													setIdUser(i)
+													setStories(!stories)
+												} else {
+													setComments(true)
+												}
 											}}
 											key={e.id || `story-${i}`}
 											className='size-[80px] flex flex-col items-center'
@@ -227,8 +665,11 @@ export default function Main() {
 											<div
 												onClick={() => {
 													setComments(true)
+													setIdx(e.userId)
 												}}
-												className='bg-white ml-[50px] mb-[10px] flex items-center justify-center p-[2px] rounded-full absolute'
+												className={`${
+													theme == 'light' ? 'bg-white' : 'bg-black'
+												} ml-[50px] mb-[10px] flex items-center justify-center p-[2px] rounded-full absolute`}
 											>
 												<button className='w-[22px] h-[22px] bg-[#3697EB] rounded-full text-white p-[5px] text-center flex items-center justify-center text-[23px]'>
 													+
@@ -417,7 +858,11 @@ export default function Main() {
 												)) || (
 													<div
 														onClick={() => {
-															setIdUser(i)
+															data?.forEach((e2, i4) => {
+																if (e2.userId === e.userId) {
+																	setIdUser(i4)
+																}
+															})
 															setStories(!stories)
 														}}
 														className='rounded-full size-[42px] p-[0.1px] flex items-center justify-center'
@@ -456,7 +901,7 @@ export default function Main() {
 												</Link>
 											</div>
 										</div>
-										{e.images[0].endsWith('.mp4') ? (
+										{e.images[0]?.endsWith('.mp4') ? (
 											<div className='flex bg-black justify-end items-baseline-last'>
 												<svg
 													className={`md:my-[18%] my-[70%] mx-[38%] md:mx-[16%] ${
@@ -480,7 +925,7 @@ export default function Main() {
 													loop
 													playsInline
 													onClick={() => toggleStop(e.postId)}
-													className='h-[85vh] m-auto'
+													className='h-[90vh] m-auto'
 												/>
 												<svg
 													className={`absolute mb-[10px]  ${
@@ -582,7 +1027,7 @@ export default function Main() {
 															'--swiper-pagination-color': '#ffffff',
 														}}
 														modules={[Pagination, Keyboard]}
-														className='w-full h-[70vh] rounded-xl overflow-hidden'
+														className='w-full h-[70vh] overflow-hidden'
 													>
 														{e.images.map((e, i) => (
 															<SwiperSlide key={i}>
@@ -603,7 +1048,7 @@ export default function Main() {
 											</>
 										)}
 										<div className='flex items-center py-[16px] justify-between'>
-											<div className='flex items-start w-[120px] justify-between'>
+											<div className='flex items-start w-[120px] gap-[10px]'>
 												<button
 													onClick={async () => {
 														await likePost(e.postId)
@@ -613,56 +1058,23 @@ export default function Main() {
 												>
 													<Heart
 														fill={e.postLike ? 'red' : 'none'}
-														stroke={e.postLike ? 'red' : 'black'}
+														stroke={
+															e.postLike
+																? 'red'
+																: theme == 'dark'
+																? 'white'
+																: 'black'
+														}
 													/>
 												</button>
-												<svg
-													xmlns='http://www.w3.org/2000/svg'
-													width='24'
-													height='24'
-													viewBox='0 0 24 24'
-													fill='none'
-												>
-													<g clipPath='url(#clip0_6_3270)'>
-														<path
-															d='M12 2C17.523 2 22 6.477 22 12C22 17.523 17.523 22 12 22C10.1782 22.0028 8.39054 21.5054 6.83201 20.562L3.80001 21.454C3.62593 21.5052 3.44126 21.5086 3.26543 21.4638C3.08959 21.4189 2.92908 21.3276 2.80077 21.1992C2.67246 21.0709 2.58108 20.9104 2.53625 20.7346C2.49142 20.5587 2.49479 20.3741 2.54601 20.2L3.43801 17.168C2.49497 15.6093 1.99759 13.8218 2.00001 12C2.00001 6.477 6.47701 2 12 2ZM12 4C10.5676 3.99974 9.16147 4.38406 7.92834 5.11281C6.69521 5.84157 5.68036 6.88804 4.98977 8.14294C4.29918 9.39784 3.95817 10.8151 4.00237 12.2468C4.04656 13.6785 4.47433 15.0721 5.24101 16.282C5.46801 16.639 5.54601 17.089 5.41801 17.522L4.97701 19.023L6.47801 18.582C6.91101 18.454 7.36101 18.532 7.71801 18.759C8.76634 19.4228 9.9547 19.8336 11.1892 19.959C12.4236 20.0844 13.6703 19.921 14.8307 19.4816C15.9911 19.0422 17.0334 18.3389 17.8752 17.4273C18.717 16.5157 19.3352 15.4208 19.6809 14.2291C20.0266 13.0374 20.0904 11.7817 19.8673 10.5611C19.6441 9.34053 19.14 8.1886 18.395 7.19638C17.65 6.20415 16.6843 5.39883 15.5744 4.84408C14.4645 4.28933 13.2408 4.00036 12 4Z'
-															fill='#1E293B'
-														/>
-													</g>
-													<defs>
-														<clipPath id='clip0_6_3270'>
-															<rect width='24' height='24' fill='white' />
-														</clipPath>
-													</defs>
-												</svg>
-												<div className='group cursor-pointer inline-block'>
-													<svg
-														xmlns='http://www.w3.org/2000/svg'
-														width={24}
-														height={24}
-														viewBox='0 0 24 24'
-														fill='none'
-														strokeWidth='2'
-														strokeLinecap='round'
-														strokeLinejoin='round'
-													>
-														<polygon
-															points='2,9 11,13 22,2'
-															className='transition-colors duration-200 fill-transparent group-hover:fill-gray-700'
-														/>
-														<polygon
-															points='11,13 15,22 22,2'
-															className='transition-colors duration-200 fill-transparent group-hover:fill-gray-500'
-														/>
-														<path
-															d='M22 2L11 13'
-															className='transition-colors duration-200 stroke-[#1E293B] group-hover:stroke-transparent'
-														/>
-														<path
-															d='M22 2L15 22L11 13L2 9L22 2Z'
-															className='transition-colors duration-200 stroke-[#1E293B] group-hover:stroke-transparent'
-														/>
-													</svg>
+												<MessageCircleMore
+													onClick={() => handleOpen(e.postId)}
+												/>
+												<div>
+													<ModalUsers
+														media={e?.images?.[0]}
+														postId={e?.postId}
+													/>
 												</div>
 											</div>
 											<button
@@ -734,77 +1146,6 @@ export default function Main() {
 													)}
 												</div>
 											)}
-											{e.commentCount != 0 && (
-												<p
-													onClick={toggleComments}
-													className='text-[#94A3B8] text-[14px] hover:underline font-[400]'
-												>
-													{comments ? 'Vie' : 'Close'} all {e.commentCount}{' '}
-													comments
-												</p>
-											)}
-											{!comments && (
-												<div className='flex flex-col overflow-y-auto h-[150px] gap-[4px]'>
-													{e.comments.map((com, index) => {
-														return (
-															<div
-																key={com.id || index}
-																className='flex flex-col gap-[10px] w-full'
-															>
-																<div className='flex items-center gap-[7px]'>
-																	{(e.userImage == '' && (
-																		<Image
-																			draggable={false}
-																			className='object-cover bg-white rounded-full p-[2.5px]'
-																			src={userIMG}
-																			alt=''
-																			width={34}
-																			height={34}
-																		/>
-																	)) || (
-																		<Image
-																			draggable={false}
-																			className='w-[34px] h-[34px]  object-cover bg-white rounded-full p-[2.5px]'
-																			src={`http://37.27.29.18:8003/images/${com.userImage}`}
-																			alt=''
-																			width={34}
-																			height={34}
-																		/>
-																	)}
-																	<p className='text-[14px] font-[600]'>
-																		{com.userName}
-																	</p>
-																</div>
-																<p className='ml-[10px] text-[14px] font-[400]'>
-																	{com.comment}
-																</p>
-															</div>
-														)
-													})}
-												</div>
-											)}
-											<div className='flex w-[100%] items-center justify-between'>
-												<input
-													type='text'
-													value={comment}
-													onChange={e => setComment(e.target.value)}
-													className='w-[90%] outline-none text-black text-[15px] placeholder:text-[16px]'
-													placeholder='Add a comment...'
-												/>
-												<p
-													onClick={async () => {
-														await commentPost({
-															comment: comment,
-															postId: e.postId,
-														})
-														setComment('')
-														toggleComments()
-													}}
-													className='hover:underline text-[16px] text-[#64748B]'
-												>
-													public
-												</p>
-											</div>
 										</div>
 									</div>
 								)
@@ -819,7 +1160,6 @@ export default function Main() {
 						Array.from({ length: 1 }).map((_, i) => (
 							<div
 								key={`skeleton-${i}`}
-								F
 								className='flex gap-[8px] items-center px-[3px]'
 							>
 								<Skeleton
@@ -911,9 +1251,9 @@ export default function Main() {
 								</Link>
 								<button
 									onClick={() => followUser(e.id)}
-									className='px-3 py-1 ml-4 text-sm text-black bg-white rounded-full'
+									className='px-4 h-[30px] text-[16px] font-[600] text-blue-600 ml-4 text-sm hover:text-blue-500 active:text-blue-400 bg-white rounded-full'
 								>
-									{e.isSubscriber ? 'Вы подписаны' : 'Подписаться'}
+									Follow
 								</button>
 							</div>
 						)
