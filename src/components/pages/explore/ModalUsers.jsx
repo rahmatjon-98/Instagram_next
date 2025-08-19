@@ -70,7 +70,7 @@ const ModalUsers = ({ media }) => {
         </Stack>
     );
 
-    async function handleCreateChat(id) {
+     async function handleCreateChat(id) {
         try {
             setIdx(id);
 
@@ -80,27 +80,20 @@ const ModalUsers = ({ media }) => {
             const chat = useDefaultChat
                 .getState()
                 .chats?.data?.find(
-                    (e) => e.receiveUserId === id || e.sendUserId === id
+                     (e) => e.receiveUserId === id || e.sendUserId === id
                 );
 
             if (chat?.chatId) {
                 if (media) {
                     const formData = new FormData();
                     formData.append("chatId", chat.chatId);
-
-                    // Если это строка → это просто текст
-                    if (typeof media === "string") {
-                        formData.append("MessageText", media);
-                    }
-                    // Если это файл (image/video) → прикладываем как файл
-                    else if (media instanceof File) {
-                        formData.append("file", media);
-                    }
+                    formData.append("MessageText", media) 
+                      formData.append("file", media) 
 
                     await sendMessage(formData);
-                    console.log(formData);
-                    
                 }
+                console.log(media);
+                
 
                 setOpenModalUsers(false);
             } else {
@@ -112,7 +105,6 @@ const ModalUsers = ({ media }) => {
             console.error("Error creating chat:", error);
         }
     }
-
 
     return (
         <div>
@@ -217,10 +209,11 @@ const ModalUsers = ({ media }) => {
                                                     : e.receiveUserImage) ? (
                                                     <Image
                                                         alt=""
-                                                        src={`http://37.27.29.18:8003/images/${e.receiveUserId === userId
+                                                        src={`http://37.27.29.18:8003/images/${
+                                                            e.receiveUserId === userId
                                                                 ? e.sendUserImage
                                                                 : e.receiveUserImage
-                                                            }`}
+                                                        }`}
                                                         width={40}
                                                         height={40}
                                                         className="w-10 h-10 rounded-full object-cover object-center"
