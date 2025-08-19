@@ -9,20 +9,6 @@ import Box from "@mui/material/Box";
 import { Typography } from "@mui/material";
 import Link from "next/link";
 
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "88%",
-  transform: "translate(-50%, -50%)",
-  width: 330,
-  bgcolor: "white",
-  borderRadius: "12px",
-  boxShadow: 24,
-  p: 2,
-  maxHeight: "80vh",
-  overflowY: "auto",
-};
-
 const Reels = () => {
   const [rellIdx, setRellIdx] = useState(0);
   const [fullText, setFullText] = useState({});
@@ -30,6 +16,7 @@ const Reels = () => {
   const [isMuted, setIsMuted] = useState(true);
   const [open, setOpen] = useState(false);
   const [newComment, setNewComment] = useState("");
+  const [isMobile, setIsMobile] = useState(false); 
   const videoRef = useRef(null);
 
   const {
@@ -44,24 +31,62 @@ const Reels = () => {
     currentUserId,
   } = useRealsStore();
 
-  // Мемоизацияи currentReel барои пешгирии рендери такрорӣ
   const currentReel = useMemo(() => rels[rellIdx] || {}, [rels, rellIdx]);
 
-  // Боркунии рилсҳо як маротиба
+  const modalStyle = useMemo(
+    () => ({
+      position: "absolute",
+      top: "50%",
+      left: isMobile ? "50%" : "88%", 
+      transform: "translate(-50%, -50%)",
+      width: isMobile ? "90%" : 330,
+      bgcolor: "white",
+      borderRadius: "12px",
+      boxShadow: 24,
+      p: 2,
+      maxHeight: "80vh",
+      overflowY: "auto",
+    }),
+    [isMobile]
+  );
+
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 640); 
+      console.log("Реҷаи экран:", window.innerWidth < 640 ? "Мобилӣ" : "Ноутбук");
+    };
+
+    handleResize(); 
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  
   useEffect(() => {
     if (rels.length === 0) {
       getRels();
     }
   }, [getRels, rels.length]);
 
-  // Идораи видео танҳо ҳангоми тағйири rellIdx ё images
   useEffect(() => {
     const video = videoRef.current;
     if (video && currentReel?.images) {
       video.src = `http://37.27.29.18:8003/images/${currentReel.images}`;
       video.load();
+      setIsPlay(true);
+      video.play().catch((err) => {
+        console.error("Хатои бозӣ:", err);
+        setIsPlay(false);
+      });
+    }
+  }, [currentReel.images, rellIdx]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (video) {
       if (isPlay) {
-        video.play().then(() => setIsPlay(true)).catch((err) => {
+        video.play().catch((err) => {
           console.error("Хатои бозӣ:", err);
           setIsPlay(false);
         });
@@ -69,9 +94,8 @@ const Reels = () => {
         video.pause();
       }
     }
-  }, [currentReel.images, rellIdx, isPlay]);
+  }, [isPlay]);
 
-  // Гузариш бо ArrowUp/ArrowDown
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.key === "ArrowDown") {
@@ -89,18 +113,10 @@ const Reels = () => {
   }, [rels.length]);
 
   const togglePlayPause = useCallback(() => {
-    const video = videoRef.current;
-    if (video) {
-      if (video.paused) {
-        video.play().then(() => setIsPlay(true)).catch((err) => {
-          console.error("Хатои бозӣ:", err);
-          setIsPlay(false);
-        });
-      } else {
-        video.pause();
-        setIsPlay(false);
-      }
-    }
+    setIsPlay((prev) => {
+      console.log("Play/Pause тағйир ёфт:", !prev);
+      return !prev;
+    });
   }, []);
 
   const toggleMute = useCallback(() => {
@@ -108,6 +124,7 @@ const Reels = () => {
     if (video) {
       video.muted = !video.muted;
       setIsMuted(video.muted);
+      console.log("Mute тағйир ёфт:", video.muted);
     }
   }, []);
 
@@ -136,15 +153,14 @@ const Reels = () => {
     }
   }, [newComment, currentReel.postId, addNewComent]);
 
-  // Тасдиқи postFavorite дар консол барои тафтиш
   useEffect(() => {
     console.log("Current postFavorite:", currentReel.postFavorite);
   }, [currentReel.postFavorite]);
 
   return (
-    <div className="w-[40%] h-screen overflow-hidden m-auto flex justify-center items-center">
+    <div className="w-[97%] m-auto sm:w-[40%] h-screen overflow-hidden sm:m-auto flex justify-center items-center">
       <Modal open={open} onClose={handleClose}>
-        <Box sx={style}>
+        <Box sx={modalStyle}>
           <div className="flex items-center justify-between p-4 border-b border-gray-200">
             <Typography className="text-lg font-semibold text-gray-800">Комментарии</Typography>
             <button onClick={handleClose} className="text-gray-500 hover:text-gray-700">
@@ -254,10 +270,12 @@ const Reels = () => {
               </button>
             </div>
             <div className="flex flex-col items-center">
-              <button onClick={() => {
-                postSaved(currentReel.postId);
-                console.log("Bookmark клик шуд, postId:", currentReel.postId);
-              }}>
+              <button
+                onClick={() => {
+                  postSaved(currentReel.postId);
+                  console.log("Bookmark клик шуд, postId:", currentReel.postId);
+                }}
+              >
                 <Bookmark
                   fill={currentReel.postFavorite ? "white" : "none"}
                   stroke="white"
@@ -266,11 +284,13 @@ const Reels = () => {
               </button>
             </div>
             <div className="flex mt-[5px] flex-col items-center">
-              <button onClick={togglePlayPause}>{isPlay ? <Pause /> : <Play />}</button>
+              <button onClick={togglePlayPause}>
+                {isPlay ? <Pause /> : <Play />}
+              </button>
             </div>
           </div>
 
-          <div className="absolute bottom-4 left-5 text-white z-10 w-[90%] flex flex-col items-start gap-[10px]">
+          <div className="absolute bottom-15 sm:bottom-4 left-5 text-white z-10 w-[90%] flex flex-col items-start gap-[10px]">
             <div className="flex items-center mb-2">
               <Link href={`/${currentReel.userId}`}>
                 <img

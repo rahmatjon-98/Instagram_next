@@ -16,12 +16,54 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, {
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+  useLayoutEffect,
+} from "react";
 import EmojiPicker from "emoji-picker-react";
 import Link from "next/link";
 import useDarkSide from "@/hook/useDarkSide";
+import PeerCall from "@/components/pages/chat/pages/chat-by-id/PeerCall";
 
 export default function ChatById() {
+  const { "chat-by-id": id } = useParams();
+  const userId = useUserId();
+
+  const {
+    messages,
+    deleteChat,
+    getChatById,
+    sendMessage,
+    deleteMessage,
+    loadingDelChat,
+  } = useChatById();
+
+  const messagesContainerRef = useRef(null);
+  const prevMessagesCount = useRef(0);
+
+  const scrollToBottom = () => {
+    const container = messagesContainerRef.current;
+    if (!container) return;
+    container.scrollTop = container.scrollHeight;
+  };
+
+  useEffect(() => {
+    if (!messages) return;
+
+    if (prevMessagesCount.current === 0) {
+      scrollToBottom();
+    }
+
+    if (messages.length > prevMessagesCount.current) {
+      scrollToBottom();
+    }
+
+    prevMessagesCount.current = messages.length;
+  }, [messages]);
+
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleDrawer = (open) => (event) => {
@@ -35,21 +77,7 @@ export default function ChatById() {
     setIsOpen(open);
   };
 
-  const { "chat-by-id": id } = useParams();
-  const userId = useUserId();
-
-  const {
-    messages,
-    deleteChat,
-    getChatById,
-    sendMessage,
-    deleteMessage,
-    loadingDelChat,
-  } = useChatById();
-
   const { chats, get, loadingChat } = useDefaultChat();
-
-  const [profilId, setprofilId] = useState(null);
 
   const intervalRef = useRef(null);
   const pollingInProgressRef = useRef(false);
@@ -59,7 +87,6 @@ export default function ChatById() {
     intervalRef.current = setInterval(async () => {
       if (!id) return;
       if (pollingInProgressRef.current) return;
-
       try {
         pollingInProgressRef.current = true;
         await getChatById(id);
@@ -68,7 +95,7 @@ export default function ChatById() {
       } finally {
         pollingInProgressRef.current = false;
       }
-    }, 2000);
+    }, 3000);
   }, [id, getChatById]);
 
   const stopPolling = useCallback(() => {
@@ -93,7 +120,13 @@ export default function ChatById() {
   const [inpFile, setinpFile] = useState(null);
   const [openImg, setOpenImg] = useState(null);
   const [openIsVideo, setOpenIsVideo] = useState(false);
+  const [openIsAudio, setOpenIsAudio] = useState(false);
   const [delMesModal, setdelMesModal] = useState(null);
+
+  const [recording, setRecording] = useState(false);
+  const [mediaRecorder, setMediaRecorder] = useState(null);
+  const [audioChunks, setAudioChunks] = useState([]);
+  const [mediaStream, setMediaStream] = useState(null);
 
   useEffect(() => {
     return () => {
@@ -129,6 +162,13 @@ export default function ChatById() {
   const isVideoFileName = (name) =>
     /\.(mp4|webm|ogg|mov)$/i.test(String(name || ""));
 
+  const isImageFileName = (name) =>
+  /\.(jpg|jpeg|png|gif|bmp|webp|svg)$/i.test(String(name || ""));
+
+
+  const isAudioFileName = (name) =>
+    /\.(mp3|wav|ogg|m4a)$/i.test(String(name || ""));
+
   const handleFile = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -143,6 +183,7 @@ export default function ChatById() {
     const objectUrl = URL.createObjectURL(file);
     setOpenImg(objectUrl);
     setOpenIsVideo(isVideoFileName(file.name));
+    setOpenIsAudio(isAudioFileName(file.name));
   };
 
   const [loading, setLoading] = useState(false);
@@ -201,6 +242,55 @@ export default function ChatById() {
   let [openEmoji, setOpenEmoji] = useState(false);
 
   let userData = chats?.data?.find((e) => e.chatId == id);
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      setMediaStream(stream);
+
+      const recorder = new MediaRecorder(stream);
+      const chunks = [];
+
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) {
+          chunks.push(e.data);
+        }
+      };
+
+      recorder.onstop = () => {
+        const audioBlob = new Blob(chunks, { type: "audio/webm" });
+        const audioFile = new File([audioBlob], "recording.webm", {
+          type: "audio/webm",
+        });
+
+        setinpFile(audioFile);
+        setOpenImg(URL.createObjectURL(audioBlob));
+        setOpenIsAudio(true);
+
+        stream.getTracks().forEach((track) => track.stop());
+        setMediaStream(null);
+      };
+
+      recorder.start();
+      setMediaRecorder(recorder);
+      setAudioChunks(chunks);
+      setRecording(true);
+    } catch (err) {
+      console.error("Ошибка доступа к микрофону:", err);
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorder) {
+      mediaRecorder.stop();
+      setRecording(false);
+
+      if (mediaStream) {
+        mediaStream.getTracks().forEach((track) => track.stop());
+        setMediaStream(null);
+      }
+    }
+  };
 
   const SkeletonRow = () => (
     <Stack
@@ -330,22 +420,36 @@ export default function ChatById() {
           )}
         </div>
 
-        <Button onClick={toggleDrawer(true)}>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="size-6"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
-            />
-          </svg>
-        </Button>
+        <div>
+          {/* <div>
+            {userData && (
+              <PeerCall
+                myId={userId}
+                herId={
+                  userData?.receiveUserId === userId
+                    ? userData.sendUserImage
+                    : userData.receiveUserImage
+                }
+              />
+            )}
+          </div> */}
+          <Button onClick={toggleDrawer(true)}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="size-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
+              />
+            </svg>
+          </Button>
+        </div>
       </div>
 
       <Drawer anchor="right" open={isOpen} onClose={toggleDrawer(false)}>
@@ -368,7 +472,10 @@ export default function ChatById() {
         </Box>
       </Drawer>
 
-      <div className="w-full mx-auto p-4 h-[76vh] overflow-y-auto gap-2 hidscrol">
+      <div
+        ref={messagesContainerRef}
+        className="flex flex-col gap-2 overflow-y-auto h-[76vh]"
+      >
         {loadingDelChat ? (
           <SkeletonChat />
         ) : (
@@ -430,10 +537,12 @@ export default function ChatById() {
                 <SkeletonRow />
               )}
             </div>
-            <div className=" flex flex-col-reverse">
+            <div ref={messagesContainerRef} className=" flex flex-col">
               {messages &&
-                messages.map((e) => {
+                [...messages].reverse().map((e) => {
                   const isCurrentUser = e.userId === userId;
+
+                  console.log(e.messageText);
                   return (
                     <div
                       key={e.messageId}
@@ -449,74 +558,82 @@ export default function ChatById() {
                         }`}
                       >
                         {e.file && isVideoFileName(e.file) ? (
-                          <div
-                            className={` ${
-                              isCurrentUser ? " self-end" : " self-start "
-                            }`}
-                          >
-                            <video
-                              src={`http://37.27.29.18:8003/images/${e.file}`}
-                              controls
-                              preload="metadata"
-                              playsInline
-                              className="pb-2 rounded-xl"
-                              style={{ width: "100%", height: "auto" }}
-                            />
-                          </div>
+                          <video
+                            src={`http://37.27.29.18:8003/images/${e.file}`}
+                            controls
+                            className="pb-2 rounded-xl  max-w-xs"
+                          />
+                        ) : e.file && isAudioFileName(e.file) ? (
+                          <audio
+                            src={`http://37.27.29.18:8003/images/${e.file}`}
+                            controls
+                            className="pb-2  max-w-xs"
+                          />
                         ) : e.file ? (
-                          <div
-                            className={` ${
-                              isCurrentUser ? " self-end" : " self-start "
-                            }`}
-                          >
-                            <Image
-                              src={`http://37.27.29.18:8003/images/${e.file}`}
-                              alt="image"
-                              width={1000}
-                              height={1000}
-                              className="pb-2 rounded-xl"
-                              priority
-                              style={{
-                                width: "100%",
-                                height: "auto",
-                              }}
-                            />
-                          </div>
-                        ) : null}
+                          <Image
+                            src={`http://37.27.29.18:8003/images/${e.file}`}
+                            alt="image"
+                            width={1000}
+                            height={1000}
+                            className="pb-2 rounded-xl  max-w-xs"
+                          />
+                        ) : (
+                          ""
+                        )}
 
-                        <div
-                          className={`rounded-lg  ${
-                            isCurrentUser
-                              ? "bg-blue-500 text-white self-end rounded-tr-none p-1.5 px-3"
-                              : "bg-gray-100 text-[#475569] self-start rounded-tl-none p-1.5 px-3"
-                          }`}
-                        >
-                          <p className="">{e.messageText}</p>
-                          <span
-                            className={`text-[10px] self-end ${
-                              isCurrentUser ? "text-gray-200" : "text-gray-700"
-                            }`}
-                          >
-                            {formatMessageTime(e.sendMassageDate)}
-                          </span>
-                        </div>
+                        {e.messageText &&
+                          (isVideoFileName(e.messageText) ? (
+                            <video
+                              src={`http://37.27.29.18:8003/images/${e.messageText}`}
+                              controls
+                              className="pb-2 rounded-xl max-w-xs"
+                            />
+                          ) : e.messageText && isImageFileName(e.messageText) ? (
+                            <img
+                              src={`http://37.27.29.18:8003/images/${e.messageText}`}
+                              alt="media"
+                              className="pb-2 rounded-xl max-w-xs"
+                            />
+                          ) : (
+                            <div
+                              className={`rounded-lg  ${
+                                isCurrentUser
+                                  ? "bg-blue-500 text-white self-end rounded-tr-none p-1.5 px-3"
+                                  : "bg-gray-100 text-[#475569] self-start rounded-tl-none p-1.5 px-3"
+                              }`}
+                            >
+                              <p>{e.messageText}</p>
+
+                              <span
+                                className={`text-[10px] self-end ${
+                                  isCurrentUser
+                                    ? "text-gray-200"
+                                    : "text-gray-700"
+                                }`}
+                              >
+                                {formatMessageTime(e.sendMassageDate)}
+                              </span>
+                            </div>
+                          ))}
                       </div>
 
                       <div className="relative">
                         <button
                           type="button"
                           onClick={() => toggleDelModal(e.messageId)}
-                          className={`hidden group-hover:block ${
+                          className={` ${
                             delMesModal === e.messageId ? "block" : ""
                           }`}
                         >
-                          <EllipsisVertical />
+                          <EllipsisVertical size={15} />
                         </button>
 
                         {delMesModal === e.messageId && (
                           <div
                             className={`absolute flex flex-col justify-center items-center gap-2 shadow rounded bg-white w-[200px] ${
-                              isCurrentUser ? "lg:-ml-60 lg:-mt-30 -mx-20 -mt-32 " : "lg:ml-5 lg:-mt-30  -mx-10 -mt-32"
+                              isCurrentUser
+                                ? "lg:-ml-60 lg:-mt-30 -mx-20 -mt-32 "
+                                : "lg:ml-5 lg:-mt-30  -mx-10 -mt-32"
                             }`}
                           >
                             <button
@@ -591,14 +708,24 @@ export default function ChatById() {
 
           {!inpMessage ? (
             <div className="flex items-center gap-2">
-              <Mic />
+              <button
+                type="button"
+                onClick={recording ? stopRecording : startRecording}
+                className={`p-2 rounded-full ${
+                  recording ? "bg-red-500 text-white animate-pulse" : ""
+                }`}
+              >
+                <Mic />
+              </button>
+
               <label className="cursor-pointer flex items-center gap-2">
                 <input
                   type="file"
                   className="hidden"
-                  accept="image/*,video/*"
+                  accept="image/*,video/*,audio/*"
                   onChange={handleFile}
                 />
+
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -640,16 +767,15 @@ export default function ChatById() {
                 <video
                   src={openImg}
                   controls
-                  preload="metadata"
                   className="max-h-64 mx-auto mb-4"
-                  style={{ width: "100%", height: "auto" }}
                 />
+              ) : openIsAudio ? (
+                <audio src={openImg} controls className="w-full mb-4" />
               ) : (
                 <img
                   src={openImg}
                   alt="preview"
                   className="max-h-64 mx-auto mb-4"
-                  style={{ width: "auto", height: "auto", maxWidth: "100%" }}
                 />
               )}
 
