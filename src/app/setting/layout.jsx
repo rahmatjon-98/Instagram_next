@@ -241,12 +241,13 @@ const LayoutSet = ({ children }) => {
 
             {open && (
                 <div
-                    className="fixed inset-0 bg-white  bg-opacity-30 z-40 md:hidden"
+                    className="fixed inset-0 bg-white bg-opacity-30 z-10 md:hidden"
                     onClick={() => setOpen(false)}
                 ></div>
             )}
 
-            <div className="md:hidden fixed top-0 p-2  w-full left-4 z-50">
+
+            <div className="md:hidden fixed top-0 p-2 bg-white w-full left-4 z-50">
                 <button onClick={() => setOpen(true)}>
                     <Menu size={28} />
                 </button>
