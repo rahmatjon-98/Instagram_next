@@ -59,7 +59,9 @@
     "comment": "Comments",
     "follow": "Followed",
     "like": "Like",
-    "answer": "To answer"
+    "answer": "To answer",
+    "unfollow": "Unfollow",
+    "followback": "Follow"
   },
 
   "setting": {

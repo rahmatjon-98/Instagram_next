@@ -59,9 +59,11 @@
     "comment": "Комментарияхо",
     "follow": "Обуна шуд",
     "like": "Лайк",
-    "answer": "Чавоб"
+    "answer": "Чавоб",
+    "unfollow": "Гайриобуна",
+    "followback": "Обуна"
   },
-  
+
   "setting": {
     "settings": "Танзимот",
     "center": "Маркази ҳисобҳо",
