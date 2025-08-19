@@ -65,14 +65,13 @@ const style2 = {
 }
 
 const Layout = ({ children }) => {
-	let { user: userer, getProfileData, getUserById } = useProfileStore()
+	let { user: userer, getProfileData } = useProfileStore()
 	// let { posts, getPosts } = useProfileStore()
 
 	let router = useRouter()
 	let pathname = usePathname()
 
 	const isMobile = useMediaQuery('(max-width:768px)')
-	// const [mounted, setMounted] = useState(false)
 
 	const myUserId = useUserId()
 
@@ -99,6 +98,31 @@ const Layout = ({ children }) => {
 		outline: '0',
 	}
 
+	const style = {
+		position: 'absolute',
+		top: '50%',
+		left: '50%',
+		transform: 'translate(-50%, -50%)',
+		width: isMobile ? 270 : 550,
+		height: 400,
+		bgcolor: 'background.paper',
+		border: 'none',
+		boxShadow: 24,
+		borderRadius: '20px',
+	}
+
+	const style2 = {
+		width: isMobile ? 270 : 600,
+		position: 'absolute',
+		top: '50%',
+		left: '50%',
+		transform: 'translate(-50%, -50%)',
+		bgcolor: 'background.paper',
+		border: 'none',
+		boxShadow: 24,
+		borderRadius: '20px',
+	}
+
 	const [openI, setOpenI] = React.useState(false)
 	const handleIOpen = () => setOpenI(true)
 	const handleIClose = () => setOpenI(false)
@@ -108,7 +132,7 @@ const Layout = ({ children }) => {
 		router.push('/login')
 		toast('Logged out!')
 	}
-	
+
 	const getProfileById = useProfileByIdStore(state => state.getProfileById)
 	const users = useProfileByIdStore(state => state.users)
 	const [open, setOpen] = useState(false)
@@ -131,30 +155,8 @@ const Layout = ({ children }) => {
 
 	const { users: infoUsers, getUsers } = usegetUserStore()
 
-	const {
-		getChats,
-		followers,
-		getFollowers,
-		getFollowings,
-		followings,
-	} = useProfileByIdStore()
-
-	// let getId = infoUsers?.data?.find(e => e.id === profileId)?.id
-
-	// async function createChat() {
-	// 	await addChats(getId)
-	// 	await getChats()
-
-	// 	const chat = useProfileByIdStore
-	// 		.getState()
-	// 		.chats?.data?.find(e => e.receiveUserName === user.userName)
-
-	// 	if (chat?.chatId) {
-	// 		router.push(`/chats/${chat.chatId}`)
-	// 	} else {
-	// 		console.error('Chat not found for this user')
-	// 	}
-	// }
+	const { getChats, followers, getFollowers, getFollowings, followings } =
+		useProfileByIdStore()
 
 	const SkeletonRow = () => (
 		<Stack direction='row' spacing={2} alignItems='center' className='p-3'>
