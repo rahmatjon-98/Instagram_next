@@ -22,6 +22,7 @@ import FollowFollowings from '@/components/pages/profile/profile-by-id/FollowFol
 import Reel from '../../../public/reelIcon.jpg'
 
 import './style.css'
+import useDarkSide from '@/hook/useDarkSide';
 
 const style = {
 	position: 'absolute',
@@ -56,6 +57,7 @@ const ProfileById = ({ children }) => {
 	const [open, setOpen] = useState(false)
 	const [focused, setFocused] = useState(false)
 	const [loading, setLoading] = useState(false)
+	const [loadings, setLoadings] = useState(false)
 	const [search, setSearch] = useState('')
 	const [filteredUsers, setFilteredUsers] = useState([])
 	const [focused2, setFocused2] = useState(false)
@@ -74,9 +76,11 @@ const ProfileById = ({ children }) => {
 	let pathname = usePathname()
 	const router = useRouter()
 
+	const [theme] = useDarkSide()
+
 	const { users: infoUsers, getUsers } = usegetUserStore()
 
-	const { addChats, getChats, followers, getFollowers, getFollowings, followings } = useProfileByIdStore()
+	const { addChats, getChats, followers, getFollowers, getFollowings, followings, getPosts, posts } = useProfileByIdStore()
 
 	let getId = infoUsers?.data?.find(e => e.id === profileId).id
 
@@ -163,31 +167,85 @@ const ProfileById = ({ children }) => {
 		getUsers()
 	}, [])
 
+	useEffect(() => {
+		setLoadings(true)
+		getProfileById(profileId).finally(() => setLoadings(false))
+	}, [profileId])
+
+	useEffect(() => { if (profileId) getPosts(profileId) }, [profileId, getPosts])
+
+	const video = posts?.data?.map(e => e?.images?.find(media => media.endsWith(".mp4")))
+
 	return (
-		<div className='pl-[8%] p-[8%]'>
-			<section className='flex gap-[20px] '>
-				<div className='hidden md:flex overflow-hidden items-center justify-center w-[100px] md:w-[160px] h-[100px] md:h-[160px] rounded-[50%]'>
-					<Image
-						src={user?.image ? `http://37.27.29.18:8003/images/${user?.image}` : defaultUser}
-						alt='profile picture'
-						width={500}
-						height={500}
-						className='rounded-full'
+		<div className='md:pl-[8%] p-[10px] md:p-[8%]'>
+			<section className="flex justify-start gap-5 md:gap-20 ">
+				{/* <div className='hidden md:flex overflow-hidden items-center justify-center w-[100px] md:w-[160px] h-[100px] md:h-[160px] rounded-[50%]'>
+					
+				</div> */}
+				{loadings ? (
+					<Skeleton
+						variant="circular"
+						width={160}
+						height={160}
+						animation="wave"
 					/>
-				</div>
-				<div className='flex flex-col gap-[20px]'>
-					<div className='flex items-center gap-[40px]'>
-						<h1 onClick={() => setOpenAccountModal(true)}
-							className='font-bold cursor-pointer text-[#1E293B] text-[20px]'>{user?.userName}</h1>
-						<div className='flex items-center gap-[10px]'>
-							<FollowUser />
-							<button onClick={createChat} className='bg-[#F3F4F6] text-[12px] md:text-[14px] font-medium py-[7px] px-4 rounded-lg'>Message</button>
-							<button onClick={() => setOpenSuggest(!openSuggest)} className='bg-[#F3F4F6] text-[12px] md:text-[14px] cursor-pointer font-medium py-[7px] px-3 rounded-lg'>
-								<UserPlusIcon size={18} fill={`${openSuggest ? "black" : "none"}`} />
-							</button>
+				) : (
+					<img
+						src={
+							user?.image
+								? `http://37.27.29.18:8003/images/${user?.image}`
+								: defaultUser
+						}
+						alt="profile picture"
+						// width={150}
+						// height={150}
+						className="rounded-full w-[77px] md:w-[150px] object-cover h-[77px] md:h-[150px]"
+					/>
+				)}
+				<div className="flex flex-col gap-[20px]">
+					<div className="flex items-center gap-[40px]">
+						{loadings ? (
+							<Skeleton variant="text" width={120} height={30} />
+						) : (
+							<h1
+								onClick={() => setOpenAccountModal(true)}
+								className="font-bold cursor-pointer text-[#1E293B] text-[20px]"
+							>
+								{user?.userName}
+							</h1>
+						)}
+						<div className="flex items-center gap-[10px]">
+							{loadings ? (
+								<>
+									<Skeleton variant="rectangular" width={80} height={32} />
+									<Skeleton variant="rectangular" width={80} height={32} />
+								</>
+							) : (
+								<>
+									<div className="flex gap-[10px] items-center">
+										<FollowUser />
+										<button
+											onClick={createChat}
+											className={`${theme == 'dark' ? "bg-[#484848] text-white" : "bg-[#F3F4F6]"} text-[12px] md:block hidden md:text-[14px] font-medium py-[7px] px-4 rounded-lg`}
+										>
+											Message
+										</button>
+									</div>
+									<button
+										onClick={() => setOpenSuggest(!openSuggest)}
+										className={`${theme == 'dark' ? "bg-[#484848] text-white" : "bg-[#F3F4F6]"} text-[12px] md:text-[14px] font-medium py-[7px] px-4 rounded-lg`}
+									>
+										<UserPlusIcon
+											size={18}
+											fill={`${openSuggest ? "black" : "none"}`}
+										/>
+									</button>
+								</>
+							)}
 						</div>
 					</div>
-					<div className='flex items-center gap-[20px]'>
+
+					<div className="flex items-center gap-[20px]">
 						{user?.subscribersCount ?
 							<Modal
 								keepMounted
@@ -271,7 +329,7 @@ const ProfileById = ({ children }) => {
 									</div>
 								</Box>
 							</Modal> : null}
-							
+
 						{user?.subscriptionsCount ?
 							<Modal
 								keepMounted
@@ -397,36 +455,56 @@ const ProfileById = ({ children }) => {
 								<div onClick={() => setOpenAccountModal(false)} className='p-4 border-t-1 border-gray-300 active:bg-[#eeeeee] rounded-b-[20px] justify-center cursor-pointer flex'>Close</div>
 							</Box>
 						</Modal>
-						<div className='flex md:hidden'>
-							<Image
-								src={user?.image ? `http://37.27.29.18:8003/images/${user?.image}` : defaultUser}
-								alt='profile picture'
-								width={500}
-								height={500}
-								className={`w-[160px] h-[160px] rounded-[50%] overflow-hidden`}
-							/>
-						</div>
-						<p className='text-[#1E293B] block md:flex'>
-							{user?.postCount}
-							<span className='text-[#64748B] block md:flex md:ml-[2px]'> posts</span>
-						</p>
-						<p onClick={handleOpen} className='text-[#1E293B] block cursor-pointer md:flex'>
-							{user?.subscribersCount}
-							<span className='text-[#64748B] block active:text-[#ccc] md:flex md:ml-[2px]'>followers</span>
-						</p>
-						<p onClick={() => setOpenFollowings(true)} className='text-[#1E293B] block cursor-pointer md:flex'>
-							{user?.subscriptionsCount}
-							<span className='text-[#64748B] block active:text-[#ccc] md:flex md:ml-[2px]'>following</span>
-						</p>
+						{loadings ? (
+							<>
+								<Skeleton width={60} height={20} />
+								<Skeleton width={80} height={20} />
+								<Skeleton width={90} height={20} />
+							</>
+						) : (
+							<>
+								<p className="text-[#1E293B] block md:flex">
+									{user?.postCount}
+									<span className="text-[#64748B] block md:flex md:ml-[2px]">
+										posts
+									</span>
+								</p>
+								<p
+									onClick={handleOpen}
+									className="text-[#1E293B] block cursor-pointer md:flex"
+								>
+									{user?.subscribersCount}
+									<span className="text-[#64748B] block active:text-[#ccc] md:flex md:ml-[2px]">
+										followers
+									</span>
+								</p>
+								<p
+									onClick={() => setOpenFollowings(true)}
+									className="text-[#1E293B] block cursor-pointer md:flex"
+								>
+									{user?.subscriptionsCount}
+									<span className="text-[#64748B] block active:text-[#ccc] md:flex md:ml-[2px]">
+										following
+									</span>
+								</p>
+							</>
+						)}
 					</div>
-					<div className='flex'>
-						<p className='font-bold text-[#1E293B] text-[20px]'>
-							{user?.firstName}
-						</p>
-						{user?.lastName && (
-							<p className='font-bold text-[#1E293B] text-[20px]'>
-								{user?.userName}
-							</p>
+
+					<div className="flex">
+						{loadings ? (
+							<Skeleton width={140} height={28} />
+						) : (
+							<>
+								<p className="font-bold text-[#1E293B] text-[20px]">
+									{user?.firstName}
+								</p>
+								{user?.lastName && (
+									<p className="font-bold text-[#1E293B] text-[20px]">
+										{user?.userName}
+									</p>
+								)}
+							</>
 						)}
 					</div>
 				</div>
@@ -434,7 +512,7 @@ const ProfileById = ({ children }) => {
 			{openSuggest && (
 				<Suggetions />
 			)}
-			<div className='w-[95%] mt-15 md:w-[80%] flex justify-center gap-[10px] md:gap-[50px]'>
+			<div className='mt-15 flex justify-center gap-[10px] md:gap-[50px]'>
 				<button
 					className='flex items-center gap-[10px] py-[10px]'
 					style={{
@@ -446,18 +524,20 @@ const ProfileById = ({ children }) => {
 					<MdOutlineGridOn size={20} />
 					<p className='text-[16px] md:text-[22px]'>Posts</p>
 				</button>
-				<button
-					className='flex items-center gap-[10px] py-[10px]'
-					style={{
-						color: pathname === `/${profileId}/Reels` ? '#2563EB' : '#64748B',
-						borderTop:
-							pathname === `/${profileId}/Reels` ? '2px solid #2563EB' : 'none',
-					}}
-					onClick={() => router.push(`/${profileId}/Reels`)}
-				>
-					<Image src={Reel} alt='reel icon' width={20} height={20} />
-					<p className='text-[16px] md:text-[22px]'>Reels</p>
-				</button>
+				{video && (
+					<button
+						className='flex items-center gap-[10px] py-[10px]'
+						style={{
+							color: pathname === `/${profileId}/Reels` ? '#2563EB' : '#64748B',
+							borderTop:
+								pathname === `/${profileId}/Reels` ? '2px solid #2563EB' : 'none',
+						}}
+						onClick={() => router.push(`/${profileId}/Reels`)}
+					>
+						<Image src={Reel} alt='reel icon' width={20} height={20} />
+						<p className='text-[16px] md:text-[22px]'>Reels</p>
+					</button>
+				)}
 				<button
 					className='flex items-center gap-[10px] py-[10px]'
 					style={{
@@ -471,7 +551,7 @@ const ProfileById = ({ children }) => {
 					<p className='text-[16px] md:text-[22px]'>Tagged</p>
 				</button>
 			</div>
-			<section className='w-[95%] md:w-[80%]'>{children}</section>
+			<section className='flex justify-center'>{children}</section>
 			{!user?.postCount && (
 				<Suggetions />
 			)}

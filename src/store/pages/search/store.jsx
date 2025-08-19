@@ -6,6 +6,7 @@ let api = 'http://37.27.29.18:8003'
 export const usegetUserStore = create((set, get) => ({
     users: [],
     searchHistories: [],
+    location: [],
     openModal: false,
     setOpenModal: () => set((state) => ({ openModal: !state.openModal })),
     getUsers: async () => {
@@ -47,5 +48,21 @@ export const usegetUserStore = create((set, get) => ({
         } catch (error) {
             console.error(error)
         }
+    },
+    getLocation: async () => {
+        let { data } = await axiosRequest.get(`Location/get-Locations`)
+        set({ location: data })
+    },
+    deleteLocation: async (id) => {
+        await axiosRequest.delete(`Location/delete-Location?id=${id}`)
+        await get().getLocation()
+    },
+    editLocation: async (updateLocation) => {
+        await axiosRequest.put(`Location/update-Location`, updateLocation)
+        await get().getLocation()
+    },
+    addLocation: async (newLocation) => {
+        await axiosRequest.post(`Location/add-Location`, newLocation)
+        await get().getLocation()
     },
 }))

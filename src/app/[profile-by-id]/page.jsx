@@ -16,6 +16,7 @@ import CommentInput from "@/components/pages/explore/Emogi"
 import { useUserId } from "@/hook/useUserId"
 import DefaultUser from "@/assets/img/pages/profile/profile/instauser (2).jpg"
 import Reel from '../../../public/reel.png'
+import { useRealsStore } from '../reels/store';
 
 const style = {
     position: 'absolute',
@@ -51,6 +52,7 @@ const Posts = () => {
     const [newComit, setNewComit] = useState("")
     const [isMuted, setIsMuted] = useState(true)
     const videoRef = useRef(null)
+    const { postSaved } = useRealsStore();
 
 
     const handleOpen = async (id) => {
@@ -107,10 +109,10 @@ const Posts = () => {
 
     return (
         <>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-3 gap-1">
                 {loading ? (
                     Array.from({ length: 9 }).map((_, i) => (
-                        <div key={i} className="relative h-[414px] w-full overflow-hidden rounded-lg">
+                        <div key={i} className="relative md:w-[310px] h-[190px] w-[113px] md:h-[414px] overflow-hidden rounded-lg">
                             <Skeleton
                                 variant="rectangular"
                                 animation="wave"
@@ -127,7 +129,7 @@ const Posts = () => {
                             return (
                                 <div
                                     key={post?.postId}
-                                    className="relative overflow-hidden group cursor-pointer h-[414px] w-full"
+                                    className="relative overflow-hidden group cursor-pointer h-[190px] w-[113px] md:h-[414px] object-cover md:w-[310px]"
                                     onClick={() => handleOpen(post?.postId)}
                                 >
                                     {post?.images?.map((media, i) =>
@@ -135,7 +137,7 @@ const Posts = () => {
                                             <video
                                                 key={i}
                                                 src={`http://37.27.29.18:8003/images/${media}`}
-                                                className="h-full w-full object-cover"
+                                                className="h-full md:w-[310px] w-[113px] object-cover"
                                                 muted
                                                 controls
                                             />
@@ -145,8 +147,8 @@ const Posts = () => {
                                                 src={`http://37.27.29.18:8003/images/${media}`}
                                                 alt="image"
                                                 height={414}
-                                                width={330}
-                                                className="h-full w-full object-cover"
+                                                width={310}
+                                                className="h-full md:w-[310px] w-[113px] object-cover"
                                             />
                                         )
                                     )}
@@ -194,7 +196,6 @@ const Posts = () => {
                 <Modal open={open} onClose={handleClose}>
                     <Box sx={style} className="flex flex-col md:flex-row h-full">
 
-                        {/* Media Section */}
                         <div className="md:w-2/5 w-full bg-black flex items-center justify-center relative">
                             {postById.data?.images?.[0] && (() => {
                                 const media = postById.data.images[0]
@@ -233,10 +234,8 @@ const Posts = () => {
                             </button>
                         </div>
 
-                        {/* Right Info Section */}
                         <div className="md:w-3/5 w-full flex flex-col p-4 overflow-hidden bg-[#1f1f1f]">
 
-                            {/* User Info */}
                             <div className="flex justify-between items-center mb-4">
                                 <div className="flex items-center gap-3">
                                     <img
@@ -249,7 +248,6 @@ const Posts = () => {
                                 <button className="text-blue-500 font-bold">Follow</button>
                             </div>
 
-                            {/* Comments Section */}
                             <div className="flex-1 overflow-y-auto space-y-3 mb-4">
                                 {postById?.data?.comments?.length ? (
                                     postById?.data?.comments?.map(c => (
@@ -265,8 +263,6 @@ const Posts = () => {
                                                     <CircleUserRound size={40} color="white" />
                                                 )}
 
-                                                {/* {c.userImage ? (
-                                            ) : <CircleUserRound size={40} color="white" />} */}
                                                 <div>
                                                     <p className="text-sm">{c.comment}</p>
                                                     {c.dateCommented && (
@@ -299,13 +295,11 @@ const Posts = () => {
                                 )}
                             </div>
 
-                            {/* Add Comment Input */}
                             <div className="flex items-center gap-2 border-t border-gray-700 pt-2">
                                 <CommentInput value2={newComit} onChange2={e => setNewComit(e.target.value)} />
                                 <button onClick={handleAddComment}><SendHorizontal /></button>
                             </div>
 
-                            {/* Post Actions */}
                             <div className="flex justify-between items-center mt-4">
                                 <div className="flex gap-3">
                                     <button onClick={handleLike}>
@@ -314,12 +308,17 @@ const Posts = () => {
                                     <MessageCircle />
                                     <SendHorizontal />
                                 </div>
-                                <Bookmark
-                                    fill={postById.data?.postFavorite ? "white" : "none"}
-                                    color="white"
-                                    size={24}
-                                    onClick={handleBookmark}
-                                />
+                                <button
+                                    onClick={() => {
+                                        postSaved(postById?.data?.postId);
+                                    }}
+                                >
+                                    <Bookmark
+                                        fill={postById?.data?.postFavorite ? "white" : "none"}
+                                        stroke="white"
+                                        size={25}
+                                    />
+                                </button>
                             </div>
                             <p className="mt-2 font-bold">{postById?.data?.postLikeCount} отметок "Нравится"</p>
                             <p className="text-sm text-gray-400">

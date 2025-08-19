@@ -68,7 +68,7 @@ export default function ChatById() {
       } finally {
         pollingInProgressRef.current = false;
       }
-    }, 2000);
+    }, 3000);
   }, [id, getChatById]);
 
   const stopPolling = useCallback(() => {
@@ -93,7 +93,13 @@ export default function ChatById() {
   const [inpFile, setinpFile] = useState(null);
   const [openImg, setOpenImg] = useState(null);
   const [openIsVideo, setOpenIsVideo] = useState(false);
+  const [openIsAudio, setOpenIsAudio] = useState(false);
   const [delMesModal, setdelMesModal] = useState(null);
+
+  const [recording, setRecording] = useState(false);
+  const [mediaRecorder, setMediaRecorder] = useState(null);
+  const [audioChunks, setAudioChunks] = useState([]);
+  const [mediaStream, setMediaStream] = useState(null);
 
   useEffect(() => {
     return () => {
@@ -129,6 +135,9 @@ export default function ChatById() {
   const isVideoFileName = (name) =>
     /\.(mp4|webm|ogg|mov)$/i.test(String(name || ""));
 
+  const isAudioFileName = (name) =>
+    /\.(mp3|wav|ogg|m4a)$/i.test(String(name || ""));
+
   const handleFile = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -143,6 +152,7 @@ export default function ChatById() {
     const objectUrl = URL.createObjectURL(file);
     setOpenImg(objectUrl);
     setOpenIsVideo(isVideoFileName(file.name));
+    setOpenIsAudio(isAudioFileName(file.name));
   };
 
   const [loading, setLoading] = useState(false);
@@ -201,6 +211,55 @@ export default function ChatById() {
   let [openEmoji, setOpenEmoji] = useState(false);
 
   let userData = chats?.data?.find((e) => e.chatId == id);
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      setMediaStream(stream);
+
+      const recorder = new MediaRecorder(stream);
+      const chunks = [];
+
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) {
+          chunks.push(e.data);
+        }
+      };
+
+      recorder.onstop = () => {
+        const audioBlob = new Blob(chunks, { type: "audio/webm" });
+        const audioFile = new File([audioBlob], "recording.webm", {
+          type: "audio/webm",
+        });
+
+        setinpFile(audioFile);
+        setOpenImg(URL.createObjectURL(audioBlob));
+        setOpenIsAudio(true);
+
+        stream.getTracks().forEach((track) => track.stop());
+        setMediaStream(null);
+      };
+
+      recorder.start();
+      setMediaRecorder(recorder);
+      setAudioChunks(chunks);
+      setRecording(true);
+    } catch (err) {
+      console.error("Ошибка доступа к микрофону:", err);
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorder) {
+      mediaRecorder.stop();
+      setRecording(false);
+
+      if (mediaStream) {
+        mediaStream.getTracks().forEach((track) => track.stop());
+        setMediaStream(null);
+      }
+    }
+  };
 
   const SkeletonRow = () => (
     <Stack
@@ -368,7 +427,7 @@ export default function ChatById() {
         </Box>
       </Drawer>
 
-      <div className="w-full mx-auto p-4 h-[76vh] overflow-y-auto gap-2 ">
+      <div className="w-full mx-auto p-4 h-[76vh] overflow-y-auto gap-2 hidscrol">
         {loadingDelChat ? (
           <SkeletonChat />
         ) : (
@@ -449,39 +508,25 @@ export default function ChatById() {
                         }`}
                       >
                         {e.file && isVideoFileName(e.file) ? (
-                          <div
-                            className={` ${
-                              isCurrentUser ? " self-end" : " self-start "
-                            }`}
-                          >
-                            <video
-                              src={`http://37.27.29.18:8003/images/${e.file}`}
-                              controls
-                              preload="metadata"
-                              playsInline
-                              className="pb-2 rounded-xl"
-                              style={{ width: "100%", height: "auto" }}
-                            />
-                          </div>
+                          <video
+                            src={`http://37.27.29.18:8003/images/${e.file}`}
+                            controls
+                            className="pb-2 rounded-xl"
+                          />
+                        ) : e.file && isAudioFileName(e.file) ? (
+                          <audio
+                            src={`http://37.27.29.18:8003/images/${e.file}`}
+                            controls
+                            className="pb-2"
+                          />
                         ) : e.file ? (
-                          <div
-                            className={` ${
-                              isCurrentUser ? " self-end" : " self-start "
-                            }`}
-                          >
-                            <Image
-                              src={`http://37.27.29.18:8003/images/${e.file}`}
-                              alt="image"
-                              width={1000}
-                              height={1000}
-                              className="pb-2 rounded-xl"
-                              priority
-                              style={{
-                                width: "100%",
-                                height: "auto",
-                              }}
-                            />
-                          </div>
+                          <Image
+                            src={`http://37.27.29.18:8003/images/${e.file}`}
+                            alt="image"
+                            width={1000}
+                            height={1000}
+                            className="pb-2 rounded-xl"
+                          />
                         ) : null}
 
                         <div
@@ -506,17 +551,19 @@ export default function ChatById() {
                         <button
                           type="button"
                           onClick={() => toggleDelModal(e.messageId)}
-                          className={`hidden group-hover:block ${
+                          className={` ${
                             delMesModal === e.messageId ? "block" : ""
                           }`}
                         >
-                          <EllipsisVertical />
+                          <EllipsisVertical size={15} />
                         </button>
 
                         {delMesModal === e.messageId && (
                           <div
                             className={`absolute flex flex-col justify-center items-center gap-2 shadow rounded bg-white w-[200px] ${
-                              isCurrentUser ? "lg:-ml-60 lg:-mt-30 -mx-20 -mt-32 " : "lg:ml-5 lg:-mt-30  -mx-10 -mt-32"
+                              isCurrentUser
+                                ? "lg:-ml-60 lg:-mt-30 -mx-20 -mt-32 "
+                                : "lg:ml-5 lg:-mt-30  -mx-10 -mt-32"
                             }`}
                           >
                             <button
@@ -591,14 +638,24 @@ export default function ChatById() {
 
           {!inpMessage ? (
             <div className="flex items-center gap-2">
-              <Mic />
+              <button
+                type="button"
+                onClick={recording ? stopRecording : startRecording}
+                className={`p-2 rounded-full ${
+                  recording ? "bg-red-500 text-white animate-pulse" : ""
+                }`}
+              >
+                <Mic />
+              </button>
+
               <label className="cursor-pointer flex items-center gap-2">
                 <input
                   type="file"
                   className="hidden"
-                  accept="image/*,video/*"
+                  accept="image/*,video/*,audio/*"
                   onChange={handleFile}
                 />
+
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -640,16 +697,15 @@ export default function ChatById() {
                 <video
                   src={openImg}
                   controls
-                  preload="metadata"
                   className="max-h-64 mx-auto mb-4"
-                  style={{ width: "100%", height: "auto" }}
                 />
+              ) : openIsAudio ? (
+                <audio src={openImg} controls className="w-full mb-4" />
               ) : (
                 <img
                   src={openImg}
                   alt="preview"
                   className="max-h-64 mx-auto mb-4"
-                  style={{ width: "auto", height: "auto", maxWidth: "100%" }}
                 />
               )}
 
