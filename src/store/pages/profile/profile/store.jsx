@@ -104,6 +104,7 @@ export const useProfileStore = create((set, get) => ({
 		try {
 			await axiosRequest.post(`${api}/Post/add-post`, formData)
 			await get().getProfileData()
+			await get().getPosts()
 		} catch (error) {
 			console.error(error)
 		}
