@@ -16,12 +16,54 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, {
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+  useLayoutEffect,
+} from "react";
 import EmojiPicker from "emoji-picker-react";
 import Link from "next/link";
 import useDarkSide from "@/hook/useDarkSide";
+import PeerCall from "@/components/pages/chat/pages/chat-by-id/PeerCall";
 
 export default function ChatById() {
+  const { "chat-by-id": id } = useParams();
+  const userId = useUserId();
+
+  const {
+    messages,
+    deleteChat,
+    getChatById,
+    sendMessage,
+    deleteMessage,
+    loadingDelChat,
+  } = useChatById();
+
+  const messagesContainerRef = useRef(null);
+  const prevMessagesCount = useRef(0);
+
+  const scrollToBottom = () => {
+    const container = messagesContainerRef.current;
+    if (!container) return;
+    container.scrollTop = container.scrollHeight;
+  };
+
+  useEffect(() => {
+    if (!messages) return;
+
+    if (prevMessagesCount.current === 0) {
+      scrollToBottom();
+    }
+
+    if (messages.length > prevMessagesCount.current) {
+      scrollToBottom();
+    }
+
+    prevMessagesCount.current = messages.length;
+  }, [messages]);
+
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleDrawer = (open) => (event) => {
@@ -35,21 +77,7 @@ export default function ChatById() {
     setIsOpen(open);
   };
 
-  const { "chat-by-id": id } = useParams();
-  const userId = useUserId();
-
-  const {
-    messages,
-    deleteChat,
-    getChatById,
-    sendMessage,
-    deleteMessage,
-    loadingDelChat,
-  } = useChatById();
-
   const { chats, get, loadingChat } = useDefaultChat();
-
-  const [profilId, setprofilId] = useState(null);
 
   const intervalRef = useRef(null);
   const pollingInProgressRef = useRef(false);
@@ -59,7 +87,6 @@ export default function ChatById() {
     intervalRef.current = setInterval(async () => {
       if (!id) return;
       if (pollingInProgressRef.current) return;
-
       try {
         pollingInProgressRef.current = true;
         await getChatById(id);
@@ -134,6 +161,10 @@ export default function ChatById() {
 
   const isVideoFileName = (name) =>
     /\.(mp4|webm|ogg|mov)$/i.test(String(name || ""));
+
+  const isImageFileName = (name) =>
+  /\.(jpg|jpeg|png|gif|bmp|webp|svg)$/i.test(String(name || ""));
+
 
   const isAudioFileName = (name) =>
     /\.(mp3|wav|ogg|m4a)$/i.test(String(name || ""));
@@ -389,22 +420,36 @@ export default function ChatById() {
           )}
         </div>
 
-        <Button onClick={toggleDrawer(true)}>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="size-6"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
-            />
-          </svg>
-        </Button>
+        <div>
+          {/* <div>
+            {userData && (
+              <PeerCall
+                myId={userId}
+                herId={
+                  userData?.receiveUserId === userId
+                    ? userData.sendUserImage
+                    : userData.receiveUserImage
+                }
+              />
+            )}
+          </div> */}
+          <Button onClick={toggleDrawer(true)}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="size-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
+              />
+            </svg>
+          </Button>
+        </div>
       </div>
 
       <Drawer anchor="right" open={isOpen} onClose={toggleDrawer(false)}>
@@ -427,7 +472,10 @@ export default function ChatById() {
         </Box>
       </Drawer>
 
-      <div className="w-full mx-auto p-4 h-[76vh] overflow-y-auto gap-2 hidscrol">
+      <div
+        ref={messagesContainerRef}
+        className="flex flex-col gap-2 overflow-y-auto h-[76vh]"
+      >
         {loadingDelChat ? (
           <SkeletonChat />
         ) : (
@@ -489,10 +537,12 @@ export default function ChatById() {
                 <SkeletonRow />
               )}
             </div>
-            <div className=" flex flex-col-reverse">
+            <div ref={messagesContainerRef} className=" flex flex-col">
               {messages &&
-                messages.map((e) => {
+                [...messages].reverse().map((e) => {
                   const isCurrentUser = e.userId === userId;
+
+                  console.log(e.messageText);
                   return (
                     <div
                       key={e.messageId}
@@ -511,13 +561,13 @@ export default function ChatById() {
                           <video
                             src={`http://37.27.29.18:8003/images/${e.file}`}
                             controls
-                            className="pb-2 rounded-xl"
+                            className="pb-2 rounded-xl  max-w-xs"
                           />
                         ) : e.file && isAudioFileName(e.file) ? (
                           <audio
                             src={`http://37.27.29.18:8003/images/${e.file}`}
                             controls
-                            className="pb-2"
+                            className="pb-2  max-w-xs"
                           />
                         ) : e.file ? (
                           <Image
@@ -525,26 +575,46 @@ export default function ChatById() {
                             alt="image"
                             width={1000}
                             height={1000}
-                            className="pb-2 rounded-xl"
+                            className="pb-2 rounded-xl  max-w-xs"
                           />
-                        ) : null}
+                        ) : (
+                          ""
+                        )}
 
-                        <div
-                          className={`rounded-lg  ${
-                            isCurrentUser
-                              ? "bg-blue-500 text-white self-end rounded-tr-none p-1.5 px-3"
-                              : "bg-gray-100 text-[#475569] self-start rounded-tl-none p-1.5 px-3"
-                          }`}
-                        >
-                          <p className="">{e.messageText}</p>
-                          <span
-                            className={`text-[10px] self-end ${
-                              isCurrentUser ? "text-gray-200" : "text-gray-700"
-                            }`}
-                          >
-                            {formatMessageTime(e.sendMassageDate)}
-                          </span>
-                        </div>
+                        {e.messageText &&
+                          (isVideoFileName(e.messageText) ? (
+                            <video
+                              src={`http://37.27.29.18:8003/images/${e.messageText}`}
+                              controls
+                              className="pb-2 rounded-xl max-w-xs"
+                            />
+                          ) : e.messageText && isImageFileName(e.messageText) ? (
+                            <img
+                              src={`http://37.27.29.18:8003/images/${e.messageText}`}
+                              alt="media"
+                              className="pb-2 rounded-xl max-w-xs"
+                            />
+                          ) : (
+                            <div
+                              className={`rounded-lg  ${
+                                isCurrentUser
+                                  ? "bg-blue-500 text-white self-end rounded-tr-none p-1.5 px-3"
+                                  : "bg-gray-100 text-[#475569] self-start rounded-tl-none p-1.5 px-3"
+                              }`}
+                            >
+                              <p>{e.messageText}</p>
+
+                              <span
+                                className={`text-[10px] self-end ${
+                                  isCurrentUser
+                                    ? "text-gray-200"
+                                    : "text-gray-700"
+                                }`}
+                              >
+                                {formatMessageTime(e.sendMassageDate)}
+                              </span>
+                            </div>
+                          ))}
                       </div>
 
                       <div className="relative">
