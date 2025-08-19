@@ -19,6 +19,7 @@ import Commentory from '@/components/pages/home/Commentory'
 
 export default function Main() {
 	const videoRefs = useRef({})
+	let { followUser, unfollowUser } = useRealsStore()
 	let {
 		getUserStories,
 		data,
@@ -361,7 +362,6 @@ export default function Main() {
 								const toggleStop = postId => {
 									const video = videoRefs.current[postId]
 									if (!video) return
-
 									setStopMap(prev => {
 										const isPlaying = !prev[postId]
 										if (isPlaying) {
@@ -451,9 +451,9 @@ export default function Main() {
 														)}
 													</div>
 												)}
-												<div className='flex flex-col'>
+												<Link href={`/${e.userId}`} className='flex flex-col'>
 													<p className='font-[600] text-[14px]'>{e.userName}</p>
-												</div>
+												</Link>
 											</div>
 										</div>
 										{e.images[0].endsWith('.mp4') ? (
@@ -879,13 +879,10 @@ export default function Main() {
 						Suggested for you
 					</p>
 					{users?.data?.slice(0, 5).map((e, i) => {
+						console.log(e)
 						return (
-							<Link
-								href={`/${e.id}`}
-								key={i}
-								className='py-[12px] pr-[8px] flex justify-between'
-							>
-								<div className='flex gap-[8px] items-center'>
+							<div key={i} className='py-[12px] pr-[8px] flex justify-between'>
+								<Link href={`/${e.id}`} className='flex gap-[8px] items-center'>
 									{(e.avatar == '' && (
 										<Image
 											draggable={false}
@@ -911,8 +908,14 @@ export default function Main() {
 										<p className='text-[16px] font-[500]'>{e.userName}</p>
 										<p className='text-[12px] font-[400]'>{e.fullName}</p>
 									</div>
-								</div>
-							</Link>
+								</Link>
+								<button
+									onClick={() => followUser(e.id)}
+									className='px-3 py-1 ml-4 text-sm text-black bg-white rounded-full'
+								>
+									{e.isSubscriber ? 'Вы подписаны' : 'Подписаться'}
+								</button>
+							</div>
 						)
 					})}
 				</div>
