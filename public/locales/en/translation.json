@@ -147,6 +147,50 @@
     "24": "Disable mentions"
   },
 
+  "commentsSettings": {
+    "comentSetings": "Comments",
+    "saveComents": "Allow comments from",
+    "my followers": "Your subscribers",
+    "vzaimnie followers": "Mutual subscribers",
+    "vikl": "Off.",
+    "save coments gif": "Allow commenting with GIF",
+    "people saved coments is gif": "People will be able to add GIFs in comments to your Reels posts and videos."
+  },
+  "rells": {
+    "Subcribe Rels": "Subscribe",
+    "Unfollow Rels": "You are subscribed",
+    "ewe": "More",
+    "menshe": "Less",
+    "original audio": "Original music",
+    "comments rels": "Comments",
+    "no coment rels": "No comments",
+    "add new comnets rels": "Add a comment..."
+  },
+  "blizki": {
+    "blizki druzya": "Close friends",
+    "konffigure blizki": "No one will be notified that you have changed your close friends list.",
+    "kak rabotaet": "How does this work.",
+    "search blizki": "Search...."
+  },
+  "words": {
+    "skritie slova": "Hidden words",
+    "nejelatelniy komentari": "Unwanted comments and requests for correspondence",
+    "skrivat komentari": "Hide comments",
+    "pravila nomer1": "Potentially offensive, misleading or spammy comments will be moved to a separate section where anyone can see them, and you can always reveal them in your own posts.",
+    "filtrasia comentari": "Advanced comment filtering",
+    "pravila nomer2": "Even comments that meet our criteria will be hidden.",
+    "skrit zaprosi": "Hide chat requests",
+    "pravila nomer3": "Chat requests that may contain abuse, spam, or scam messages will be moved to the Hidden Requests folder. We will also filter notifications about such messages.",
+    "opredelenie slova": "Specific words in messages and comments",
+    "ypravlyat slova": "Manage your list of words and phrases",
+    "pravila nomer4": "Comments that contain words, phrases, or emojis from your custom list or misspellings will be filtered and only visible to the author..",
+    "pravila nomer5": "Chat requests that contain words from your list will be hidden.",
+    "skritiy akaunt": "Hidden accounts",
+    "net skritix polzovateley": "There are no hidden users.",
+    "nastroyka kontenta": "Content settings",
+    "kontent iz akauntov": "Content from accounts you don't follow",
+    "potensialno nepriemlimiy content": "Potentially inappropriate content"
+  },
   "chat": {
     "messages": "Messages",
     "requests": "Requests",
