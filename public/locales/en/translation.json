@@ -73,15 +73,5 @@
 		"follow": "Followed",
 		"like": "Like",
 		"answer": "To answer"
-	},
-	"exlpore": {
-		"1": "Follow",
-		"2": "UnFollow",
-		"3": "likes ",
-		"4": "Like",
-		"5": "Share",
-		"6": "To whom:",
-		"7": "Add a comment",
-		"8": "Search"
 	}
 }

@@ -24,6 +24,7 @@ import { useTodoAsyncStore } from "@/store/pages/notification/store";
 import ModalUsers from "@/components/pages/explore/ModalUsers";
 import BasicModal from "@/components/pages/explore/BasicModal";
 import { useTranslation } from "react-i18next";
+import useDarkSide from "@/hook/useDarkSide";
 
 const style = {
 	position: "absolute",
@@ -187,6 +188,7 @@ export default function Explore() {
 
 	const { i18n } = useTranslation();
 	const { t } = useTranslation();
+	const [theme, setTheme] = useDarkSide();
 
 	return (
 		<div>
@@ -200,7 +202,7 @@ export default function Explore() {
 				aria-describedby="modal-modal-description"
 			>
 				<Box sx={style}>
-					<div className="flex flex-col lg:flex-row gap-[20px] h-[85vh] bg-[#272727]">
+					<div className={` flex flex-col lg:flex-row gap-[20px] h-[85vh] bg-[#272727]`}>
 						{postById ? (
 							<div className="lg:flex w-full gap-[20px]">
 								<div className="lg:w-[47%] ">
@@ -280,8 +282,8 @@ export default function Explore() {
 												onClick={() => HendlFollow(postById.data?.userId)}
 											>
 												{postById?.data?.isFollowing
-													? "Вы подписаны"
-													: "Подписаться"}
+													? t("exlpore.2")
+													: t("exlpore.1")}
 											</button>
 
 											<button
@@ -438,7 +440,7 @@ export default function Explore() {
 
 										<div className="mb-2">
 											<span className="font-bold">
-												{postById.data?.postLikeCount} отметок "Нравится"
+												{postById.data?.postLikeCount} {t("exlpore.3")} {t("exlpore.4")}
 											</span>
 										</div>
 
