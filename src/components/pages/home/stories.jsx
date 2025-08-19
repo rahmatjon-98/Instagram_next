@@ -17,14 +17,29 @@ export default function SwiperStories({ indexUser = 0 }) {
 	const [isMuted, setIsMuted] = useState(true)
 	const [activeIndex, setActiveIndex] = useState(indexUser) // активный слайд
 	const swiperRef = useRef(null)
+	let [theme, setTheme] = useState(
+			typeof window !== 'undefined' ? localStorage.getItem('theme') : ''
+		)
+		useEffect(() => {
+			const handleStorageChange = event => {
+				if (event.key === 'theme') {
+					setTheme(event.newValue)
+				}
+			}
+			window.addEventListener('storage', handleStorageChange)
+			return () => {
+				window.removeEventListener('storage', handleStorageChange)
+			}
+		}, [])
 
 	const storiesData = useMemo(() => {
+		
 		if (!data) return []
 
-		return data.map(user => ({
+		return data?.filter(e => e?.stories?.length > 0).map(user => ({
 			userName: user.userName,
-			stories: user.stories.map(stor => {
-				const isVideo = stor.fileName.endsWith('.mp4')
+			stories: user?.stories?.map(stor => {
+				const isVideo = stor.fileName?.endsWith('.mp4')
 				return {
 					url: `http://37.27.29.18:8003/images/${stor.fileName}`,
 					type: isVideo ? 'video' : 'image',
@@ -50,14 +65,11 @@ export default function SwiperStories({ indexUser = 0 }) {
 		}
 	}, [indexUser])
 
+	console.log(storiesData);
+	
 	return (
 		<div
 			className='w-full h-[600px] flex justify-center items-center relative'
-			onMouseDown={() => setPaused(true)}
-			onMouseUp={() => setPaused(false)}
-			onMouseLeave={() => setPaused(false)}
-			onTouchStart={() => setPaused(true)}
-			onTouchEnd={() => setPaused(false)}
 		>
 			<Swiper
 				effect='cube'
