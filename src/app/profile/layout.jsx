@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import React, { useState } from 'react'
 import { useProfileStore } from '@/store/pages/profile/profile/store'
 import Image from 'next/image'
 import { useEffect } from 'react'
@@ -9,6 +9,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { MdOutlineGridOn } from 'react-icons/md'
 import { FaRegBookmark } from 'react-icons/fa'
 import { MdOutlinePhotoCameraFront } from 'react-icons/md'
+import useDarkSide from '@/hook/useDarkSide'
 
 const Layout = ({ children }) => {
 	let { user, getProfileData } = useProfileStore()
@@ -16,12 +17,23 @@ const Layout = ({ children }) => {
 	let router = useRouter()
 	let pathname = usePathname()
 
+	// const [theme] = useDarkSide()
+
 	useEffect(() => {
 		getProfileData()
-		console.log(user ? user : 'error')
 	}, [])
+
+	const [theme, setTheme] = useDarkSide()
+	const [mounted, setMounted] = useState(false)
+
+	useEffect(() => {
+		setMounted(true)
+	}, [])
+
+	const resolvedTheme = mounted ? theme : 'light'
+
 	return (
-		<div className='pl-[8%] pt-[8%] h-[100vh]'>
+		<div className='pl-[8%] pt-[8%]'>
 			<section className='flex gap-[20px]'>
 				<div className='hidden md:flex overflow-hidden items-center justify-center w-[100px] md:w-[160px] h-[100px] md:h-[160px] rounded-[50%]'>
 					<Image
@@ -46,13 +58,30 @@ const Layout = ({ children }) => {
 						</h1>
 						<div className='flex items-center gap-[10px]'>
 							<button
-								className='text-[#334155] bg-[#F0F2F5] hover:bg-gray-200 text-[10px] md:text-[16px] px-[10px] md:px-[20px] py-[5px] md:py-[10px] rounded-xl md:rounded-2xl active:scale-95 transition-transform duration-100 ease-in'
+								className={` text-[10px] md:text-[16px] px-[10px] md:px-[20px] py-[5px] md:py-[10px] rounded-xl md:rounded-2xl ${
+									mounted &&
+									'active:scale-95 transition-transform duration-100 ease-in'
+								} ${
+									resolvedTheme === 'dark'
+										? 'bg-[#25292E] text-[#F4F4F4] hover:bg-gray-800'
+										: 'bg-[#F0F2F5] text-[#334155] hover:bg-gray-200'
+								}`}
 								onClick={() => router.push('/editprofile')}
 							>
 								Edit profile
 							</button>
-							<button className='text-[#334155] bg-[#F0F2F5] hover:bg-gray-200 text-[10px] md:text-[16px] px-[10px] md:px-[20px] py-[5px] md:py-[10px] rounded-xl md:rounded-2xl active:scale-95 transition-transform duration-100 ease-in'>
-								View archive
+							<button
+								className={`hover:bg-gray-200 text-[10px] md:text-[16px] px-[10px] md:px-[20px] py-[5px] md:py-[10px] rounded-xl md:rounded-2xl ${
+									mounted &&
+									'active:scale-95 transition-transform duration-100 ease-in'
+								} ${
+									resolvedTheme === 'dark'
+										? 'bg-[#25292E] text-[#F4F4F4] hover:bg-gray-800'
+										: 'bg-[#F0F2F5] text-[#334155] hover:bg-gray-200'
+								}`}
+								onClick={() => router.push('/editprofile')}
+							>
+								Edit profile
 							</button>
 							<button>
 								<RxHamburgerMenu

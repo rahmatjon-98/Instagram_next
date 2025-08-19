@@ -25,17 +25,9 @@ export const useProfileByIdStore = create((set, get) => ({
         await axiosRequest.post(`Chat/create-chat?receiverUserId=${id}`)
         await get().getChats()
     },
-    getPosts: async () => {
+    getPosts: async (id) => {
         try {
-            let { data } = await axiosRequest.get(`Post/get-posts`)
-            set({ posts: data })
-        } catch (error) {
-            console.error(error);
-        }
-    },
-    getPostById: async (id) => {
-        try {
-            let { data } = await axiosRequest.get(`Post/get-post-by-id?id=${id}`)
+            let { data } = await axiosRequest.get(`Post/get-posts?UserId=${id}`)
             set({ posts: data })
         } catch (error) {
             console.error(error);
