@@ -191,6 +191,12 @@
     "kontent iz akauntov": "Content from accounts you don't follow",
     "potensialno nepriemlimiy content": "Potentially inappropriate content"
   },
+   "home":{
+    "follow":"follow",
+    "likes":"Likes",
+    "Loading_history":"Loading history",
+    "Suggested_for_you" : "Suggested for you"
+  },
   "chat": {
     "messages": "Messages",
     "requests": "Requests",
@@ -201,6 +207,11 @@
     "toLabel": "To:",
     "searchPlaceholder": "Search",
     "recommendedLabel": "Recommended",
-    "noUsersFound": "No users found"
+    "noUsersFound": "No users found",
+    "removeChat": "Remove Chat",
+    "seeProfile": "See profile",
+    "deleteMessage": "Delete message",
+    "cancel": "Cancel",
+    "messagePlaceholder": "Write your message..."
   }
 }

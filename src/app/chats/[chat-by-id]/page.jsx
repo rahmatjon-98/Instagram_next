@@ -27,6 +27,7 @@ import EmojiPicker from "emoji-picker-react";
 import Link from "next/link";
 import useDarkSide from "@/hook/useDarkSide";
 import PeerCall from "@/components/pages/chat/pages/chat-by-id/PeerCall";
+import { useTranslation } from "react-i18next";
 
 export default function ChatById() {
   const { "chat-by-id": id } = useParams();
@@ -375,7 +376,7 @@ export default function ChatById() {
   }
 
   const [theme, setTheme] = useDarkSide();
-
+  const { t } = useTranslation();
   //------------------------------------------------------------------------------------------------------
   return (
     <div className="w-full">
@@ -464,7 +465,7 @@ export default function ChatById() {
               onClick={() => handleDelChat(id)}
               className="text-red-500  p-2 rounded flex items-center justify-between gap-2 w-full"
             >
-              Remove Chat <Trash size={18} />
+              {t("chat.removeChat")} <Trash size={18} />
             </button>
           </div>
         </Box>
@@ -478,7 +479,7 @@ export default function ChatById() {
           <SkeletonChat />
         ) : (
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 p-5">
               {userData ? (
                 <div className="flex items-center gap-2 w-full justify-center flex-col">
                   {!userData.receiveUserImage ? (
@@ -528,7 +529,7 @@ export default function ChatById() {
                         : "bg-gray-100 text-black"
                     }`}
                   >
-                    See profill
+                    {t("chat.seeProfile")}
                   </button>
                 </div>
               ) : (
@@ -642,7 +643,8 @@ export default function ChatById() {
                                   <Loader2 className="animate-spin w-5 h-5" />
                                 ) : (
                                   <p className="flex items-center gap-2">
-                                    Delete messege <Trash size={18} />
+                                    {t("chat.deleteMessage")}{" "}
+                                    <Trash size={18} />
                                   </p>
                                 )}
                               </button>
@@ -652,7 +654,7 @@ export default function ChatById() {
                                 onClick={() => setdelMesModal(null)}
                                 className="p-2"
                               >
-                                Cancel
+                                {t("chat.cancel")}
                               </button>
                             </div>
                           )}
@@ -699,7 +701,7 @@ export default function ChatById() {
           <input
             type="text"
             className="w-full outline-none px-2"
-            placeholder="Write your message..."
+            placeholder={t("chat.messagePlaceholder")}
             value={inpMessage}
             onChange={(e) => setinpMessage(e.target.value)}
           />
