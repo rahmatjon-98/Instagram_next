@@ -246,9 +246,14 @@ const Layout = ({ children }) => {
 					<Image
 						src={defaultUser}
 						alt='default user'
+<<<<<<< HEAD
+						className={`${user.image ? 'hidden' : 'flex'
+							} w-[160px] h-[160px] rounded-[50%]`}
+=======
 						className={`${
 							userer.image ? 'hidden' : 'flex'
 						} w-[160px] h-[160px] rounded-[50%]`}
+>>>>>>> f65262a60832b552ad51536bfb3fe9dacd235c07
 					/>
 				</div>
 				<div className='flex flex-col gap-[20px]'>
@@ -261,22 +266,41 @@ const Layout = ({ children }) => {
 						</h1>
 						<div className='flex items-center gap-[5px] md:gap-[10px]'>
 							<button
+<<<<<<< HEAD
+								className={` text-[10px] md:text-[16px] px-[10px] md:px-[20px] py-[5px] md:py-[10px] rounded-xl md:rounded-2xl ${mounted &&
+									'active:scale-95 transition-transform duration-100 ease-in'
+									} ${resolvedTheme === 'dark'
+										? 'bg-[#25292E] text-[#F4F4F4] hover:bg-gray-800'
+										: 'bg-[#F0F2F5] text-[#334155] hover:bg-gray-200'
+									}`}
+=======
 								className={`cursor-pointer text-[10px] md:text-[16px] px-[10px] md:px-[20px] py-[5px] md:py-[10px] rounded-xl md:rounded-2xl active:scale-95 transition-transform duration-100 ease-in ${
 									theme == 'light'
 										? 'bg-[#F0F2F5] text-[#334155] hover:bg-gray-200'
 										: 'bg-[#25292E] text-[#F4F4F4] hover:bg-gray-800'
 								}`}
+>>>>>>> f65262a60832b552ad51536bfb3fe9dacd235c07
 								onClick={() => router.push('/editprofile')}
 							>
 								Edit profile
 							</button>
 							<button
+<<<<<<< HEAD
+								className={`hover:bg-gray-200 text-[10px] md:text-[16px] px-[10px] md:px-[20px] py-[5px] md:py-[10px] rounded-xl md:rounded-2xl ${mounted &&
+									'active:scale-95 transition-transform duration-100 ease-in'
+									} ${resolvedTheme === 'dark'
+										? 'bg-[#25292E] text-[#F4F4F4] hover:bg-gray-800'
+										: 'bg-[#F0F2F5] text-[#334155] hover:bg-gray-200'
+									}`}
+								onClick={() => router.push('/editprofile')}
+=======
 								className={`cursor-pointer text-[10px] md:text-[16px] px-[10px] md:px-[20px] py-[5px] md:py-[10px] rounded-xl md:rounded-2xl active:scale-95 transition-transform duration-100 ease-in
 								${
 									theme == 'light'
 										? 'bg-[#F0F2F5] text-[#334155] hover:bg-gray-200'
 										: 'bg-[#25292E] text-[#F4F4F4] hover:bg-gray-800'
 								}`}
+>>>>>>> f65262a60832b552ad51536bfb3fe9dacd235c07
 							>
 								View archive
 							</button>
@@ -660,9 +684,14 @@ const Layout = ({ children }) => {
 							<Image
 								src={defaultUser}
 								alt='default user'
+<<<<<<< HEAD
+								className={`${user.image ? 'hidden' : 'flex'
+									} w-[70px] rounded-[50%]`}
+=======
 								className={`${
 									userer.image ? 'hidden' : 'flex'
 								} w-[70px] rounded-[50%]`}
+>>>>>>> f65262a60832b552ad51536bfb3fe9dacd235c07
 							/>
 						</div>
 						<p

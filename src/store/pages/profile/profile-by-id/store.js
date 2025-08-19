@@ -6,11 +6,13 @@ let api = 'http://37.27.29.18:8003/'
 export const useProfileByIdStore = create((set, get) => ({
     users: [],
     chats: [],
+    loadings: false,
     posts: [],
     followers: [],
     followings: [],
     getProfileById: async (id) => {
         try {
+            set({ loading: true })
             let { data } = await axiosRequest.get(`${api}UserProfile/get-user-profile-by-id?id=${id}`)
             set({ users: data })
         } catch (error) {
