@@ -72,8 +72,6 @@
 		"comment":"Comments",
 		"follow":"Followed",
 		"like":"Like",
-		"answer":"To answer",
-		"unfollow":"Unfollow",
-		"followback":"Follow"
+		"answer":"To answer"
 	}
 }

@@ -16,12 +16,12 @@ import { useRouter } from 'next/navigation'
 import { usegetUserStore } from '@/store/pages/search/store';
 import { MdOutlineGridOn, MdOutlinePhotoCameraFront } from 'react-icons/md';
 import { FaRegBookmark } from 'react-icons/fa';
-// import Loading from '@/components/pages/profile/profile-by-id/Loading';
 import './style.css'
 import { useRegisterStore } from '@/store/pages/auth/registration/registerStore';
 import { useUserId } from '@/hook/useUserId'
 import FollowUser from '@/components/pages/profile/profile-by-id/FollowUser';
 import FollowFollowers from '@/components/pages/profile/profile-by-id/FollowFollowers';
+import FollowFollowings from '@/components/pages/profile/profile-by-id/FollowFollowings';
 
 const style = {
 	position: 'absolute',
@@ -58,6 +58,10 @@ const ProfileById = ({ children }) => {
 	const [loading, setLoading] = useState(false)
 	const [search, setSearch] = useState('')
 	const [filteredUsers, setFilteredUsers] = useState([])
+	const [focused2, setFocused2] = useState(false)
+	const [loading2, setLoading2] = useState(false)
+	const [search2, setSearch2] = useState('')
+	const [filteredUsers2, setFilteredUsers2] = useState([])
 	const [openSuggest, setOpenSuggest] = useState(null)
 	const [openAccountModal, setOpenAccountModal] = useState(null)
 	const [openFollowings, setOpenFollowings] = useState(null)
@@ -98,6 +102,15 @@ const ProfileById = ({ children }) => {
 			</Stack>
 		</Stack>
 	)
+	const SkeletonRow2 = () => (
+		<Stack direction="row" spacing={2} alignItems="center" className="p-3">
+			<Skeleton variant="circular" width={44} height={44} />
+			<Stack spacing={0.5} flex={1}>
+				<Skeleton variant="text" width="60%" height={14} />
+				<Skeleton variant="text" width="40%" height={12} />
+			</Stack>
+		</Stack>
+	)
 
 	useEffect(() => {
 		if (!search.trim()) {
@@ -108,8 +121,8 @@ const ProfileById = ({ children }) => {
 
 		setLoading(true)
 		const delayDebounce = setTimeout(() => {
-			const results = users?.data?.filter(u =>
-				u.userName?.toLowerCase().includes(search.toLowerCase())
+			const results = followers?.data?.filter(u =>
+				u?.userShortInfo?.userName?.toLowerCase().includes(search.toLowerCase())
 			) || []
 			setFilteredUsers(results)
 			setLoading(false)
@@ -117,6 +130,25 @@ const ProfileById = ({ children }) => {
 
 		return () => clearTimeout(delayDebounce)
 	}, [search, users])
+
+	useEffect(() => {
+		if (!search2.trim()) {
+			setFilteredUsers2([])
+			setLoading(false)
+			return
+		}
+
+		setLoading(true)
+		const delayDebounce = setTimeout(() => {
+			const results = followings?.data?.filter(u =>
+				u?.userShortInfo?.userName?.toLowerCase().includes(search2.toLowerCase())
+			) || []
+			setFilteredUsers2(results)
+			setLoading(false)
+		}, 500)
+
+		return () => clearTimeout(delayDebounce)
+	}, [search2, users])
 
 	useEffect(() => {
 		if (profileId) {
@@ -155,72 +187,11 @@ const ProfileById = ({ children }) => {
 						</div>
 					</div>
 					<div className='flex items-center gap-[20px]'>
-						<Modal
-							keepMounted
-							open={open}
-							onClose={handleClose}
-							aria-labelledby="keep-mounted-modal-title"
-							aria-describedby="keep-mounted-modal-description"
-						>
-							<Box sx={style}>
-								<div className="">
-									<div className="flex p-4 pb-2 border-b-1 border-gray-300 items-center justify-between">
-										<div></div>
-										<h3 className='font-semibold text-[18px]'>Followers</h3>
-										<button onClick={handleClose}><X /></button>
-									</div>
-									<div className="relative m-4">
-										{!focused && (
-											<Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
-										)}
-										<input
-											type="text"
-											value={search}
-											onChange={(e) => setSearch(e.target.value)}
-											placeholder="Search"
-											className={`py-2 w-full rounded-lg bg-[rgb(239,239,239)] pr-10 ${!focused ? 'pl-10' : 'pl-4'}`}
-											onFocus={() => setFocused(true)}
-											onBlur={() => setFocused(false)}
-										/>
-
-										{loading ? (
-											<Loader className="absolute right-3 top-6 -translate-y-1/2 text-gray-400 animate-spin" size={18} />
-										) : (
-											search && (
-												<button
-													type="button"
-													onClick={() => setSearch('')}
-													className="absolute right-3 top-6 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-												>
-													<XCircle size={18} />
-												</button>
-											)
-										)}
-									</div>
-									<div className="flex h-[270px] overflow-y-scroll flex-col">
-										{followers?.data?.map(e => (
-											<div key={e.id} className='flex items-center justify-between hover:bg-[#eeeeee] rounded p-3'>
-												<div onClick={() => router.push(`${e?.userShortInfo?.userId}`)} className='flex cursor-pointer items-center gap-5'>
-													<Image src={e?.userShortInfo?.userPhoto ?
-														`http://37.27.29.18:8003/images/${e?.userShortInfo?.userPhoto}` : defaultUser}
-														className='object-cover w-[44px] h-[44px] rounded-full' width={44} height={44} alt="avatar" />
-													<div>
-														<p>{e?.userShortInfo?.userName}</p>
-														<p>{e?.userShortInfo?.fullname}</p>
-													</div>
-												</div>
-												<FollowFollowers id={e?.userShortInfo?.userId} />
-											</div>
-										))}
-									</div>
-								</div>
-							</Box>
-						</Modal>
-						{user?.subscriptionsCount ?
+						{user?.subscribersCount ?
 							<Modal
 								keepMounted
-								open={openFollowings}
-								onClose={() => setOpenFollowings(false)}
+								open={open}
+								onClose={handleClose}
 								aria-labelledby="keep-mounted-modal-title"
 								aria-describedby="keep-mounted-modal-description"
 							>
@@ -228,8 +199,8 @@ const ProfileById = ({ children }) => {
 									<div className="">
 										<div className="flex p-4 pb-2 border-b-1 border-gray-300 items-center justify-between">
 											<div></div>
-											<h3 className='font-semibold text-[18px]'>Followings</h3>
-											<button onClick={() => setOpenFollowings(false)}><X /></button>
+											<h3 className='font-semibold text-[18px]'>Followers</h3>
+											<button onClick={handleClose}><X /></button>
 										</div>
 										<div className="relative m-4">
 											{!focused && (
@@ -260,69 +231,172 @@ const ProfileById = ({ children }) => {
 											)}
 										</div>
 										<div className="flex h-[270px] overflow-y-scroll flex-col">
-											{followings?.data?.map(e => (
-												<div key={e.id} className='flex items-center justify-between hover:bg-[#eeeeee] rounded p-3'>
-													<div onClick={() => router.push(`${e?.userShortInfo?.userId}`)} className='flex cursor-pointer items-center gap-5'>
-														<Image src={e?.userShortInfo?.userPhoto ?
-															`http://37.27.29.18:8003/images/${e?.userShortInfo?.userPhoto}` : defaultUser}
-															className='object-cover w-[44px] h-[44px] rounded-full' width={44} height={44} alt="avatar" />
-														<div>
-															<p>{e?.userShortInfo?.userName}</p>
-															<p>{e?.userShortInfo?.fullname}</p>
+											{loading ? (
+												Array.from({ length: 5 }).map((_, i) => (
+													<SkeletonRow key={i} className="h-6 w-full rounded" />
+												))) : (
+												filteredUsers?.map(e => (
+													<div key={e.id} className='flex items-center justify-between hover:bg-[#eeeeee] rounded p-3'>
+														<div className='flex cursor-pointer items-center gap-5'>
+															<Image src={e?.userShortInfo?.userPhoto ?
+																`http://37.27.29.18:8003/images/${e?.userShortInfo?.userPhoto}` : defaultUser}
+																className='object-cover w-[44px] h-[44px] rounded-full' width={44} height={44} alt="avatar" />
+															<div>
+																<p>{e?.userShortInfo?.userName}</p>
+																<p>{e?.userShortInfo?.fullname}</p>
+															</div>
 														</div>
+														<FollowFollowers id={e?.userShortInfo?.userId} checkMyFollowings={false} />
 													</div>
-													<button>Follow</button>
-												</div>
-											))}
+												))
+											)}
+											{!search && !loading && (
+												followers?.data?.map(e => (
+													<div key={e.id} className='flex items-center justify-between hover:bg-[#eeeeee] rounded p-3'>
+														<div onClick={() => router.push(`${e?.userShortInfo?.userId}`)} className='flex cursor-pointer items-center gap-5'>
+															<Image src={e?.userShortInfo?.userPhoto ?
+																`http://37.27.29.18:8003/images/${e?.userShortInfo?.userPhoto}` : defaultUser}
+																className='object-cover w-[44px] h-[44px] rounded-full' width={44} height={44} alt="avatar" />
+															<div>
+																<p>{e?.userShortInfo?.userName}</p>
+																<p>{e?.userShortInfo?.fullname}</p>
+															</div>
+														</div>
+														<FollowFollowers id={e?.userShortInfo?.userId} checkMyFollowings={false} />
+													</div>
+												))
+											)}
 										</div>
 									</div>
 								</Box>
 							</Modal> : null}
-						{user?.subscribersCount ?
+						{user?.subscriptionsCount ?
 							<Modal
 								keepMounted
-								open={openAccountModal}
-								onClose={() => setOpenAccountModal(false)}
+								open={openFollowings}
+								onClose={() => setOpenFollowings(false)}
 								aria-labelledby="keep-mounted-modal-title"
 								aria-describedby="keep-mounted-modal-description"
 							>
-								<Box sx={style2}>
-									<div className='p-4 border-b-1 border-gray-300 justify-center flex'>About this account</div>
-									<div className="flex flex-col gap-3 items-center text-center px-10 p-4">
-										<Image
-											src={user?.image ? `http://37.27.29.18:8003/images/${user?.image}` : defaultUser}
-											alt='profile picture'
-											width={78}
-											height={78}
-											className={`w-[78px] h-[78px] rounded-full overflow-hidden`}
-										/>
-										<h3 className='font-bold text-[18px]'>{user?.userName}</h3>
-										<h4 className='text-[12px]'>To help keep our community authentic, we’re showing information about accounts on Instagram. See why this information is important.</h4>
-									</div>
-									<div className="flex flex-col p-4 pb-4 gap-[10px]">
-										<div className="flex items-center gap-[10px]">
-											<Calendar />
-											<div>
-												<h3>Date joined</h3>
-												<h3 className='text-gray-400'>
-													{user?.dob ? new Date(user.dob).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : ''}
-												</h3>
-											</div>
+								<Box sx={style}>
+									<div className="">
+										<div className="flex p-4 pb-2 border-b-1 border-gray-300 items-center justify-between">
+											<div></div>
+											<h3 className='font-semibold text-[18px]'>Followings</h3>
+											<button onClick={() => setOpenFollowings(false)}><X /></button>
 										</div>
-										<div className="flex items-center justify-between">
-											<div className="flex items-center gap-[10px]">
-												<User />
-												<h3>Former usernames</h3>
-											</div>
-											<div className="flex text-[gray] items-center gap-[10px]">
-												<span>2</span>
-												<ArrowRight size={18} />
-											</div>
+										<div className="relative m-4">
+											{!focused2 && (
+												<Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
+											)}
+											<input
+												type="text"
+												value={search2}
+												onChange={(e) => setSearch2(e.target.value)}
+												placeholder="Search"
+												className={`py-2 w-full rounded-lg bg-[rgb(239,239,239)] pr-10 ${!focused2 ? 'pl-10' : 'pl-4'}`}
+												onFocus={() => setFocused2(true)}
+												onBlur={() => setFocused2(false)}
+											/>
+
+											{loading2 ? (
+												<Loader className="absolute right-3 top-6 -translate-y-1/2 text-gray-400 animate-spin" size={18} />
+											) : (
+												search2 && (
+													<button
+														type="button"
+														onClick={() => setSearch2('')}
+														className="absolute right-3 top-6 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+													>
+														<XCircle size={18} />
+													</button>
+												)
+											)}
+										</div>
+										<div className="flex h-[270px] overflow-y-scroll flex-col">
+											{loading2 ? (
+												Array.from({ length: 5 }).map((_, i) => (
+													<SkeletonRow2 key={i} className="h-6 w-full rounded" />
+												))) : (
+												filteredUsers2?.map(e => (
+													<div key={e.id} className='flex items-center justify-between hover:bg-[#eeeeee] rounded p-3'>
+														<div onClick={() => router.push(`${e?.userShortInfo?.userId}`)} className='flex cursor-pointer items-center gap-5'>
+															<Image src={e?.userShortInfo?.userPhoto ?
+																`http://37.27.29.18:8003/images/${e?.userShortInfo?.userPhoto}` : defaultUser}
+																className='object-cover w-[44px] h-[44px] rounded-full' width={44} height={44} alt="avatar" />
+															<div>
+																<p>{e?.userShortInfo?.userName}</p>
+																<p>{e?.userShortInfo?.fullname}</p>
+															</div>
+														</div>
+														<FollowFollowings id={e?.userShortInfo?.userId} checkMyFollowings={true} />
+													</div>
+												))
+											)}
+											{!loading2 && !search2 && (
+												followings?.data?.map(e => (
+													<div key={e.id} className='flex items-center justify-between hover:bg-[#eeeeee] rounded p-3'>
+														<div onClick={() => router.push(`${e?.userShortInfo?.userId}`)} className='flex cursor-pointer items-center gap-5'>
+															<Image src={e?.userShortInfo?.userPhoto ?
+																`http://37.27.29.18:8003/images/${e?.userShortInfo?.userPhoto}` : defaultUser}
+																className='object-cover w-[44px] h-[44px] rounded-full' width={44} height={44} alt="avatar" />
+															<div>
+																<p>{e?.userShortInfo?.userName}</p>
+																<p>{e?.userShortInfo?.fullname}</p>
+															</div>
+														</div>
+														<FollowFollowings id={e?.userShortInfo?.userId} checkMyFollowings={true} />
+													</div>
+												))
+											)}
 										</div>
 									</div>
-									<div onClick={() => setOpenAccountModal(false)} className='p-4 border-t-1 border-gray-300 active:bg-[#eeeeee] rounded-b-[20px] justify-center cursor-pointer flex'>Close</div>
 								</Box>
 							</Modal> : null}
+						<Modal
+							keepMounted
+							open={openAccountModal}
+							onClose={() => setOpenAccountModal(false)}
+							aria-labelledby="keep-mounted-modal-title"
+							aria-describedby="keep-mounted-modal-description"
+						>
+							<Box sx={style2}>
+								<div className='p-4 border-b-1 border-gray-300 justify-center flex'>About this account</div>
+								<div className="flex flex-col gap-3 items-center text-center px-10 p-4">
+									<Image
+										src={user?.image ? `http://37.27.29.18:8003/images/${user?.image}` : defaultUser}
+										alt='profile picture'
+										width={78}
+										height={78}
+										className={`w-[78px] h-[78px] rounded-[200px] overflow-hidden`}
+									/>
+									<h3 className='font-bold text-[18px]'>{user?.userName}</h3>
+									<h4 className='text-[12px]'>To help keep our community authentic, we’re showing information about accounts on Instagram. See why this information is important.</h4>
+								</div>
+								<div className="flex flex-col p-4 pb-4 gap-[10px]">
+									<div className="flex items-center gap-[10px]">
+										<Calendar />
+										<div>
+											<h3>Date joined</h3>
+											<h3 className='text-gray-400'>
+												{user?.dob ? new Date(user.dob).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : ''}
+											</h3>
+										</div>
+									</div>
+									<div className="flex items-center justify-between">
+										<div className="flex items-center gap-[10px]">
+											<User />
+											<h3>Former usernames</h3>
+										</div>
+										<div className="flex text-[gray] items-center gap-[10px]">
+											<span>2</span>
+											<ArrowRight size={18} />
+										</div>
+									</div>
+								</div>
+								<div onClick={() => setOpenAccountModal(false)} className='p-4 border-t-1 border-gray-300 active:bg-[#eeeeee] rounded-b-[20px] justify-center cursor-pointer flex'>Close</div>
+							</Box>
+						</Modal>
 						<div className='flex md:hidden'>
 							<Image
 								src={user?.image ? `http://37.27.29.18:8003/images/${user?.image}` : defaultUser}

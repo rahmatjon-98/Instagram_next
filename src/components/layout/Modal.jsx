@@ -67,7 +67,7 @@ const Modal = () => {
             animate={{ x: 0 }}
             exit={{ x: 400 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="fixed top-0 left-12 p-5 z-30 h-full w-[400px] bg-white shadow-xl rounded-r-[16px] overflow-y-auto"
+            className="fixed top-0 left-12 p-5 z-30 h-full w-[400px] bg-white shadow-xl rounded-r-[16px]"
         >
             <button
                 onClick={() => setOpenModal(false)}
@@ -109,7 +109,7 @@ const Modal = () => {
                 <p className='font-semibold'>Recent</p>
                 <button onClick={clearUserHistory} className='font-medium hover:underline cursor-pointer text-[rgb(125,161,255)]'>Clear All</button>
             </div>
-            <div className="flex flex-col">
+            <div className="flex overflow-y-auto h-[400px] flex-col">
                 {search ? (
                     loading ? (
                         Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)
@@ -117,7 +117,7 @@ const Modal = () => {
                         filteredUsers.map(e => (
                             <div onClick={() => addUserHistory(e.id)} key={e.id}>
                                 <div onClick={() => linkToProfile(e.id)} className='flex cursor-pointer hover:bg-[#eeeeee] rounded p-3 items-center gap-5'>
-                                    {e.avatar == '' ? <Image src={defaultUser} className='object-cover w-[44px] h-[44px] rounded-full' height={44} width={44} /> : <Image src={`http://37.27.29.18:8003/images/${e.avatar}`} className='object-cover w-[44px] h-[44px] rounded-full' width={44} height={44} alt="avatar" />}
+                                    <Image src={e.avatar ? `http://37.27.29.18:8003/images/${e.avatar}` : defaultUser} className='object-cover w-[44px] h-[44px] rounded-full' width={44} height={44} alt="avatar" />
                                     <div>
                                         <p>{e.userName}</p>
                                         <p>{e.fullName}</p>
@@ -132,7 +132,7 @@ const Modal = () => {
                     searchHistories?.data?.map(e => (
                         <div key={e.id} className="flex items-center cursor-pointer hover:bg-[#eeeeee] rounded p-3 w-full justify-between">
                             <div onClick={() => linkToProfile(e?.users.id)} className='flex cursor-pointer items-center gap-5'>
-                                {e?.users?.avatar == '' ? <Image src={defaultUser} className='object-cover w-[44px] h-[44px] rounded-full' height={44} width={44} alt='image' /> : <Image src={`http://37.27.29.18:8003/images/${e?.users?.avatar}`} className='object-cover w-[44px] h-[44px] rounded-full' width={44} height={44} alt="avatar" />}
+                                <Image src={e?.users?.avatar ? `http://37.27.29.18:8003/images/${e?.users?.avatar}` : defaultUser} className='object-cover w-[44px] h-[44px] rounded-full' width={44} height={44} alt="avatar" />
                                 <div>
                                     <p>{e?.users?.userName}</p>
                                     <p>{e?.users?.fullName}</p>

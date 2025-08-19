@@ -105,7 +105,7 @@ export default function UsersList() {
 												{user.userName}
 											</p>
 											<span className='text-gray-500 text-xs '>
-												{t("notice.followback")}
+												{t("notice.follow")}
 											</span>
 										</div>
 										<p className='text-gray-500 text-xs truncate'>
@@ -123,7 +123,7 @@ export default function UsersList() {
 										}`}
 										onClick={() => toggleFollow(user.userId)}
 									>
-										{user.isFollowed ? t("notice.unfollow") : t("notice.follow")}
+										{user.isFollowed ? t("notice.unfollow") : t("notice.followback")}
 									</button>
 
 									<button

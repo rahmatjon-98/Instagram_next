@@ -1,5 +1,5 @@
 import axiosRequest from '@/lib/axiosRequest'
-import { useEffect } from 'react'
+import axios from 'axios'
 import { create } from 'zustand'
 
 export const useHome = create((set, get) => ({
@@ -22,7 +22,7 @@ export const useHome = create((set, get) => ({
 	},
 	getUser: async () => {
 		try {
-			let { data: data2 } = await axiosRequest('User/get-users')
+			let { data: data2 } = await axiosRequest(`User/get-users?PageSize=${Math.floor(Math.random() * 10) + 1}`)
 			set(state => ({ users: data2 }))
 		} catch (error) {
 			console.error(error)
@@ -43,44 +43,73 @@ export const useHome = create((set, get) => ({
 	},
 	likePost: async postId => {
 		const prevPosts = get().posts
-    set(state => ({
-      posts: {
-        ...state.posts,
-        data: state.posts.data.map(post =>
-          post.postId === postId
-            ? {
-                ...post,
-                postLike: !post.postLike,
-                likeCount: post.postLike
-                  ? post.likeCount - 1
-                  : post.likeCount + 1
-              }
-            : post
-        )
-      }
-    }))
-    try {
-      await axiosRequest.post(`/Post/like-post?postId=${postId}`, {})
-    } catch (error) {
-      console.error('Error in Like', error)
-      set({ posts: prevPosts })
-    }
+		set(state => ({
+			posts: {
+				...state.posts,
+				data: state.posts.data.map(post =>
+					post.postId === postId
+						? {
+								...post,
+								postLike: !post.postLike,
+								likeCount: post.postLike
+									? post.likeCount - 1
+									: post.likeCount + 1,
+						  }
+						: post
+				),
+			},
+		}))
+		try {
+			await axiosRequest.post(`/Post/like-post?postId=${postId}`, {})
+		} catch (error) {
+			console.error('Error in Like', error)
+			set({ posts: prevPosts })
+		}
 	},
 	LikeStory: async postId => {
-    try {
-      await axiosRequest.post(`/Story/LikeStory?storyId=${postId}`, {})
-    } catch (error) {
-      console.error('Error in Like', error)
-      set({ posts: prevPosts })
-    }
+		try {
+			await axiosRequest.post(`/Story/LikeStory?storyId=${postId}`, {})
+		} catch (error) {
+			console.error('Error in Like', error)
+			set({ posts: prevPosts })
+		}
 	},
-	commentPost: async (comment) => {
+	commentPost: async comment => {
 		const prevPosts = get().posts
-    try {
-      await axiosRequest.post(`/Post/add-comment`, comment)
-    } catch (error) {
-      console.error('Error in Like', error)
-      set({ posts: prevPosts })
-    }
+		try {
+			await axiosRequest.post(`/Post/add-comment`, comment)
+		} catch (error) {
+			console.error('Error in Like', error)
+			set({ posts: prevPosts })
+		}
 	},
+	postSaved: async postId => {
+		try {
+			await axiosRequest.post(`/Post/add-post-favorite`, { postId })
+			set(state => ({
+				users: {
+					...state.users,
+					data: state.users.data.map(user =>
+						user.postId === postId ? { ...user, postFavorite: true } : user
+					),
+				},
+				posts: {
+					...state.posts,
+					data: state.posts.data.map(post =>
+						post.postId === postId ? { ...post, postFavorite: true } : post
+					),
+				},
+			}))
+		} catch (error) {
+			console.error(error)
+		}
+	},
+	postStory: async (formdata) => {
+		try {
+			await axios('http://37.27.29.18:8003/Story/AddStories',formdata)
+			get().getUserStories()
+		} catch (error) {
+			console.error(error);	
+		}
+	}
 }))
