@@ -53,25 +53,11 @@
 			"download": "Get the app."
 		}
 	},
-	"setting": {
-		"settings": "Settings",
-		"center": "Accounts Center",
-		"desc": "Manage cross-service features and account settings across Meta platforms.",
-		"insta": "How you use Instagram",
-		"profile": "Edit Profile",
-		"notification": "Notifications",
-		"content": "Who can see your content",
-		"russian": "Russian",
-		"tajik": "Tajik",
-		"english": "English",
-		"lang": "Language Preferences",
-		"text": "Text on buttons, headings, and other text will be shown in the language you prefer."
-	},
-	"notice":{
-		"week":"This week",
-		"comment":"Comments",
-		"follow":"Followed",
-		"like":"Like",
-		"answer":"To answer"
+	"notice": {
+		"week": "This week",
+		"comment": "Comments",
+		"follow": "Followed",
+		"like": "Like",
+		"answer": "To answer"
 	}
 }
