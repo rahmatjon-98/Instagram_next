@@ -8,6 +8,8 @@ let api = 'http://37.27.29.18:8003'
 export const useProfileStore = create((set, get) => ({
 	user: {},
 	favorites: {},
+	posts: {},
+	userById: {},
 	// decodeToken: {},
 	// jwtDecode: () => {
 	// 	try {
@@ -73,11 +75,47 @@ export const useProfileStore = create((set, get) => ({
 	getFavorites: async () => {
 		try {
 			const { data } = await axiosRequest.get(
-				'http://37.27.29.18:8003/UserProfile/get-post-favorites'
+				`${api}/UserProfile/get-post-favorites`
 			)
 			set({ favorites: data })
 		} catch (error) {
 			console.error(error)
+		}
+	},
+	getPosts: async () => {
+		try {
+			const { data } = await axiosRequest.get(`${api}/Post/get-my-posts`)
+			set({ posts: data })
+		} catch (error) {
+			console.error(error)
+		}
+	},
+	getUserById: async id => {
+		try {
+			const { data } = await axiosRequest.get(
+				`${api}/UserProfile/get-user-profile-by-id?id=${id}`
+			)
+			set({ userById: data })
+		} catch (error) {
+			console.error(error)
+		}
+	},
+	addPost: async formData => {
+		try {
+			await axiosRequest.post(`${api}/Post/add-post`, formData)
+			await get().getProfileData()
+			await get().getPosts()
+		} catch (error) {
+			console.error(error)
+		}
+	},
+	deletePost: async postId => {
+		try {
+			await axiosRequest.delete(`${api}/Post/delete-post?id=${postId}`)
+			await get().getProfileData()
+			await get().getPosts()
+		} catch (error) {
+			console.error('Could not delete post', error)
 		}
 	},
 }))

@@ -123,7 +123,7 @@ export default function UsersList() {
 										}`}
 										onClick={() => toggleFollow(user.userId)}
 									>
-										{user.isFollowed ? 'Отписаться' : 'Подписаться'}
+										{user.isFollowed ? t("notice.unfollow") : t("notice.followback")}
 									</button>
 
 									<button

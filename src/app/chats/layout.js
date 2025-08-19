@@ -1,14 +1,6 @@
 "use client";
 
-import {
-  ChevronDown,
-  EllipsisVertical,
-  Loader2,
-  Search,
-  Trash,
-  User,
-  X,
-} from "lucide-react";
+import { ChevronDown, Loader2, Search, User, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
@@ -16,13 +8,14 @@ import img from "@/assets/img/pages/chat/layout/userFoto.jpg";
 import { useDefaultChat } from "@/store/pages/chat/pages/default-chat/store";
 import { useMyProfile } from "@/store/pages/chat/layout/store";
 import { useUserId } from "@/hook/useUserId";
-import { useChatById } from "@/store/pages/chat/pages/chat-by-id/store";
 import { usegetUserStore } from "@/store/pages/search/store";
 import { Skeleton, Stack } from "@mui/material";
 import { useRouter } from "next/navigation";
 import useDarkSide from "@/hook/useDarkSide";
+import { useTranslation } from "react-i18next";
 
 export default function Layout({ children }) {
+  const { t } = useTranslation();
   const router = useRouter();
   const userId = useUserId();
 
@@ -40,7 +33,6 @@ export default function Layout({ children }) {
   const [openModalUsers, setOpenModalUsers] = useState(false);
   const [search, setSearch] = useState("");
   const [filteredUsers, setFilteredUsers] = useState([]);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     get();
@@ -54,11 +46,9 @@ export default function Layout({ children }) {
   useEffect(() => {
     if (!search || !search.trim()) {
       setFilteredUsers(allUsers);
-      setLoading(false);
       return;
     }
 
-    setLoading(true);
     const t = setTimeout(() => {
       const q = search.toLowerCase();
       const results = allUsers.filter((u) =>
@@ -67,7 +57,6 @@ export default function Layout({ children }) {
           .includes(q)
       );
       setFilteredUsers(results);
-      setLoading(false);
     }, 500);
 
     return () => clearTimeout(t);
@@ -161,7 +150,7 @@ export default function Layout({ children }) {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search"
+            placeholder={t("chat.searchPlaceholder")}
             className={` w-9/10 `}
           />
         </section>
@@ -178,7 +167,7 @@ export default function Layout({ children }) {
             >
               <div className="relative">
                 <p className="text-center font-bold text-xl pb-5">
-                  Новое сообщение
+                  {t("chat.newMessageTitle")}
                 </p>
                 <button
                   type="button"
@@ -194,14 +183,17 @@ export default function Layout({ children }) {
                     type="text"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Search"
+                    placeholder={t("chat.searchPlaceholder")}
                     className={`outline-none w-9/10 `}
                   />
                 </div>
               </div>
 
               <div className="flex flex-col overflow-y-auto h-[50vh] py-3 hidscrol">
-                <p className="pb-2 px-5 text-left font-bold">Рекомендуемые</p>
+                <p className="pb-2 px-5 text-left font-bold">
+                  {" "}
+                  {t("chat.recommendedLabel")}
+                </p>
 
                 <div className="flex flex-col">
                   {loadingChat ? (
@@ -241,7 +233,7 @@ export default function Layout({ children }) {
                       ))
                     ) : (
                       <div className="p-4 text-center text-gray-500">
-                        Пользователи не найдены
+                        {t("chat.noUsersFound")}
                       </div>
                     )
                   ) : (
@@ -283,9 +275,9 @@ export default function Layout({ children }) {
         )}
 
         <section className="flex items-center justify-between font-medium text-sm px-5 py-3">
-          <p className="text-[#64748B]">Messages</p>
+          <p className="text-[#64748B]">{t("chat.messages")}</p>
           <button type="button" className="text-[#1780C2]">
-            Requests
+              {t("chat.requests")}
           </button>
         </section>
 
