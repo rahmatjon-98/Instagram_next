@@ -104,7 +104,7 @@ const Editprofile = () => {
 	}
 
 	return (
-		<div className='pt-[5vh] h-[100vh]'>
+		<div className='pt-[5vh] h-[100vh] mb-[15vh] md:mb-0'>
 			<section className='flex flex-col gap-[3vh] w-[80%] m-auto'>
 				<h1 className='text-[#2563EB] font-bold text-[25px]'>
 					Profile
@@ -132,13 +132,13 @@ const Editprofile = () => {
 							<div>
 								<h1
 									className='font-bold text-[#1E293B] text-[22px] w-[150px] 
-								lg:overflow-hidden text-ellipsis whitespace-nowrap'
+								overflow-hidden text-ellipsis whitespace-nowrap '
 								>
 									{user.userName}
 								</h1>
 							</div>
 							<div>
-								<p className='font-normal text-[#64748B] text-[20px] w-[150px] overflow-hidden text-ellipsis whitespace-nowrap '>
+								<p className='font-normal text-[#64748B] text-[20px] w-[130px] overflow-hidden text-ellipsis whitespace-nowrap '>
 									{user.firstName}
 								</p>
 								{user.lastName && (
@@ -255,7 +255,7 @@ const Editprofile = () => {
 						</span>
 					</div>
 					<button
-						className='bg-[#64748B] hover:bg-[#214b8e] text-[#FFFFFF] self-baseline px-[7%] py-[15px] rounded-2xl text-[20px] cursor-pointer active:scale-95 transition-transform duration-100 ease-in'
+						className='bg-[#64748B] hover:bg-[#214b8e] text-[#FFFFFF] self-baseline px-[7%] py-[10px] rounded-2xl text-[20px] cursor-pointer active:scale-95 transition-transform duration-100 ease-in'
 						onClick={handleEditProfile}
 					>
 						Submit
