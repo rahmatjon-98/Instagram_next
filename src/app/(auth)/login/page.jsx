@@ -43,19 +43,17 @@ export default function Login() {
 		}
 	}
 
-	return (
-		<div className='flex justify-around w-[80%] m-auto items-center'>
-			<Toaster />
-			<div>
-				<Image src={image71} alt='phone' />
-				<p className='text-[#64748B] text-center mt-[20px]'>
-					Установите приложение
-				</p>
-				<div className='flex items-center justify-center gap-[10px] mt-[20px]'>
-					<Image src={image72} alt='Google Play' />
-					<Image src={image73} alt='Microsoft' />
-				</div>
-			</div>
+  return (
+    <div className="flex justify-around w-[80%] m-auto items-center">
+      <Toaster />
+      <div className="hidden md:block">
+        <Image src={image71} alt="phone" />
+        <p className="text-[#64748B] text-center mt-[20px]">Установите приложение</p>
+        <div className="flex items-center justify-center gap-[10px] mt-[20px]">
+          <Image src={image72} alt="Google Play" />
+          <Image src={image73} alt="Microsoft" />
+        </div>
+      </div>
 
 			<div className='flex items-center justify-center min-h-screen w-[400px]'>
 				<div className='bg-white border border-gray-300 rounded-lg p-8 w-full  max-w-sm shadow-sm'>

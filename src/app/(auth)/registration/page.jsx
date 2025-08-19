@@ -51,7 +51,7 @@ export default function Registration() {
   return (
     <div className="flex justify-around w-[80%] m-auto items-center">
       <Toaster />
-      <div>
+      <div className="hidden md:block">
         <Image src={image71} alt="phone" />
         <p className="text-[#64748B] text-center mt-[20px]">Установите приложение</p>
         <div className="flex items-center justify-center gap-[10px] mt-[20px]">

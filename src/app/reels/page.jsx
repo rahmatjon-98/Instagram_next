@@ -8,6 +8,7 @@ import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import { Typography } from "@mui/material";
 import Link from "next/link";
+import ModalUsers from "@/components/pages/explore/ModalUsers";
 
 const Reels = () => {
   const [rellIdx, setRellIdx] = useState(0);
@@ -265,9 +266,9 @@ const Reels = () => {
               <span>{currentReel.commentCount}</span>
             </div>
             <div className="flex flex-col items-center">
-              <button>
-                <SendHorizontal />
-              </button>
+            <ModalUsers
+                            media={currentReel.images}
+              />
             </div>
             <div className="flex flex-col items-center">
               <button

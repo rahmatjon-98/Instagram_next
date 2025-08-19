@@ -135,9 +135,8 @@ export default function SideBar({ children }) {
           <div className="flex flex-col justify-between h-full">
             <div className="flex flex-col gap-2 mt-4">
               <div
-                className={`${
-                  theme == "dark" ? "hover:bg-gray-800" : "hover:bg-gray-100"
-                }`}
+                className={`${theme == "dark" ? "hover:bg-gray-800" : "hover:bg-gray-100"
+                  }`}
               >
                 <NavLink
                   href="/"
@@ -149,9 +148,8 @@ export default function SideBar({ children }) {
               </div>
 
               <button
-                className={`${
-                  theme == "dark" ? "hover:bg-gray-800" : "hover:bg-gray-100"
-                }`}
+                className={`${theme == "dark" ? "hover:bg-gray-800" : "hover:bg-gray-100"
+                  }`}
                 onClick={setOpenModal}
               >
                 <NavLink
@@ -164,9 +162,8 @@ export default function SideBar({ children }) {
               </button>
 
               <div
-                className={`${
-                  theme == "dark" ? "hover:bg-gray-800" : "hover:bg-gray-100"
-                }`}
+                className={`${theme == "dark" ? "hover:bg-gray-800" : "hover:bg-gray-100"
+                  }`}
               >
                 <NavLink
                   href="/explore"
@@ -178,9 +175,8 @@ export default function SideBar({ children }) {
               </div>
 
               <div
-                className={`${
-                  theme == "dark" ? "hover:bg-gray-800" : "hover:bg-gray-100"
-                }`}
+                className={`${theme == "dark" ? "hover:bg-gray-800" : "hover:bg-gray-100"
+                  }`}
               >
                 <NavLink
                   href="/reels"
@@ -192,9 +188,8 @@ export default function SideBar({ children }) {
               </div>
 
               <div
-                className={`${
-                  theme == "dark" ? "hover:bg-gray-800" : "hover:bg-gray-100"
-                }`}
+                className={`${theme == "dark" ? "hover:bg-gray-800" : "hover:bg-gray-100"
+                  }`}
               >
                 <NavLink
                   href="/chats"
@@ -206,9 +201,8 @@ export default function SideBar({ children }) {
               </div>
 
               <div
-                className={`${
-                  theme == "dark" ? "hover:bg-gray-800" : "hover:bg-gray-100"
-                }`}
+                className={`${theme == "dark" ? "hover:bg-gray-800" : "hover:bg-gray-100"
+                  }`}
               >
                 <NavLink
                   href="/notification"
@@ -220,28 +214,25 @@ export default function SideBar({ children }) {
               </div>
 
               <div
-                className={`flex items-center gap-4 w-[90%] m-auto rounded-md h-[52px] px-4 hover:bg-gray-100 ${
-                  theme == "dark" ? "hover:bg-gray-800" : "hover:bg-gray-100"
-                } `}
+                className={`flex items-center gap-4 w-[90%] m-auto rounded-md h-[52px] px-4 hover:bg-gray-100 ${theme == "dark" ? "hover:bg-gray-800" : "hover:bg-gray-100"
+                  } `}
               >
                 {action}
                 <p className="text-lg">{t("layout.create")}</p>
               </div>
 
               <div
-                className={`${
-                  theme == "dark" ? "hover:bg-gray-800" : "hover:bg-gray-100"
-                }`}
+                className={`${theme == "dark" ? "hover:bg-gray-800" : "hover:bg-gray-100"
+                  }`}
               >
                 <NavLink
                   href="/profile"
                   icon={
                     <Image
-                      className={`${
-                        pathname === "/profile"
+                      className={`${pathname === "/profile"
                           ? "border-2 border-black rounded-full"
                           : ""
-                      } h-10 w-10`}
+                        } h-10 w-10`}
                       src={Profile}
                       alt="Profile"
                     />
@@ -253,81 +244,81 @@ export default function SideBar({ children }) {
             </div>
 
             <div
-              className={`flex items-center gap-4 w-[90%] m-auto rounded-md h-[52px] px-4 ${
-                theme == "dark" ? "hover:bg-gray-800" : "hover:bg-gray-100"
-              }`}
+              className={`flex items-center gap-4 w-[90%] m-auto rounded-md h-[52px] px-4 ${theme == "dark" ? "hover:bg-gray-800" : "hover:bg-gray-100"
+                }`}
             >
               {threads}
               <p className="text-lg">{t("layout.threads")}</p>
             </div>
 
             <div
-              className={`flex items-center gap-4 w-[90%] m-auto rounded-md h-[52px] px-4 ${
-                theme == "dark" ? "hover:bg-gray-800" : "hover:bg-gray-100"
-              }`}
+              className={`flex items-center gap-4 w-[90%] m-auto rounded-md h-[52px] px-4 ${theme == "dark" ? "hover:bg-gray-800" : "hover:bg-gray-100"
+                }`}
             >
               <button onClick={handleClick} className="flex gap-5">
                 {setting}
                 <p className="text-lg">{t("layout.more")}</p>
               </button>
-              <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleClose}
-                anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-                transformOrigin={{ vertical: "top", horizontal: "center" }}
-              >
-                <Link href={"/setting/pro"}>
-                  <MenuItem onClick={handleClose}>
+              <div className="bg-gray-600">
+                <Menu
+                  anchorEl={anchorEl}
+                  open={Boolean(anchorEl)}
+                  onClose={handleClose}
+                  anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+                  transformOrigin={{ vertical: "top", horizontal: "center" }}
+                >
+                  <Link href={"/setting/pro"}>
+                    <MenuItem onClick={handleClose}>
+                      <div className="flex gap-[20px]">
+                        <Settings /> {t('setting.settings')}
+                      </div>
+                    </MenuItem>
+                  </Link>
+                  <MenuItem
+                    onClick={() => {
+                      handleClose();
+                      setOpenSwitchModal(true);
+                    }}
+                  >
                     <div className="flex gap-[20px]">
-                      <Settings /> Settings
+                      <CircleUserRound /> {t('setting.setAccount')}
                     </div>
                   </MenuItem>
-                </Link>
-                <MenuItem
-                  onClick={() => {
-                    handleClose();
-                    setOpenSwitchModal(true);
-                  }}
-                >
-                  <div className="flex gap-[20px]">
-                    <CircleUserRound /> Switch account
-                  </div>
-                </MenuItem>
-                <MenuItem>
-                  <div className="p-6 rounded-xl max-w-sm mx-auto shadow-lg">
-                    <div className="flex gap-[10px] justify-between items-center mb-6">
-                      <span className="text-lg font-semibold">
-                        Переключить режим
-                      </span>
-                      {theme === "dark" ? <Moon /> : <Sun />}
-                    </div>
+                  <MenuItem>
+                    <div className="p-6 rounded-xl max-w-sm mx-auto shadow-lg">
+                      <div className="flex gap-[10px] justify-between items-center mb-6">
+                        <span className="text-lg font-semibold">
+                          {t('setting.rejim')}
+                        </span>
+                        {theme === "dark" ? <Moon /> : <Sun />}
+                      </div>
 
-                    <div className="flex justify-between items-center">
-                      <span className="text-base">Ночной режим</span>
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={theme === "dark"}
-                          onChange={() =>
-                            setTheme(theme === "dark" ? "light" : "dark")
-                          }
-                          className="sr-only peer"
-                        />
+                      <div className="flex justify-between items-center">
+                        <span className="text-base">{t('setting.noch')}</span>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={theme === "dark"}
+                            onChange={() =>
+                              setTheme(theme === "dark" ? "light" : "dark")
+                            }
+                            className="sr-only peer"
+                          />
 
-                        <div className="w-11 h-6 bg-gray-400 rounded-full peer peer-checked:bg-blue-600 transition-colors"></div>
-                        <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform peer-checked:translate-x-full"></div>
-                      </label>
+                          <div className="w-11 h-6 bg-gray-400 rounded-full peer peer-checked:bg-blue-600 transition-colors"></div>
+                          <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform peer-checked:translate-x-full"></div>
+                        </label>
+                      </div>
                     </div>
-                  </div>
-                </MenuItem>
-                <Divider />
-                <MenuItem sx={{ color: "#ed4956", fontWeight: 600 }}>
-                  <div onClick={logOut} className="flex gap-[20px]">
-                    <LogOut /> Log out
-                  </div>
-                </MenuItem>
-              </Menu>
+                  </MenuItem>
+                  <Divider />
+                  <MenuItem sx={{ color: "#ed4956", fontWeight: 600 }}>
+                    <div onClick={logOut} className="flex gap-[20px]">
+                      <LogOut /> {t('setting.log')}
+                    </div>
+                  </MenuItem>
+                </Menu>
+              </div>
             </div>
           </div>
         </div>
@@ -386,17 +377,16 @@ export default function SideBar({ children }) {
             <button
               type="submit"
               disabled={isLoading}
-              className={`w-full text-white font-semibold py-2 rounded-md transition ${
-                isLoading
+              className={`w-full text-white font-semibold py-2 rounded-md transition ${isLoading
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-blue-500 hover:bg-blue-600"
-              }`}
+                }`}
             >
               {isLoading ? "Logging in..." : "Log in"}
             </button>
 
             <Link href={"/registration"}>
-              <p className="text-[#3B82F6] text-center">Forgot password?</p>
+              <p className="text-[#3B82F6] text-center">{t('setting.for')}</p>
             </Link>
           </form>
         </Box>
