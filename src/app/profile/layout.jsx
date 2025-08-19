@@ -65,14 +65,13 @@ const style2 = {
 }
 
 const Layout = ({ children }) => {
-	let { user: userer, getProfileData, getUserById } = useProfileStore()
+	let { user: userer, getProfileData } = useProfileStore()
 	// let { posts, getPosts } = useProfileStore()
 
 	let router = useRouter()
 	let pathname = usePathname()
 
 	const isMobile = useMediaQuery('(max-width:768px)')
-	// const [mounted, setMounted] = useState(false)
 
 	const myUserId = useUserId()
 
@@ -158,23 +157,6 @@ const Layout = ({ children }) => {
 
 	const { getChats, followers, getFollowers, getFollowings, followings } =
 		useProfileByIdStore()
-
-	// let getId = infoUsers?.data?.find(e => e.id === profileId)?.id
-
-	// async function createChat() {
-	// 	await addChats(getId)
-	// 	await getChats()
-
-	// 	const chat = useProfileByIdStore
-	// 		.getState()
-	// 		.chats?.data?.find(e => e.receiveUserName === user.userName)
-
-	// 	if (chat?.chatId) {
-	// 		router.push(`/chats/${chat.chatId}`)
-	// 	} else {
-	// 		console.error('Chat not found for this user')
-	// 	}
-	// }
 
 	const SkeletonRow = () => (
 		<Stack direction='row' spacing={2} alignItems='center' className='p-3'>
