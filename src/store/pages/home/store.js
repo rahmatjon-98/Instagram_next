@@ -1,5 +1,4 @@
 import axiosRequest from '@/lib/axiosRequest'
-import axios from 'axios'
 import { create } from 'zustand'
 
 export const useHome = create((set, get) => ({
@@ -106,10 +105,16 @@ export const useHome = create((set, get) => ({
 	},
 	postStory: async (formdata) => {
 		try {
-			await axios('http://37.27.29.18:8003/Story/AddStories',formdata)
-			get().getUserStories()
+			 await axiosRequest.post('/Story/AddStories', formdata)
 		} catch (error) {
 			console.error(error);	
+		}
+	},
+	followUser: async (id) => {
+		try {
+			await axiosRequest.post(`FollowingRelationShip/add-following-relation-ship?followingUserId=${id}`,{})
+		} catch (error) {
+			console.error(error);
 		}
 	}
 }))
