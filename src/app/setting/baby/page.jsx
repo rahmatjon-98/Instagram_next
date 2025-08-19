@@ -8,7 +8,7 @@ const Baby = () => {
   return (
     <div className="p-6">
       <h2 className="text-lg font-bold mb-4">Специальные возможности</h2>
-
+    
       <div className="flex items-center justify-between border rounded-2xl px-5 py-4 max-w-xl">
         <span className="text-base">Уменьшить движение</span>
 
