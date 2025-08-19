@@ -12,16 +12,16 @@ import ModalUsers from "@/components/pages/explore/ModalUsers";
 import { useTranslation } from 'react-i18next';
 
 const Reels = () => {
-  const [rellIdx, setRellIdx] = useState(0);
-  const [fullText, setFullText] = useState({});
-  const [isPlay, setIsPlay] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
-  const [open, setOpen] = useState(false);
-  const [newComment, setNewComment] = useState("");
-  const [isMobile, setIsMobile] = useState(false); 
-  const videoRef = useRef(null);
+  let [rellIdx, setRellIdx] = useState(0);
+  let [fullText, setFullText] = useState({});
+  let [isPlay, setIsPlay] = useState(false);
+  let [isMuted, setIsMuted] = useState(true);
+  let [open, setOpen] = useState(false);
+  let [newComment, setNewComment] = useState("");
+  let [isMobile, setIsMobile] = useState(false); 
+  let videoRef = useRef(null);
 
-  const {
+  let {
     rels,
     getRels,
     likeReals,
@@ -33,11 +33,11 @@ const Reels = () => {
     currentUserId,
   } = useRealsStore();
 
-  const {t} = useTranslation()
+  let {t} = useTranslation()
 
-  const currentReel = useMemo(() => rels[rellIdx] || {}, [rels, rellIdx]);
+  let currentReel = useMemo(() => rels[rellIdx] || {}, [rels, rellIdx]);
 
-  const modalStyle = useMemo(
+  let modalStyle = useMemo(
     () => ({
       position: "absolute",
       top: "50%",
@@ -58,7 +58,6 @@ const Reels = () => {
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 640); 
-      console.log("Реҷаи экран:", window.innerWidth < 640 ? "Мобилӣ" : "Ноутбук");
     };
 
     handleResize(); 
@@ -122,6 +121,7 @@ const Reels = () => {
       return !prev;
     });
   }, []);
+  
 
   const toggleMute = useCallback(() => {
     const video = videoRef.current;
@@ -131,21 +131,26 @@ const Reels = () => {
       console.log("Mute тағйир ёфт:", video.muted);
     }
   }, []);
+  
 
   const truncateText = useCallback((text, maxlength) => {
     if (!text || text.length <= maxlength) return text || "";
     return text.slice(0, maxlength) + "...";
   }, []);
+  
 
   const toggleFullText = useCallback((postId) => {
     setFullText((prev) => ({ ...prev, [postId]: !prev[postId] }));
   }, []);
+  
 
   const handleOpen = useCallback(() => setOpen(true), []);
   const handleClose = useCallback(() => {
     setOpen(false);
     setNewComment("");
   }, []);
+
+  
 
   const handleAddComment = useCallback(async () => {
     if (newComment.trim() && currentReel.postId) {
@@ -179,7 +184,7 @@ const Reels = () => {
                     src={
                       comment.userImage
                         ? `http://37.27.29.18:8003/images/${comment.userImage}`
-                        : "https://via.placeholder.com/40"
+                        : "https://img.freepik.com/premium-vector/vector-flat-illustration-grayscale-avatar-user-profile-person-icon-gender-neutral-silhouette-profile-picture-suitable-social-media-profiles-icons-screensavers-as-templatex9xa_719432-2210.jpg?semt=ais_hybrid&w=740&q=80"
                     }
                     alt={comment.userName}
                     className="w-10 h-10 border border-gray-300 rounded-full"
@@ -301,7 +306,7 @@ const Reels = () => {
                   src={
                     currentReel.userImage
                       ? `http://37.27.29.18:8003/images/${currentReel.userImage}`
-                      : "https://via.placeholder.com/40"
+                      : "https://img.freepik.com/premium-vector/vector-flat-illustration-grayscale-avatar-user-profile-person-icon-gender-neutral-silhouette-profile-picture-suitable-social-media-profiles-icons-screensavers-as-templatex9xa_719432-2210.jpg?semt=ais_hybrid&w=740&q=80"
                   }
                   alt={currentReel.userName}
                   className="w-10 h-10 mr-3 border border-white rounded-full"
