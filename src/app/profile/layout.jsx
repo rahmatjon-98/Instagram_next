@@ -666,7 +666,7 @@ const Layout = ({ children }) => {
 							/>
 						</div>
 						<p
-							className='text-[#1E293B] block md:flex cursor-pointer'
+							className='text-[#1E293B] block md:flex cursor-pointer items-baseline'
 							onClick={() => router.push('/profile')}
 						>
 							{userer?.postCount}
@@ -676,7 +676,7 @@ const Layout = ({ children }) => {
 							</span>
 						</p>
 						<p
-							className='text-[#1E293B] block md:flex cursor-pointer'
+							className='text-[#1E293B] block md:flex cursor-pointer items-baseline'
 							onClick={handleOpen}
 						>
 							{userer?.subscribersCount}
@@ -686,7 +686,7 @@ const Layout = ({ children }) => {
 							</span>
 						</p>
 						<p
-							className='text-[#1E293B] block md:flex cursor-pointer'
+							className='text-[#1E293B] block md:flex cursor-pointer items-baseline'
 							onClick={() => setOpenFollowings(true)}
 						>
 							{userer?.subscriptionsCount}
