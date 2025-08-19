@@ -18,8 +18,8 @@ export const useRealsStore = create((set, get) => ({
     }
 
     try {
-      const payload = token.split('.')[1]; 
-      const decodedPayload = atob(payload); 
+      const payload = token.split('.')[1];
+      const decodedPayload = atob(payload);
       const parsed = JSON.parse(decodedPayload);
 
       return {
@@ -32,7 +32,6 @@ export const useRealsStore = create((set, get) => ({
       return null;
     }
   },
-
 
   initUserFromToken: () => {
     const userInfo = get().extractUserFromToken();
@@ -48,7 +47,7 @@ export const useRealsStore = create((set, get) => ({
   getRels: async (pageNumber = 1, pageSize = 100) => {
     get().initUserFromToken();
     try {
-      let response = await axiosRequest.get("/Post/get-reels", {
+      const response = await axiosRequest.get("/Post/get-reels", {
         params: { pageNumber, pageSize },
       });
 
@@ -56,6 +55,7 @@ export const useRealsStore = create((set, get) => ({
         rels: response.data.data.map((reel) => ({
           ...reel,
           isLiked: reel.postLike || false,
+          postFavorite: reel.postFavorite || false,
           images: reel.images || "",
           userImage: reel.userImage || "",
           comments: reel.comments || [],
@@ -66,101 +66,140 @@ export const useRealsStore = create((set, get) => ({
     }
   },
 
-
   likeReals: async (postId) => {
-    set((state) => ({
-      rels: state.rels.map((reel) =>
-        reel.postId === postId
-          ? {
-              ...reel,
-              isLiked: !reel.isLiked,
-              postLikeCount: reel.isLiked
-                ? reel.postLikeCount - 1
-                : reel.postLikeCount + 1,
-            }
-          : reel
-      ),
-    }));
+    const { rels } = get();
+    const reelIndex = rels.findIndex((r) => String(r.postId) === String(postId));
+    if (reelIndex === -1) {
+      console.error("Рилс бо postId:", postId, "ёфт нашуд");
+      return;
+    }
+
+    const prevReel = rels[reelIndex];
+    set({
+      rels: [
+        ...rels.slice(0, reelIndex),
+        {
+          ...prevReel,
+          isLiked: !prevReel.isLiked,
+          postLikeCount: prevReel.isLiked ? prevReel.postLikeCount - 1 : prevReel.postLikeCount + 1,
+        },
+        ...rels.slice(reelIndex + 1),
+      ],
+    });
 
     try {
       const response = await axiosRequest.post(
         `/Post/like-post?postId=${postId}`,
         {},
+        { headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` } }
       );
 
       if (response.data.statusCode !== 200) {
-        throw new Error("Like API error");
+        throw new Error("Хатогии API лайк");
       }
     } catch (error) {
-      console.error("Error liking/unliking post:", error.message, error.response?.data);
-      set((state) => ({
-        rels: state.rels.map((reel) =>
-          reel.postId === postId
-            ? {
-                ...reel,
-                isLiked: !reel.isLiked,
-                postLikeCount: reel.isLiked
-                  ? reel.postLikeCount - 1
-                  : reel.postLikeCount + 1,
-              }
-            : reel
-        ),
-      }));
+      console.error("Хатогии лайк/анлайк:", error.message, error.response?.data);
+      set({
+        rels: [
+          ...rels.slice(0, reelIndex),
+          prevReel,
+          ...rels.slice(reelIndex + 1),
+        ],
+      });
     }
   },
 
   followUser: async (id) => {
-    set((state) => ({
-      rels: state.rels.map((reel) =>
-        reel.userId === id
-          ? {
-              ...reel,
-              isSubscriber: true,
-              subscribersCount: (reel.subscribersCount || 0) + 1,
-            }
-          : reel
-      ),
-    }));
+    const { rels } = get();
+    const reelIndex = rels.findIndex((r) => String(r.userId) === String(id));
+    if (reelIndex === -1) {
+      console.error("Рилс бо userId:", id, "ёфт нашуд");
+      return;
+    }
+
+    const prevReel = rels[reelIndex];
+    set({
+      rels: [
+        ...rels.slice(0, reelIndex),
+        {
+          ...prevReel,
+          isSubscriber: true,
+          subscribersCount: (prevReel.subscribersCount || 0) + 1,
+        },
+        ...rels.slice(reelIndex + 1),
+      ],
+    });
 
     try {
       await axiosRequest.post(
         `/FollowingRelationShip/add-following-relation-ship?followingUserId=${id}`,
         {},
+        { headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` } }
       );
     } catch (error) {
       console.error("Хатогии пайравӣ кардан:", error.message, error.response?.data);
+      set({
+        rels: [
+          ...rels.slice(0, reelIndex),
+          prevReel,
+          ...rels.slice(reelIndex + 1),
+        ],
+      });
     }
   },
 
   unfollowUser: async (id) => {
-    set((state) => ({
-      rels: state.rels.map((reel) =>
-        reel.userId === id
-          ? {
-              ...reel,
-              isSubscriber: false,
-              subscribersCount: Math.max(
-                (reel.subscribersCount || 1) - 1,
-                0
-              ),
-            }
-          : reel
-      ),
-    }));
+    const { rels } = get();
+    const reelIndex = rels.findIndex((r) => String(r.userId) === String(id));
+    if (reelIndex === -1) {
+      console.error("Рилс бо userId:", id, "ёфт нашуд");
+      return;
+    }
+
+    const prevReel = rels[reelIndex];
+    set({
+      rels: [
+        ...rels.slice(0, reelIndex),
+        {
+          ...prevReel,
+          isSubscriber: false,
+          subscribersCount: Math.max((prevReel.subscribersCount || 1) - 1, 0),
+        },
+        ...rels.slice(reelIndex + 1),
+      ],
+    });
 
     try {
       await axiosRequest.delete(
         `/FollowingRelationShip/delete-following-relation-ship?followingUserId=${id}`,
+        { headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` } }
       );
     } catch (error) {
       console.error("Хатогии қатъи пайравӣ:", error.message, error.response?.data);
+      set({
+        rels: [
+          ...rels.slice(0, reelIndex),
+          prevReel,
+          ...rels.slice(reelIndex + 1),
+        ],
+      });
     }
   },
 
   addNewComent: async ({ postId, commentText }) => {
-    const { currentUserId, currentUserName, currentUserImage } = get();
-    if (!currentUserId) return;
+    const { currentUserId, currentUserName, currentUserImage, rels } = get();
+    if (!currentUserId) {
+      console.error("Корбари ҷорӣ ёфт нашуд");
+      return;
+    }
 
+    const reelIndex = rels.findIndex((r) => String(r.postId) === String(postId));
+    if (reelIndex === -1) {
+      console.error("Рилс бо postId:", postId, "ёфт нашуд");
+      return;
+    }
+
+    const prevReel = rels[reelIndex];
     const tempId = `temp_${Date.now()}`;
     const tempComment = {
       postCommentId: tempId,
@@ -171,129 +210,137 @@ export const useRealsStore = create((set, get) => ({
       comment: commentText,
     };
 
-    // локально добавляем
-    set((state) => ({
-      rels: state.rels.map((r) =>
-        r.postId === postId
-          ? {
-              ...r,
-              comments: [...r.comments, tempComment],
-              commentCount: (r.commentCount || 0) + 1,
-            }
-          : r
-      ),
-    }));
+    set({
+      rels: [
+        ...rels.slice(0, reelIndex),
+        {
+          ...prevReel,
+          comments: [...prevReel.comments, tempComment],
+          commentCount: (prevReel.commentCount || 0) + 1,
+        },
+        ...rels.slice(reelIndex + 1),
+      ],
+    });
 
     try {
-      const res = await axiosRequest.post("/Post/add-comment", {
-        comment: commentText,
-        postId,
-      });
+      const res = await axiosRequest.post(
+        "/Post/add-comment",
+        { comment: commentText, postId },
+        { headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` } }
+      );
       const realId = res.data.data?.commentId;
 
       if (realId) {
-        // заменяем tempId на реальный
-        set((state) => ({
-          rels: state.rels.map((r) =>
-            r.postId === postId
-              ? {
-                  ...r,
-                  comments: r.comments.map((c) =>
-                    c.postCommentId === tempId
-                      ? { ...c, postCommentId: realId }
-                      : c
-                  ),
-                }
-              : r
-          ),
-        }));
+        set({
+          rels: [
+            ...rels.slice(0, reelIndex),
+            {
+              ...prevReel,
+              comments: prevReel.comments.map((c) =>
+                c.postCommentId === tempId ? { ...c, postCommentId: realId } : c
+              ),
+            },
+            ...rels.slice(reelIndex + 1),
+          ],
+        });
       }
     } catch (err) {
-      console.error("Ошибка при добавлении комментария:", err.message);
-      // убираем временный, если API упал
-      set((state) => ({
-        rels: state.rels.map((r) =>
-          r.postId === postId
-            ? {
-                ...r,
-                comments: r.comments.filter(
-                  (c) => c.postCommentId !== tempId
-                ),
-                commentCount: Math.max((r.commentCount || 1) - 1, 0),
-              }
-            : r
-        ),
-      }));
+      console.error("Хатогии иловаи коммент:", err.message, err.response?.data);
+      set({
+        rels: [
+          ...rels.slice(0, reelIndex),
+          prevReel,
+          ...rels.slice(reelIndex + 1),
+        ],
+      });
     }
   },
 
- // В deleteComment: сравнение через String(...) и добавим логирование при отказе
- deleteComment: async (postId, commentId) => {
-  const { rels, currentUserId } = get();
-  const reel = rels.find((r) => String(r.postId) === String(postId));
-  const comment = reel?.comments?.find(
-    (c) => String(c.postCommentId) === String(commentId)
-  );
-  if (!reel || !comment) return;
+  deleteComment: async (postId, commentId) => {
+    const { rels, currentUserId } = get();
+    const reelIndex = rels.findIndex((r) => String(r.postId) === String(postId));
+    if (reelIndex === -1) {
+      console.error("Рилс бо postId:", postId, "ёфт нашуд");
+      return;
+    }
 
-  // если это временный коммент — удаляем только локально
-  if (String(commentId).startsWith("temp_")) {
+    const prevReel = rels[reelIndex];
+    const comment = prevReel.comments.find((c) => String(c.postCommentId) === String(commentId));
+    if (!comment || String(comment.userId) !== String(currentUserId)) {
+      console.error("Коммент ё корбар мувофиқ нест");
+      return;
+    }
+
     set({
-      rels: rels.map((r) =>
-        r.postId === postId
-          ? {
-              ...r,
-              comments: r.comments.filter(
-                (c) => String(c.postCommentId) !== String(commentId)
-              ),
-              commentCount: Math.max((r.commentCount || 1) - 1, 0),
-            }
-          : r
-      ),
+      rels: [
+        ...rels.slice(0, reelIndex),
+        {
+          ...prevReel,
+          comments: prevReel.comments.filter((c) => String(c.postCommentId) !== String(commentId)),
+          commentCount: Math.max((prevReel.commentCount || 1) - 1, 0),
+        },
+        ...rels.slice(reelIndex + 1),
+      ],
     });
-    return;
-  }
 
-  // удаляем из стора сразу
-  set({
-    rels: rels.map((r) =>
-      r.postId === postId
-        ? {
-            ...r,
-            comments: r.comments.filter(
-              (c) => String(c.postCommentId) !== String(commentId)
-            ),
-            commentCount: Math.max((r.commentCount || 0) - 1, 0),
-          }
-        : r
-    ),
-  });
+    if (String(commentId).startsWith("temp_")) return;
 
-  try {
-    await axiosRequest.delete(
-      `/Post/delete-comment?commentId=${commentId}`
-    );
-  } catch (err) {
-    console.error("Ошибка удаления комментария:", err.message);
-    // откат — возвращаем коммент
+    try {
+      await axiosRequest.delete(`/Post/delete-comment?commentId=${commentId}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` },
+      });
+    } catch (err) {
+      console.error("Хатогии нест кардани коммент:", err.message, err.response?.data);
+      set({
+        rels: [
+          ...rels.slice(0, reelIndex),
+          prevReel,
+          ...rels.slice(reelIndex + 1),
+        ],
+      });
+    }
+  },
+
+  postSaved: async (postId) => {
+    const { rels } = get();
+    const reelIndex = rels.findIndex((r) => String(r.postId) === String(postId));
+    if (reelIndex === -1) {
+      console.error("Рилс бо postId:", postId, "ёфт нашуд");
+      return;
+    }
+
+    const prevReel = { ...rels[reelIndex] }; // Нигоҳ доштани ҳолати пешина
     set({
-      rels: rels.map((r) =>
-        r.postId === postId
-          ? {
-              ...r,
-              comments: [...r.comments, comment].sort(
-                (a, b) =>
-                  new Date(a.dateCommented) - new Date(b.dateCommented)
-              ),
-              commentCount: (r.commentCount || 0) + 1,
-            }
-          : r
-      ),
+      rels: [
+        ...rels.slice(0, reelIndex),
+        {
+          ...prevReel,
+          postFavorite: !prevReel.postFavorite, // Тағйири postFavorite
+        },
+        ...rels.slice(reelIndex + 1),
+      ],
     });
-  }
-},
 
-  
+    // Тасдиқи тағйири postFavorite дар консол
+    console.log("PostFavorite тағйир ёфт:", !prevReel.postFavorite);
 
-  
+    try {
+      const response = await axiosRequest.post(
+        `/Post/add-post-favorite`,
+        { postId },
+        { headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` } }
+      );
+      console.log("API response:", response.data); // Логи API барои тафтиш
+    } catch (error) {
+      console.error("Хатогии захира кардан:", error.message, error.response?.data);
+      set({
+        rels: [
+          ...rels.slice(0, reelIndex),
+          prevReel, // Барқарор кардани ҳолати пешина
+          ...rels.slice(reelIndex + 1),
+        ],
+      });
+      console.log("PostFavorite барқарор шуд:", prevReel.postFavorite);
+    }
+  },
 }));
