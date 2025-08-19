@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import img from "@/assets/img/pages/chat/layout/userFoto.jpg";
 import useDarkSide from "@/hook/useDarkSide";
+import { useTranslation } from "react-i18next";
 
 export default function DefaultChat() {
   const userId = useUserId();
@@ -164,7 +165,7 @@ export default function DefaultChat() {
   }
 
   const [theme, setTheme] = useDarkSide();
-
+  const { t } = useTranslation();
   return (
     <div className="w-full">
       <div className="lg:hidden block">
@@ -334,9 +335,9 @@ export default function DefaultChat() {
           )}
 
           <section className="flex items-center justify-between font-medium text-sm px-5">
-            <p className="text-[#64748B]">Messages</p>
+            <p className="text-[#64748B]">{t("chat.messages")}</p>
             <button type="button" className="text-[#1780C2]">
-              Requests
+              {t("chat.requests")}
             </button>
           </section>
 
@@ -404,9 +405,9 @@ export default function DefaultChat() {
             className="w-25 h-25"
             priority
           />
-          <p className="font-medium text-[#1E293B]">Your messages</p>
+          <p className="font-medium text-[#1E293B]">{t("chat.defaultTitle")}</p>
           <p className="text-[#64748B] text-xs">
-            Send private photos and messages to a friend or group
+            {t("chat.defaultDescription")}
           </p>
           <button
             type="button"
@@ -414,7 +415,7 @@ export default function DefaultChat() {
             aria-label="New message"
             className="py-1 px-10 rounded bg-blue-500  text-white"
           >
-            Send message
+            {t("chat.newMessageButton")}
           </button>
 
           {openModalUsers && (
@@ -431,7 +432,7 @@ export default function DefaultChat() {
               >
                 <div className="relative">
                   <p className="text-center font-bold text-xl pb-5">
-                    Новое сообщение
+                   {t("chat.newMessageTitle")}
                   </p>
                   <button
                     type="button"
@@ -442,19 +443,19 @@ export default function DefaultChat() {
                   </button>
 
                   <div className="flex items-center gap-5 border-y-2 border-gray-200 p-3">
-                    <p className="text-[18px] font-bold">Кому:</p>
+                    <p className="text-[18px] font-bold">{t("chat.toLabel")}</p>
                     <input
                       type="text"
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}
-                      placeholder="Search"
+                      placeholder={t("chat.searchPlaceholder")}
                       className={`outline-none w-9/10 `}
                     />
                   </div>
                 </div>
 
                 <div className="flex flex-col overflow-y-auto hidscrol h-[50vh] py-3">
-                  <p className="pb-2 px-5 text-left font-bold">Рекомендуемые</p>
+                  <p className="pb-2 px-5 text-left font-bold"> {t("chat.recommendedLabel")}</p>
 
                   <div className="flex flex-col">
                     {loadingChat ? (
@@ -495,7 +496,7 @@ export default function DefaultChat() {
                         ))
                       ) : (
                         <div className="p-4 text-center text-gray-500">
-                          Пользователи не найдены
+                          {t("chat.noUsersFound")}
                         </div>
                       )
                     ) : (
