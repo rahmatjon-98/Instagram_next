@@ -17,15 +17,13 @@ const LayoutSet = ({ children }) => {
     return (
         <div className="flex flex-col md:flex-row  lg:gap-[10px]">
 
-            {/* Sidebar / Menu */}
             <div className={`
-                fixed top-0 left-0 h-[80vh] z-50 transition-transform duration-300 
+                fixed top-0 left-0 h-[80vh] z-20 transition-transform duration-300 
                 md:relative md:h-screen md:translate-x-0
                 ${open ? "translate-x-0" : "-translate-x-full"} 
                 md:w-[320px] lg:w-[400px] w-full p-[20px] overflow-y-auto scroll-smooth hidscrol
             `}>
 
-                {/* Close button mobile */}
                 <div className="flex justify-end md:hidden mb-4">
                     <button onClick={() => setOpen(false)} className="p-2">
                         <X size={24} />
@@ -67,7 +65,6 @@ const LayoutSet = ({ children }) => {
                     </a>
                 </div>
 
-                {/* Instagram section */}
                 <p className='font-semibold text-[15px] text-gray-600 w-[300px] mt-[30px]'>{t('setting.insta')}</p>
                 <Link href={'/setting/pro'}>
                     <div onClick={() => setOpen(false)} className={`flex gap-[10px] items-center p-4 rounded-md mt-[20px] transition-colors duration-300 ${pathname === "/setting/pro" ? "bg-gray-300" : "hover:bg-gray-200"}`}>
@@ -82,7 +79,6 @@ const LayoutSet = ({ children }) => {
                     </div>
                 </Link>
 
-                {/* Content section */}
                 <p className='font-semibold text-[15px] text-gray-600 mt-[30px]'>{t('setting.content')}</p>
                 <Link href={'/setting/block-account'}>
                     <div onClick={() => setOpen(false)} className={`flex gap-[10px] items-center p-3 rounded-md mt-[15px] transition-colors duration-300 ${pathname === "/setting/block-account" ? "bg-gray-300" : "hover:bg-gray-200"}`}>
@@ -109,7 +105,6 @@ const LayoutSet = ({ children }) => {
                     </div>
                 </Link>
 
-                {/* Interaction section */}
                 <p className='font-semibold text-[15px] text-gray-600 mt-[30px]'>{t('setting.vami')}</p>
                 <Link href={'/chats'}>
                     <div onClick={() => setOpen(false)} className={`flex gap-[10px] items-center p-3 rounded-md mt-[15px] transition-colors duration-300 ${pathname === "/setting/message" ? "bg-gray-300" : "hover:bg-gray-200"}`}>
@@ -148,7 +143,6 @@ const LayoutSet = ({ children }) => {
                     </div>
                 </Link>
 
-                {/* Visibility section */}
                 <p className='font-semibold text-[15px] text-gray-600 mt-[30px]'>{t('setting.vidite')}</p>
                 <Link href={'/setting/accountes-block'}>
                     <div onClick={() => setOpen(false)} className={`flex gap-[10px] items-center p-3 rounded-md mt-[15px] transition-colors duration-300 ${pathname === "/setting/accountes-block" ? "bg-gray-300" : "hover:bg-gray-200"}`}>
@@ -175,25 +169,90 @@ const LayoutSet = ({ children }) => {
                     </div>
                 </Link>
 
-                {/* More sections ... continue exactly as your code */}
+                <p className='font-semibold text-[15px] text-gray-600 mt-[30px]'>{t('setting.vawe')}</p>
+                <Link href={'/setting/download'}>
+                    <div onClick={() => setOpen(false)} className={`flex gap-[10px] items-center p-3 rounded-md mt-[15px] transition-colors duration-300 ${pathname === "/setting/download" ? "bg-gray-300" : "hover:bg-gray-200"}`}>
+                        <ArrowDownToLine />
+                        <p className='w-[200px]'>{t('setting.arxiv')}</p>
+                    </div>
+                </Link>
+                <Link href={'/setting/baby'}>
+                    <div onClick={() => setOpen(false)} className={`flex gap-[10px] items-center p-3 rounded-md mt-[5px] transition-colors duration-300 ${pathname === "/setting/baby" ? "bg-gray-300" : "hover:bg-gray-200"}`}>
+                        <Baby />
+                        <p>{t('setting.spet')}</p>
+                    </div>
+                </Link>
+                <Link href={'/setting/language'}>
+                    <div onClick={() => setOpen(false)} className={`flex gap-[10px] items-center p-3 rounded-md mt-[5px] transition-colors duration-300 ${pathname === "/setting/language" ? "bg-gray-300" : "hover:bg-gray-200"}`}>
+                        <Languages />
+                        <p>{t('setting.yazik')}</p>
+                    </div>
+                </Link>
+                <Link href={'/setting/sayt'}>
+                    <div className={`flex gap-[10px] items-center p-3 rounded-md mt-[5px] transition-colors duration-300 ${pathname === "/setting/sayt" ? "bg-gray-300" : "hover:bg-gray-200"}`}>
+                        <Wallet />
+                        <p>{t('setting.sayt')}</p>
+                    </div>
+                </Link>
+
+                <p className='font-semibold text-[15px] text-gray-600 mt-[30px]'>Семьям</p>
+                <Link href={'/setting/family'}>
+                    <div onClick={() => setOpen(false)} className={`flex gap-[10px] items-center p-3 rounded-md mt-[5px] transition-colors duration-300 ${pathname === "/setting/family" ? "bg-gray-300" : "hover:bg-gray-200"}`}>
+                        <Users />
+                        <p>{t('setting.semya')}</p>
+                    </div>
+                </Link>
+
+                <p className='font-semibold text-[15px] text-gray-600 mt-[30px]'>Для профессиональных аккаунтов</p>
+                <Link href={'/setting/accountType'}>
+                    <div onClick={() => setOpen(false)} className={`flex gap-[10px] items-center p-3 rounded-md mt-[15px] transition-colors duration-300 ${pathname === "/setting/accountType" ? "bg-gray-300" : "hover:bg-gray-200"}`}>
+                        <SquareChartGantt />
+                        <p>Тип аккаунта и <br /> инструменты</p>
+                    </div>
+                </Link>
+                <Link href={'/setting/show'}>
+                    <div onClick={() => setOpen(false)} className={`flex gap-[10px] items-center p-3 rounded-md mt-[5px] transition-colors duration-300 ${pathname === "/setting/show" ? "bg-gray-300" : "hover:bg-gray-200"}`}>
+                        <BadgeCheck />
+                        <p>Покажите, что ваш <br /> профиль подтвержден</p>
+                    </div>
+                </Link>
+
+                <p className='font-semibold text-[15px] text-gray-600 mt-[30px]'>Информация и поддержка</p>
+                <Link href={'/setting/help'}>
+                    <div onClick={() => setOpen(false)} className={`flex gap-[10px] items-center p-3 rounded-md mt-[15px] transition-colors duration-300 ${pathname === "/setting/help" ? "bg-gray-300" : "hover:bg-gray-200"}`}>
+                        <LifeBuoy />
+                        <p>Помощь</p>
+                    </div>
+                </Link>
+                <Link href={'/setting/center'}>
+                    <div onClick={() => setOpen(false)} className={`flex gap-[10px] items-center p-3 rounded-md mt-[5px] transition-colors duration-300 ${pathname === "/setting/center" ? "bg-gray-300" : "hover:bg-gray-200"}`}>
+                        <ShieldPlus />
+                        <p>Центр <br /> конфиденциальности</p>
+                    </div>
+                </Link>
+                <Link href={'/setting/statusAccount'}>
+                    <div onClick={() => setOpen(false)} className={`flex gap-[10px] items-center p-3 rounded-md mt-[5px] transition-colors duration-300 ${pathname === "/setting/statusAccount" ? "bg-gray-300" : "hover:bg-gray-200"}`}>
+                        <UserRound />
+                        <p>Статус аккаунта</p>
+                    </div>
+                </Link>
+
             </div>
 
-            {/* Overlay */}
             {open && (
                 <div
-                    className="fixed inset-0 bg-white bg-opacity-30 z-40 md:hidden"
+                    className="fixed inset-0 bg-white bg-opacity-30 z-10 md:hidden"
                     onClick={() => setOpen(false)}
                 ></div>
             )}
 
-            {/* Mobile toggle button */}
+
             <div className="md:hidden fixed top-0 p-2 bg-white w-full left-4 z-50">
                 <button onClick={() => setOpen(true)}>
                     <Menu size={28} />
                 </button>
             </div>
 
-            {/* Main content */}
             <div className="w-full md:flex-1 lg:w-[1000px] overflow-auto">
                 {children}
             </div>

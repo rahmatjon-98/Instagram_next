@@ -91,7 +91,6 @@ export const useRealsStore = create((set, get) => ({
       const response = await axiosRequest.post(
         `/Post/like-post?postId=${postId}`,
         {},
-        { headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` } }
       );
 
       if (response.data.statusCode !== 200) {
@@ -134,7 +133,6 @@ export const useRealsStore = create((set, get) => ({
       await axiosRequest.post(
         `/FollowingRelationShip/add-following-relation-ship?followingUserId=${id}`,
         {},
-        { headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` } }
       );
     } catch (error) {
       console.error("Хатогии пайравӣ кардан:", error.message, error.response?.data);
@@ -172,7 +170,6 @@ export const useRealsStore = create((set, get) => ({
     try {
       await axiosRequest.delete(
         `/FollowingRelationShip/delete-following-relation-ship?followingUserId=${id}`,
-        { headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` } }
       );
     } catch (error) {
       console.error("Хатогии қатъи пайравӣ:", error.message, error.response?.data);
@@ -226,7 +223,6 @@ export const useRealsStore = create((set, get) => ({
       const res = await axiosRequest.post(
         "/Post/add-comment",
         { comment: commentText, postId },
-        { headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` } }
       );
       const realId = res.data.data?.commentId;
 
@@ -287,7 +283,6 @@ export const useRealsStore = create((set, get) => ({
 
     try {
       await axiosRequest.delete(`/Post/delete-comment?commentId=${commentId}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` },
       });
     } catch (err) {
       console.error("Хатогии нест кардани коммент:", err.message, err.response?.data);
@@ -309,34 +304,32 @@ export const useRealsStore = create((set, get) => ({
       return;
     }
 
-    const prevReel = { ...rels[reelIndex] }; // Нигоҳ доштани ҳолати пешина
+    const prevReel = { ...rels[reelIndex] }; 
     set({
       rels: [
         ...rels.slice(0, reelIndex),
         {
           ...prevReel,
-          postFavorite: !prevReel.postFavorite, // Тағйири postFavorite
+          postFavorite: !prevReel.postFavorite, 
         },
         ...rels.slice(reelIndex + 1),
       ],
     });
 
-    // Тасдиқи тағйири postFavorite дар консол
     console.log("PostFavorite тағйир ёфт:", !prevReel.postFavorite);
 
     try {
       const response = await axiosRequest.post(
         `/Post/add-post-favorite`,
         { postId },
-        { headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` } }
       );
-      console.log("API response:", response.data); // Логи API барои тафтиш
+      console.log("API response:", response.data); 
     } catch (error) {
       console.error("Хатогии захира кардан:", error.message, error.response?.data);
       set({
         rels: [
           ...rels.slice(0, reelIndex),
-          prevReel, // Барқарор кардани ҳолати пешина
+          prevReel,
           ...rels.slice(reelIndex + 1),
         ],
       });
