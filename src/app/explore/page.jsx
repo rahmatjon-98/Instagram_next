@@ -190,82 +190,6 @@ export default function Explore() {
 	const { t } = useTranslation();
 	const [theme, setTheme] = useDarkSide();
 
-<<<<<<< HEAD
-											<button className="cursor-pointer lg:block hidden" onClick={() => setOpen(false)}>
-												<X />
-											</button>
-
-										</div>
-										<div className="overflow-y-auto overflow-x-hidden break-words select-none max-h-[53vh] space-y-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-											{postById.data?.comments?.length > 0 ? (
-												postById.data.comments.map(comment => (
-													<div key={comment.id} className="flex items-center justify-between">
-														<div className="flex  gap-3 items-center flex-1 min-w-0">
-															{comment.userImage
-																? (
-																	<img
-																		src={comment.userImage ? `http://37.27.29.18:8003/images/${comment.userImage}` : "https://via.placeholder.com/40"}
-																		alt={comment.userName}
-																		className="w-8 h-8 border border-gray-300 rounded-full"
-																	/>
-																)
-																: (
-																	<div>
-																		<CircleUserRound className="cursor-pointer" size={34} onClick={() => router.push(`/${comment.userId}`)} color="#ffffff" />
-
-																	</div>
-																)
-															}
-															<div className="min-w-120">
-																<p className="text-[15px]  w-[90%] ">{comment.comment}</p>
-																{comment.dateCommented && (
-
-																	<span className="text-[10px] text-gray-400 leading-0 self-end">
-																		{new Date(comment.dateCommented).toLocaleString([], {
-																			year: "numeric",
-																			month: "2-digit",
-																			day: "2-digit",
-																			hour: "2-digit",
-																			minute: "2-digit"
-																		})}
-																	</span>
-																)}
-
-															</div>
-														</div>
-														{
-															comment.userId == useUserId() ?
-																<div className="flex gap-[10px]">
-
-																	<button className="cursor-pointer hover:text-red-500" onClick={() => RemoveComit(comment.postCommentId)}>
-																		<X />
-																	</button>
-																	<Heart
-																		className="cursor-pointer"
-																		onClick={() => handleLikeComment(comment.postCommentId)}
-																		size={20}
-																		color="#ffffff"
-																		fill={likedComments[comment.postCommentId] ? 'red' : 'nane'}
-																		stroke={likedComments[comment.postCommentId] ? 'red' : 'white'}
-																	/>
-																</div>
-																: <Heart
-																	className="cursor-pointer"
-																	onClick={() => handleLikeComment(comment.postCommentId)}
-																	size={20}
-																	color="#ffffff"
-																	fill={likedComments[comment.postCommentId] ? 'red' : 'none'}
-																	stroke={likedComments[comment.postCommentId] ? 'red' : 'white'}
-																/>
-														}
-													</div>
-												))
-											) : (
-												<p className="text-gray-400">Нет комментариев</p>
-											)}
-										</div>
-									</div>
-=======
 	return (
 		<div>
 			<div className="lg:hidden">
@@ -361,7 +285,6 @@ export default function Explore() {
 													? t("exlpore.2")
 													: t("exlpore.1")}
 											</button>
->>>>>>> f65262a60832b552ad51536bfb3fe9dacd235c07
 
 											<button
 												className="cursor-pointer lg:block hidden"
@@ -521,111 +444,6 @@ export default function Explore() {
 											</span>
 										</div>
 
-<<<<<<< HEAD
-			<div className="flex justify-center lg:pt-0 pt-[50px]">
-				<div className="grid grid-cols-3 gap-0.5  my-[10px] mx-[10px]  max-w-[1240px]">
-					{user?.data?.map((el, i) => {
-						if (i == 15) {
-							cnt = 4;
-						}
-						let isFifth = (i + 1) % cnt === 0;
-						if (i == 22) {
-							isFifth = true
-						}
-						if (i == 23) {
-							isFifth = false
-						}
-						if (i == 25) { isFifth = true }
-						if (i == 31) { isFifth = false }
-						if (i == 32) { isFifth = true }
-						if (i == 35) { isFifth = true }
-						if(i==42){ isFifth=true}
-						if ((i + 1) % cnt === 0) {
-							if (i == 11) {
-								cnt = cnt + 1
-								isFifth = false
-							} else {
-								cnt += cnt
-							}
-						}
-						return (
-							<div key={el.postId} className={`relative ${isFifth ? "row-span-2 h-[100%] min-w-[100%] max-w-[53%]" : ""} group aspect-square w-[100%] overflow-hidden rounded  bg-black cursor-pointer`} onClick={() => handleOpen(el.postId)}>
-								{el.images[0].endsWith(".mp4") ? (
-									<div>
-										<div className="z-[10] absolute top-2 left-2 text-white  rounded-full p-1">
-											<svg
-												className='x1lliihq x1n2onr6 x5n08af'
-												fill='currentColor'
-												height='24'
-												role='img'
-												viewBox='0 0 24 24'
-												width='24'
-											>
-												<title>Reels</title>
-												<line
-													fill='none'
-													stroke='currentColor'
-													strokeLinejoin='round'
-													strokeWidth='2'
-													x1='2.049'
-													x2='21.95'
-													y1='7.002'
-													y2='7.002'
-												></line>
-												<line
-													fill='none'
-													stroke='currentColor'
-													strokeLinecap='round'
-													strokeLinejoin='round'
-													strokeWidth='2'
-													x1='13.504'
-													x2='16.362'
-													y1='2.001'
-													y2='7.002'
-												></line>
-												<line
-													fill='none'
-													stroke='currentColor'
-													strokeLinecap='round'
-													strokeLinejoin='round'
-													strokeWidth='2'
-													x1='7.207'
-													x2='10.002'
-													y1='2.11'
-													y2='7.002'
-												></line>
-												<path
-													d='M2 12.001v3.449c0 2.849.698 4.006 1.606 4.945.94.908 2.098 1.607 4.946 1.607h6.896c2.848 0 4.006-.699 4.946-1.607.908-.939 1.606-2.096 1.606-4.945V8.552c0-2.848-.698-4.006-1.606-4.945C19.454 2.699 18.296 2 15.448 2H8.552c-2.848 0-4.006.699-4.946 1.607C2.698 4.546 2 5.704 2 8.552Z'
-													fill='none'
-													stroke='currentColor'
-													strokeLinecap='round'
-													strokeLinejoin='round'
-													strokeWidth='2'
-												></path>
-												<path
-													d='M9.763 17.664a.908.908 0 0 1-.454-.787V11.63a.909.909 0 0 1 1.364-.788l4.545 2.624a.909.909 0 0 1 0 1.575l-4.545 2.624a.91.91 0 0 1-.91 0Z'
-													fillRule='evenodd'
-												></path>
-											</svg>
-										</div>
-										<video
-											src={`http://37.27.29.18:8003/images/${el.images[0]}`}
-											className={`  ${isFifth ? "h-[1000px]" : ""}  w-full object-cover transition-transform duration-500 group-hover:scale-101`}
-											muted
-											loop
-											playsInline
-										/>
-									</div>
-								) : (
-									<Image
-										src={`http://37.27.29.18:8003/images/${el.images[0]}`}
-										alt={`Post by ${el.userName}`}
-										width={500}
-										height={500}
-										className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-101"
-									/>
-								)}
-=======
 										<div className="flex gap-2">
 											<CommentInput
 												value2={newcomit}
@@ -650,7 +468,6 @@ export default function Explore() {
 					</div>
 				</Box>
 			</Modal>
->>>>>>> f65262a60832b552ad51536bfb3fe9dacd235c07
 
 			<div className="flex justify-center lg:pt-0 pt-[50px]">
 				<div className="grid grid-cols-3 gap-0.5  my-[10px] mx-[10px]  max-w-[1240px]">
