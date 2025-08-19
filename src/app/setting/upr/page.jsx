@@ -16,7 +16,7 @@ const Upr = () => {
   };
 
   return (
-    <div className='w-[90%] mx-auto mb-[30px]'>
+    <div className='w-[90%] mx-auto mb-[30px] max-h-[95vh] overflow-y-auto overflow-x-hidden'>
       <p className='font-bold text-2xl my-[20px]'>{t("Help.13")}</p>
       <p className='font-mono text-gray-700 text-[20px]'>{t("Help.14")}</p>
       <p className='text-[15px] text-gray-500'>{t("Help.15")}</p>

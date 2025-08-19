@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { useChatById } from "@/store/pages/chat/pages/chat-by-id/store";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import useDarkSide from "@/hook/useDarkSide";
 
 const ModalUsers = ({ media }) => {
     const router = useRouter();
@@ -98,12 +99,12 @@ const ModalUsers = ({ media }) => {
                     } else if (media instanceof File) {
                         formData.append("file", media);
                     }
-                  
-                    toast.success("Отправлено"); 
+
+                    toast.success("Отправлено");
                     await sendMessage(formData);
                     console.log(formData);
                 }
-                
+
             } else {
                 toast.error("Chat not found for this user");
             }
@@ -114,7 +115,8 @@ const ModalUsers = ({ media }) => {
         }
     }
 
-    let {t}=useTranslation()
+    let { t } = useTranslation()
+    const [theme, setTheme] = useDarkSide();
 
     return (
         <div>
@@ -126,13 +128,16 @@ const ModalUsers = ({ media }) => {
             >
                 <Send />
             </button>
-            <div className={` bg-white text-black`}>
+            <div className={theme === "dark" ? "bg-[#232323] text-white" : "bg-white text-black"}>
                 {openModalUsers && (
                     <section
                         style={{ backdropFilter: "blur(6px)" }}
                         className="fixed inset-0 z-20 flex items-center justify-center bg-[rgba(0,0,0,0.6)]"
                     >
-                        <article className="w-[600px] bg-white rounded-2xl shadow-lg py-5 px-4">
+                        <article className={theme === "dark"
+                            ? "w-[600px] bg-[#232323] text-white rounded-2xl shadow-lg py-5 px-4"
+                            : "w-[600px] bg-white text-black rounded-2xl shadow-lg py-5 px-4"
+                        }>
                             <div className="relative border-b border-gray-200 pb-4 mb-3">
                                 <p className="text-center font-semibold text-2xl">
                                     {t("exlpore.8")}
@@ -226,8 +231,8 @@ const ModalUsers = ({ media }) => {
                                                     <Image
                                                         alt=""
                                                         src={`http://37.27.29.18:8003/images/${e.receiveUserId === userId
-                                                                ? e.sendUserImage
-                                                                : e.receiveUserImage
+                                                            ? e.sendUserImage
+                                                            : e.receiveUserImage
                                                             }`}
                                                         width={40}
                                                         height={40}

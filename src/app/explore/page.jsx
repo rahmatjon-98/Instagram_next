@@ -31,18 +31,18 @@ const style = {
 	top: "50%",
 	left: "50%",
 	transform: "translate(-50%, -50%)",
-	width: "100%", // адаптивная ширина
-	maxWidth: 900, // максимум как у тебя было
+	width: "100%", 
+	maxWidth: 900,
 	color: "white",
-	maxHeight: "90vh", // ограничение по высоте для маленьких экранов
-	overflow: "hidden", // чтобы не вылазило
+	maxHeight: "90vh", 
+	overflow: "hidden", 
 	borderRadius: "5px",
 	"@media (max-width:768px)": {
 		top: 0,
-		transform: "translate(-50%, 0)", // чтобы не сдвигалось
-		height: "100vh", // на мобилке — во всю высоту
-		maxHeight: "100vh", // убираем ограничение
-		borderRadius: 0, // по желанию, как в Instagram
+		transform: "translate(-50%, 0)", 
+		height: "100vh", 
+		maxHeight: "100vh",
+		borderRadius: 0,
 	},
 };
 
