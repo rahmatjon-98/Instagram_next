@@ -29,18 +29,18 @@ const style = {
 	top: '50%',
 	left: '50%',
 	transform: 'translate(-50%, -50%)',
-	width: '100%', 
+	width: '100%',
 	maxWidth: 900,
 	color: 'white',
-	maxHeight: '90vh', 
-	overflow: 'hidden', 
+	maxHeight: '90vh',
+	overflow: 'hidden',
 	borderRadius: '5px',
 	'@media (max-width:768px)': {
 		top: 0,
 		transform: 'translate(-50%, 0)',
-		height: '100vh', 
-		maxHeight: '100vh', 
-		borderRadius: 0, 
+		height: '100vh',
+		maxHeight: '100vh',
+		borderRadius: 0,
 	},
 }
 
@@ -176,6 +176,7 @@ const Saved = () => {
 			const updatedFollow = FolowUser?.data?.some(
 				e => e.userShortInfo.userId == id
 			)
+			getProfileData()
 		} catch (error) {
 			console.error('Ошибка при подписке/отписке:', error)
 		}
