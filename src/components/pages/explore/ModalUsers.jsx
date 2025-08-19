@@ -85,11 +85,13 @@ const ModalUsers = ({ media }) => {
           const formData = new FormData();
           formData.append("chatId", chat.chatId);
 
-          formData.append("MessageText", { postImage: `${media}` });
+          formData.append("MessageText", media);
           //   formData.append("file", media);
 
           await sendMessage(formData);
           console.log(media);
+
+          router.push(`/chats/${chat.chatId}`);
         }
 
         setOpenModalUsers(false);
