@@ -4,6 +4,8 @@ import { useHome } from '@/store/pages/home/store'
 import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
 import userIMG from '../../../assets/img/pages/home/userDefault.png'
+import { X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 export default function Commentory({ UserId, setClose }) {
   let {getUserStories, postStory} = useHome()
@@ -90,7 +92,7 @@ export default function Commentory({ UserId, setClose }) {
 	}
 
 	useEffect(() => () => revokePrevUrl(), [])
-
+	let {t} = useTranslation()
 	return (
 		<form
 			onSubmit={onSave}
@@ -99,14 +101,14 @@ export default function Commentory({ UserId, setClose }) {
 			} z-[999999999999] shadow-2xl p-6 flex flex-col gap-4`}
 		>
 			<div className='flex items-center justify-between'>
-				<h2 className='text-lg md:text-xl font-semibold'>Загрузка истрории</h2>
+				<h2 className='text-lg md:text-xl font-semibold'>{t("home.Loading_history")}</h2>
 				<button
 					type='button'
 					onClick={onClear}
 					className='px-3 py-1 rounded-xl border border-gray-300 hover:bg-gray-50 disabled:opacity-50'
 					disabled={!file && !previewUrl}
 				>
-					Очистить
+					<X/>
 				</button>
 			</div>
 
