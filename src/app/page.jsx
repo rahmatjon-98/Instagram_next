@@ -1,7 +1,7 @@
 'use client'
 import { useHome } from '@/store/pages/home/store'
 import { Skeleton } from '@mui/material'
-import { Heart } from 'lucide-react'
+import { Bookmark, Heart } from 'lucide-react'
 import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
 import 'swiper/css'
@@ -14,8 +14,8 @@ import userIMG from '../assets/img/pages/home/userDefault.png'
 import './globals.css'
 import { useRealsStore } from './reels/store'
 import Link from 'next/link'
-import StoryComponent from '@/components/pages/home/stories'
 import SwiperStories from '@/components/pages/home/stories'
+import Commentory from '@/components/pages/home/Commentory'
 
 export default function Main() {
 	const videoRefs = useRef({})
@@ -30,6 +30,7 @@ export default function Main() {
 		commentPost,
 		getUser,
 		users,
+		postSaved,
 	} = useHome()
 	const [mutedMap, setMutedMap] = useState({})
 	const [stopMap, setStopMap] = useState({})
@@ -81,6 +82,10 @@ export default function Main() {
 			window.removeEventListener('storage', handleStorageChange)
 		}
 	}, [])
+	let [comments, setComments] = useState(false)
+	let [commentId, setCommentId] = useState({})
+	let [commentStop, setCommentStop] = useState(false)
+	let [commentMuted, setCommentMuted] = useState(true)
 	return (
 		<div className='flex w-full items-start'>
 			{stories && (
@@ -119,7 +124,27 @@ export default function Main() {
 					</div>
 				</section>
 			)}
-			<div className='px-[40px] pt-[40px] w-[100%] md:w-[70%]'>
+			{comments && (
+				<div
+					onClick={() => setComments(false)}
+					className='inset-0 fixed z-[2018083900979878979086087687686896] w-[100%] h-[100vh] p-[20px] cursor-pointer bg-[#0000008F] flex items-start justify-end'
+				>
+					<svg
+						xmlns='http://www.w3.org/2000/svg'
+						width='18'
+						height='18'
+						viewBox='0 0 14 14'
+						fill='none'
+					>
+						<path
+							d='M14 1.41L12.59 0L7 5.59L1.41 0L0 1.41L5.59 7L0 12.59L1.41 14L7 8.41L12.59 14L14 12.59L8.41 7L14 1.41Z'
+							fill='#FFFFFF'
+						/>
+					</svg>
+				</div>
+			)}
+			{comments && <Commentory />}
+			<div className='md:px-[11%] px-[10px] pt-[40px] w-[100%] md:w-[70%]'>
 				<div
 					ref={scrollRef}
 					onMouseDown={onMouseDown}
@@ -135,6 +160,15 @@ export default function Main() {
 								className='flex flex-col items-center px-[3px]'
 							>
 								<Skeleton
+									sx={{
+										bgcolor: theme == 'dark' ? '#333' : '#e0e0e0',
+										'&::after': {
+											background:
+												theme == 'dark'
+													? 'linear-gradient(90deg, #333, #444, #333)'
+													: 'linear-gradient(90deg, #e0e0e0, #f5f5f5, #e0e0e0)',
+										},
+									}}
 									variant='circular'
 									width={66}
 									className='mx-[3px] md:mx-[6px]'
@@ -146,46 +180,60 @@ export default function Main() {
 						<div className='flex gap-[14px]'>
 							{data?.map((e, i) => {
 								return (
-									<div
-										onClick={() => {
-											setIdUser(i)
-											setStories(!stories)
-										}}
-										key={e.id || `story-${i}`}
-										className='size-[80px] flex flex-col items-center'
-									>
+									<div className='flex items-end'>
 										<div
-											className='rounded-full size-[72px] p-[2.5px] flex items-center justify-center'
-											style={{
-												background:
-													'linear-gradient(180deg, #DE0046 0%, #F7A34B 100%)',
+											onClick={() => {
+												setIdUser(i)
+												setStories(!stories)
 											}}
+											key={e.id || `story-${i}`}
+											className='size-[80px] flex flex-col items-center'
 										>
-											{(e.userImage == '' && (
-												<Image
-													draggable={false}
-													className={`object-cover ${
-														theme == 'dark' ? 'bg-black' : 'bg-white'
-													} rounded-full p-[2.5px]`}
-													src={userIMG}
-													alt=''
-													width={66}
-													height={66}
-												/>
-											)) || (
-												<Image
-													draggable={false}
-													className={`w-[64px] h-[64px] object-cover ${
-														theme == 'dark' ? 'bg-black' : 'bg-white'
-													} rounded-full p-[2.5px]`}
-													src={`http://37.27.29.18:8003/images/${e.userImage}`}
-													alt=''
-													width={66}
-													height={66}
-												/>
-											)}
+											<div
+												className='rounded-full size-[72px] p-[2.5px] flex items-center justify-center'
+												style={{
+													background:
+														'linear-gradient(180deg, #DE0046 0%, #F7A34B 100%)',
+												}}
+											>
+												{(e.userImage == '' && (
+													<Image
+														draggable={false}
+														className={`object-cover ${
+															theme == 'dark' ? 'bg-black' : 'bg-white'
+														} rounded-full p-[2.5px]`}
+														src={userIMG}
+														alt=''
+														width={66}
+														height={66}
+													/>
+												)) || (
+													<Image
+														draggable={false}
+														className={`w-[64px] h-[64px] object-cover ${
+															theme == 'dark' ? 'bg-black' : 'bg-white'
+														} rounded-full p-[2.5px]`}
+														src={`http://37.27.29.18:8003/images/${e.userImage}`}
+														alt=''
+														width={66}
+														height={66}
+													/>
+												)}
+											</div>
+											<p className='text-[14px] font-[400]'>{e.userName}</p>
 										</div>
-										<p className='text-[14px] font-[400]'>{e.userName}</p>
+										{i == 0 && (
+											<div
+												onClick={() => {
+													setComments(true)
+												}}
+												className='bg-white ml-[50px] mb-[10px] flex items-center justify-center p-[2px] rounded-full absolute'
+											>
+												<button className='w-[22px] h-[22px] bg-[#3697EB] rounded-full text-white p-[5px] text-center flex items-center justify-center text-[23px]'>
+													+
+												</button>
+											</div>
+										)}
 									</div>
 								)
 							})}
@@ -199,6 +247,15 @@ export default function Main() {
 								<div className='flex items-center justify-between'>
 									<div className='flex w-[100%] py-[12px] gap-[8px] items-center'>
 										<Skeleton
+											sx={{
+												bgcolor: theme == 'dark' ? '#333' : '#e0e0e0',
+												'&::after': {
+													background:
+														theme == 'dark'
+															? 'linear-gradient(90deg, #333, #444, #333)'
+															: 'linear-gradient(90deg, #e0e0e0, #f5f5f5, #e0e0e0)',
+												},
+											}}
 											variant='circular'
 											width={42}
 											className=''
@@ -206,8 +263,17 @@ export default function Main() {
 										/>
 										<div>
 											<Skeleton
+												sx={{
+													fontSize: '14px',
+													bgcolor: theme == 'dark' ? '#333' : '#e0e0e0',
+													'&::after': {
+														background:
+															theme == 'dark'
+																? 'linear-gradient(90deg, #333, #444, #333)'
+																: 'linear-gradient(90deg, #e0e0e0, #f5f5f5, #e0e0e0)',
+													},
+												}}
 												variant='text'
-												sx={{ fontSize: '14px' }}
 												width={75}
 											/>
 										</div>
@@ -234,6 +300,15 @@ export default function Main() {
 									</svg>
 								</div>
 								<Skeleton
+									sx={{
+										bgcolor: theme == 'dark' ? '#333' : '#e0e0e0',
+										'&::after': {
+											background:
+												theme == 'dark'
+													? 'linear-gradient(90deg, #333, #444, #333)'
+													: 'linear-gradient(90deg, #e0e0e0, #f5f5f5, #e0e0e0)',
+										},
+									}}
 									variant='rectangular'
 									className='rounded-2xl'
 									height={400}
@@ -241,13 +316,31 @@ export default function Main() {
 								/>
 								<div className='py-[16px] flex flex-col'>
 									<Skeleton
+										sx={{
+											fontSize: '20px',
+											bgcolor: theme == 'dark' ? '#333' : '#e0e0e0',
+											'&::after': {
+												background:
+													theme == 'dark'
+														? 'linear-gradient(90deg, #333, #444, #333)'
+														: 'linear-gradient(90deg, #e0e0e0, #f5f5f5, #e0e0e0)',
+											},
+										}}
 										variant='text'
-										sx={{ fontSize: '20px' }}
 										width={'100%'}
 									/>
 									<Skeleton
+										sx={{
+											fontSize: '20px',
+											bgcolor: theme == 'dark' ? '#333' : '#e0e0e0',
+											'&::after': {
+												background:
+													theme == 'dark'
+														? 'linear-gradient(90deg, #333, #444, #333)'
+														: 'linear-gradient(90deg, #e0e0e0, #f5f5f5, #e0e0e0)',
+											},
+										}}
 										variant='text'
-										sx={{ fontSize: '20px' }}
 										width={'30%'}
 									/>
 								</div>
@@ -255,6 +348,7 @@ export default function Main() {
 						))) || (
 						<>
 							{posts?.data?.map((e, i) => {
+								console.log(e)
 								const muted = mutedMap[e.postId] ?? true
 								const stop = stopMap[e.postId] ?? true
 								const comments = commentsMap[e.postId] ?? true
@@ -301,7 +395,9 @@ export default function Main() {
 													{(e.userImage == '' && (
 														<Image
 															draggable={false}
-															className='size-[36px] object-cover bg-white rounded-full p-[2px]'
+															className={`size-[36px] object-cover ${
+																theme == 'dark' ? 'bg-black' : 'bg-white'
+															} rounded-full p-[2px]`}
 															src={userIMG}
 															alt=''
 															width={37}
@@ -310,7 +406,9 @@ export default function Main() {
 													)) || (
 														<Image
 															draggable={false}
-															className='w-[34px] h-[34px]  size-[37px] rounded-full bg-white p-[2px] object-cover'
+															className={`w-[34px] h-[34px] ${
+																theme == 'dark' ? 'bg-black' : 'bg-white'
+															} size-[37px] rounded-full  p-[2px] object-cover`}
 															src={`http://37.27.29.18:8003/images/${e.userImage}`}
 															alt=''
 															width={37}
@@ -322,31 +420,11 @@ export default function Main() {
 													<p className='font-[600] text-[14px]'>{e.userName}</p>
 												</div>
 											</div>
-											<svg
-												xmlns='http://www.w3.org/2000/svg'
-												width='24'
-												height='24'
-												viewBox='0 0 24 24'
-												fill='none'
-											>
-												<path
-													d='M12 13.5C12.8284 13.5 13.5 12.8284 13.5 12C13.5 11.1716 12.8284 10.5 12 10.5C11.1716 10.5 10.5 11.1716 10.5 12C10.5 12.8284 11.1716 13.5 12 13.5Z'
-													fill='#262626'
-												/>
-												<path
-													d='M6.5 13.5C7.32843 13.5 8 12.8284 8 12C8 11.1716 7.32843 10.5 6.5 10.5C5.67157 10.5 5 11.1716 5 12C5 12.8284 5.67157 13.5 6.5 13.5Z'
-													fill='#262626'
-												/>
-												<path
-													d='M17.5 13.5C18.3284 13.5 19 12.8284 19 12C19 11.1716 18.3284 10.5 17.5 10.5C16.6716 10.5 16 11.1716 16 12C16 12.8284 16.6716 13.5 17.5 13.5Z'
-													fill='#262626'
-												/>
-											</svg>
 										</div>
 										{e.images[0].endsWith('.mp4') ? (
-											<div className='flex bg-black rounded-2xl justify-end items-baseline-last'>
+											<div className='flex bg-black justify-end items-baseline-last'>
 												<svg
-													className={`md:my-[18%] my-[70%] mx-[28%] md:mx-[22%] ${
+													className={`md:my-[18%] my-[70%] mx-[38%] md:mx-[16%] ${
 														stopMap[e.postId] ? 'hidden' : 'inline'
 													} duration-1000 absolute`}
 													xmlns='http://www.w3.org/2000/svg'
@@ -438,16 +516,21 @@ export default function Main() {
 													<>
 														{e.images.map((image, i3) => {
 															return (
-																<Image
+																<div
 																	key={i3}
-																	src={`http://37.27.29.18:8003/images/${image}`}
-																	width={900}
-																	height={200}
-																	style={{ width: '100%', height: 'auto' }}
-																	className='max-h-[90vh] rounded-2xl w-[34px] max-w- h-[34px]'
-																	draggable={false}
-																	alt='omg sory'
-																/>
+																	className='w-[100%] bg-black h-[80vh]'
+																>
+																	<Image
+																		key={i3}
+																		src={`http://37.27.29.18:8003/images/${image}`}
+																		width={900}
+																		height={200}
+																		style={{ height: '100%' }}
+																		className='text-white max-h-[90vh] w-auto m-auto'
+																		draggable={false}
+																		alt='Not my problem ¯\_(ツ)_/¯,That is not my problem ¯\_(ツ)_/¯'
+																	/>
+																</div>
 															)
 														})}
 													</>
@@ -547,25 +630,33 @@ export default function Main() {
 													</svg>
 												</div>
 											</div>
-											<svg
-												xmlns='http://www.w3.org/2000/svg'
-												width='14'
-												height='18'
-												viewBox='0 0 14 18'
-												fill={e.postLike ? '#1E293B' : 'none'}
+											<button
+												onClick={() => {
+													postSaved(e.postId)
+												}}
 											>
-												<path
-													d='M12 0H2C0.9 0 0.0100002 0.9 0.0100002 2L0 18L7 15L14 18V2C14 0.9 13.1 0 12 0ZM12 15L7 12.82L2 15V2H12V15Z'
-													fill='#1E293B'
+												<Bookmark
+													fill={
+														e.postFavorite
+															? theme == 'dark'
+																? 'white'
+																: 'black'
+															: 'none'
+													}
+													size={24}
+													color={theme == 'dark' ? '#FFFFFF' : '#000000'}
 												/>
-											</svg>
+											</button>
 										</div>
 										<div className='flex flex-col gap-[8px] w-[100%]'>
 											<div className='flex items-center gap-[8px]'>
 												{(e.userImage == '' && (
 													<Image
 														draggable={false}
-														className='size-[24px] object-cover bg-white rounded-full p-[2px]'
+														className={`size-[24px] object-cover ${
+															theme == 'dark' ? 'bg-black' : 'bg-white'
+														}
+													 rounded-full p-[2px]`}
 														src={userIMG}
 														alt=''
 														width={24}
@@ -574,7 +665,9 @@ export default function Main() {
 												)) || (
 													<Image
 														draggable={false}
-														className='w-[34px] h-[34px]  size-[24px] rounded-full bg-white p-[2px] object-cover'
+														className={`w-[34px] ${
+															theme == 'dark' ? 'bg-black' : 'bg-white'
+														} h-[34px]  size-[24px] rounded-full p-[2px] object-cover`}
 														src={`http://37.27.29.18:8003/images/${e.userImage}`}
 														alt=''
 														width={24}
@@ -591,11 +684,11 @@ export default function Main() {
 												<div className='flex items-center gap-[10px]'>
 													<p className='font-bold'>{e.userName}</p>
 													{(e.content.length > 90 && (
-														<p className='text-[#262626] text-[14px] font-[400]'>
+														<p className='text-[12px] md:text-[14px] font-[400]'>
 															{e.content.slice(0, 87)}...
 														</p>
 													)) || (
-														<p className='text-[#262626] text-[14px] font-[400]'>
+														<p className='text-[14px] font-[400]'>
 															{e.content}
 														</p>
 													)}
@@ -694,6 +787,15 @@ export default function Main() {
 								className='flex gap-[8px] items-center px-[3px]'
 							>
 								<Skeleton
+									sx={{
+										bgcolor: theme == 'dark' ? '#333' : '#e0e0e0',
+										'&::after': {
+											background:
+												theme == 'dark'
+													? 'linear-gradient(90deg, #333, #444, #333)'
+													: 'linear-gradient(90deg, #e0e0e0, #f5f5f5, #e0e0e0)',
+										},
+									}}
 									variant='circular'
 									width={48}
 									className='mx-[3px] md:mx-[6px]'
@@ -703,13 +805,10 @@ export default function Main() {
 							</div>
 						))) || (
 						<div className='flex gap-[14px]'>
-							<div
-								onClick={() => {
-									setIdUser(0)
-									setStories(!stories)
-								}}
+							<Link
+								href={'/profile'}
 								key={data[0]?.id || `story-${0}`}
-								className='size-[80px] flex gap-[8px] items-center'
+								className='h-[80px] flex gap-[8px] items-center'
 							>
 								{(data[0]?.userImage == '' && (
 									<Image
@@ -723,17 +822,19 @@ export default function Main() {
 										height={48}
 									/>
 								)) || (
-									<Image
-										draggable={false}
-										className={`w-[48px] h-[48px] object-cover rounded-full`}
-										src={`http://37.27.29.18:8003/images/${data[0]?.userImage}`}
-										alt=''
-										width={48}
-										height={48}
-									/>
+									<div className='w-12 h-12'>
+										<Image
+											draggable={false}
+											src={`http://37.27.29.18:8003/images/${data[0]?.userImage}`}
+											width={48}
+											height={48}
+											alt={data[0]?.userName || 'User Avatar'}
+											className='w-12 h-12 rounded-full object-cover'
+										/>
+									</div>
 								)}
 								<p className='text-[14px] font-[400]'>{data[0]?.userName}</p>
-							</div>
+							</Link>
 						</div>
 					)}
 				</div>
@@ -741,9 +842,13 @@ export default function Main() {
 					<p className='block text-[#64748B] text-[14px] font-[500] '>
 						Suggested for you
 					</p>
-					{users?.data?.slice(0, 5).map((e,i) => {
+					{users?.data?.slice(0, 5).map((e, i) => {
 						return (
-							<div key={i} className='py-[12px] pr-[8px] flex justify-between'>
+							<Link
+								href={`/${e.id}`}
+								key={i}
+								className='py-[12px] pr-[8px] flex justify-between'
+							>
 								<div className='flex gap-[8px] items-center'>
 									{(e.avatar == '' && (
 										<Image
@@ -767,15 +872,11 @@ export default function Main() {
 										/>
 									)}
 									<div className='flex flex-col'>
-										<p className='text-[16px] font-[500]'>
-											{e.userName}
-										</p>
-										<p className='text-[12px] font-[400]'>
-											{e.fullName}
-										</p>
+										<p className='text-[16px] font-[500]'>{e.userName}</p>
+										<p className='text-[12px] font-[400]'>{e.fullName}</p>
 									</div>
 								</div>
-							</div>
+							</Link>
 						)
 					})}
 				</div>
