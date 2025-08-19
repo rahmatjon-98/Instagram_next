@@ -108,9 +108,7 @@ const Layout = ({ children }) => {
 		router.push('/login')
 		toast('Logged out!')
 	}
-
-	// const userId = useUserId()
-	// const { 'profile-by-id': profileId } = useParams()
+	
 	const getProfileById = useProfileByIdStore(state => state.getProfileById)
 	const users = useProfileByIdStore(state => state.users)
 	const [open, setOpen] = useState(false)
@@ -134,7 +132,6 @@ const Layout = ({ children }) => {
 	const { users: infoUsers, getUsers } = usegetUserStore()
 
 	const {
-		// addChats,
 		getChats,
 		followers,
 		getFollowers,
@@ -238,13 +235,13 @@ const Layout = ({ children }) => {
 	return (
 		<div className='pt-[8%]'>
 			<section className='flex gap-[5%] m-auto lg:w-[80%] justify-center'>
-				<div className='hidden md:flex overflow-hidden items-center justify-center w-[100px] md:w-[160px] h-[100px] md:h-[160px] rounded-[50%]'>
+				<div className='hidden md:flex overflow-hidden items-center justify-center w-[100px] md:w-[160px] h-[100px] md:h-[160px] rounded-[50%] bg-gray-200'>
 					<Image
 						src={`http://37.27.29.18:8003/images/${userer.image}`}
 						alt='profile picture'
 						width={500}
 						height={500}
-						className={`${userer.image ? 'flex' : 'hidden'} `}
+						className={`${userer.image ? 'flex' : 'hidden'} h-full`}
 					/>
 					<Image
 						src={defaultUser}
@@ -658,7 +655,7 @@ const Layout = ({ children }) => {
 								alt='profile picture'
 								width={500}
 								height={500}
-								className={`${userer.image ? 'flex' : 'hidden'}`}
+								className={`${userer.image ? 'flex' : 'hidden'} h-full`}
 							/>
 							<Image
 								src={defaultUser}
