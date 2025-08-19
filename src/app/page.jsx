@@ -385,37 +385,72 @@ export default function Main() {
 									<div className='flex py-[10px] flex-col' key={e.postId || i}>
 										<div className='flex items-center justify-between py-[12px]'>
 											<div className='flex items-center gap-[8px]'>
-												<div
-													className='rounded-full size-[42px] p-[0.1px] flex items-center justify-center'
-													style={{
-														background:
-															'linear-gradient(180deg, #DE0046 0%, #F7A34B 100%)',
-													}}
-												>
-													{(e.userImage == '' && (
-														<Image
-															draggable={false}
-															className={`size-[36px] object-cover ${
-																theme == 'dark' ? 'bg-black' : 'bg-white'
-															} rounded-full p-[2px]`}
-															src={userIMG}
-															alt=''
-															width={37}
-															height={37}
-														/>
-													)) || (
-														<Image
-															draggable={false}
-															className={`w-[34px] h-[34px] ${
-																theme == 'dark' ? 'bg-black' : 'bg-white'
-															} size-[37px] rounded-full  p-[2px] object-cover`}
-															src={`http://37.27.29.18:8003/images/${e.userImage}`}
-															alt=''
-															width={37}
-															height={37}
-														/>
-													)}
-												</div>
+												{(!data?.some(e2 => e2.userId === e.userId) && (
+													<Link
+														href={`${e.userId}`}
+														className='rounded-full size-[42px] flex items-center justify-center'
+													>
+														{(e.userImage == '' && (
+															<Image
+																draggable={false}
+																className={`size-[42px] object-cover ${
+																	theme == 'dark' ? 'bg-black' : 'bg-white'
+																} rounded-full p-[2px]`}
+																src={userIMG}
+																alt=''
+																width={42}
+																height={42}
+															/>
+														)) || (
+															<Image
+																draggable={false}
+																className={`w-[34px] h-[34px] ${
+																	theme == 'dark' ? 'bg-black' : 'bg-white'
+																} size-[37px] rounded-full  p-[2px] object-cover`}
+																src={`http://37.27.29.18:8003/images/${e.userImage}`}
+																alt=''
+																width={37}
+																height={37}
+															/>
+														)}
+													</Link>
+												)) || (
+													<div
+														onClick={() => {
+															setIdUser(i)
+															setStories(!stories)
+														}}
+														className='rounded-full size-[42px] p-[0.1px] flex items-center justify-center'
+														style={{
+															background:
+																'linear-gradient(180deg, #DE0046 0%, #F7A34B 100%)',
+														}}
+													>
+														{(e.userImage == '' && (
+															<Image
+																draggable={false}
+																className={`size-[36px] object-cover ${
+																	theme == 'dark' ? 'bg-black' : 'bg-white'
+																} rounded-full p-[2px]`}
+																src={userIMG}
+																alt=''
+																width={37}
+																height={37}
+															/>
+														)) || (
+															<Image
+																draggable={false}
+																className={`w-[34px] h-[34px] ${
+																	theme == 'dark' ? 'bg-black' : 'bg-white'
+																} size-[37px] rounded-full  p-[2px] object-cover`}
+																src={`http://37.27.29.18:8003/images/${e.userImage}`}
+																alt=''
+																width={37}
+																height={37}
+															/>
+														)}
+													</div>
+												)}
 												<div className='flex flex-col'>
 													<p className='font-[600] text-[14px]'>{e.userName}</p>
 												</div>
@@ -784,6 +819,7 @@ export default function Main() {
 						Array.from({ length: 1 }).map((_, i) => (
 							<div
 								key={`skeleton-${i}`}
+								F
 								className='flex gap-[8px] items-center px-[3px]'
 							>
 								<Skeleton
