@@ -113,7 +113,7 @@ export default function Commentory({ UserId, setClose }) {
 			</div>
 
 			<div
-				className={`border-2 border-dashed rounded-2xl p-6 flex flex-col items-center justify-center gap-4 ${
+				className={`border-2 border-dashed h-[80%] rounded-2xl p-6 flex flex-col items-center justify-center gap-4 ${
 					theme === 'dark'
 						? 'border-gray-600 bg-[#1a1c20]'
 						: 'border-gray-300 bg-gray-50'

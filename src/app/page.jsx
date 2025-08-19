@@ -277,7 +277,7 @@ export default function Main() {
 															<X size={30} />
 														</button>
 													</div>
-													{el.endsWith('.mp4') ? (
+													{el.endsWith('.mp4' || '.webm' || '.ogg') ? (
 														<div>
 															<video
 																ref={videoRef}
