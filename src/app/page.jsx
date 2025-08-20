@@ -1,7 +1,7 @@
 'use client'
 import { useHome } from '@/store/pages/home/store'
 import { Skeleton } from '@mui/material'
-import { Bookmark, Heart, MessageCircleMore } from 'lucide-react'
+import {  MessageCircleMore } from 'lucide-react'
 import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
 import 'swiper/css'
@@ -12,173 +12,146 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import image2 from '../assets/img/pages/home/image 69.svg'
 import userIMG from '../assets/img/pages/home/userDefault.png'
 import './globals.css'
-import { useRealsStore } from './reels/store'
 import Link from 'next/link'
 import SwiperStories from '@/components/pages/home/stories'
 import Commentory from '@/components/pages/home/Commentory'
 import { useUserStore } from '@/store/pages/explore/explorestore'
 import * as React from 'react'
-import Box from '@mui/material/Box'
 import Modal from '@mui/material/Modal'
 import {
 	CircleUserRound,
-	Send,
 	SendHorizontal,
-	Smile,
 	Volume2,
 	VolumeX,
 	X,
 } from 'lucide-react'
 import CommentInput from '@/components/pages/explore/Emogi'
-import { useUserId } from '@/hook/useUserId'
-import { useRouter } from 'next/navigation'
-import { useTodoAsyncStore } from '@/store/pages/notification/store'
 import ModalUsers from '@/components/pages/explore/ModalUsers'
-import BasicModal from '@/components/pages/explore/BasicModal'
-import { useTranslation } from 'react-i18next'
+import Box from "@mui/material/Box";
+import { Bookmark,  Heart } from "lucide-react";
+import { useUserId } from "@/hook/useUserId";
+import { useRouter } from "next/navigation";
+import BasicModal from "@/components/pages/explore/BasicModal";
+import { useTranslation } from "react-i18next";
+
 const style = {
-	position: 'absolute',
-	top: '50%',
-	left: '50%',
-	transform: 'translate(-50%, -50%)',
-	width: '100%',
-	maxWidth: 900,
-	color: 'white',
-	maxHeight: '90vh',
-	overflow: 'hidden',
-	borderRadius: '5px',
-	'@media (max-width:768px)': {
-		top: 0,
-		transform: 'translate(-50%, 0)',
-		height: '100vh',
-		maxHeight: '100vh',
-		borderRadius: 0,
-	},
-}
-const mediaStyle = {
-	width: 'full',
-	height: 'full',
-	objectFit: 'cover',
-	borderRadius: '8px',
-	cursor: 'pointer',
-	backgroundColor: '#f5f5f5',
-}
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: "100%",
+  maxWidth: 900,
+  color: "white",
+  maxHeight: "90vh",
+  overflow: "hidden",
+  borderRadius: "5px",
+  "@media (max-width:768px)": {
+    top: 0,
+    transform: "translate(-50%, 0)",
+    height: "100vh",
+    maxHeight: "100vh",
+    borderRadius: 0,
+  },
+};
 const mediaStyleModal = {
-	width: '100%',
-	objectFit: 'cover',
-	borderRadius: '2px',
-	cursor: 'pointer',
-	backgroundColor: '#f5f5f5',
-}
+  width: "100%",
+  objectFit: "cover",
+  borderRadius: "2px",
+  cursor: "pointer",
+  backgroundColor: "#f5f5f5",
+};
 export default function Main() {
-	let {
-		user,
-		fechUser,
-		postById,
-		getPostById,
-		deletComit,
-		AddComit,
-		unfollowUser,
-		Follow,
-		getUsersFollow,
-		FolowUser,
-		f,
-	} = useUserStore()
-	console.log(postById)
-	const [open, setOpen] = React.useState(false)
-	let cnt = 3
-	let router = useRouter()
-	async function RemoveComit(postCommentId) {
-		await deletComit(postCommentId)
-	}
-	useEffect(() => {
-		fechUser()
-		const saved = JSON.parse(localStorage.getItem('bookmarks')) || []
-		setwishLix(saved)
-	}, [])
-	const handleOpen = async id => {
-		const isFollowed = FolowUser?.data?.some(
-			e => e.userShortInfo.userId == postById.data?.userId
-		)
-		console.log(isFollowed)
-		await getPostById(id)
-		try {
-			await getUsersFollow(userId)
-		} catch (err) {
-			console.error('Ошибка при обновлении списка подписок в handleOpen:', err)
-		}
-		setFollow(Boolean(isFollowed))
-		setOpen(true)
-	}
-	const handleClose = () => {
-		setOpen(false)
-	}
-	const [isMuted, setIsMuted] = React.useState(false)
-	const videoRef = React.useRef(null)
-	const toggleMute = () => {
-		const video = videoRef.current
-		if (video) {
-			video.muted = !video.muted
-			setIsMuted(video.muted)
-		}
-	}
-	let [newcomit, setnewComit] = React.useState('')
-	const handleAddComment = async () => {
-		if (newcomit.trim() === '') return
-		await AddComit(newcomit, postById.data?.postId)
-		await getPostById(postById.data?.postId)
-		setnewComit('')
-	}
-	const [likedComments, setLikedComments] = React.useState({})
-	const handleLikeComment = commentId => {
-		setLikedComments(prev => ({
-			...prev,
-			[commentId]: !prev[commentId],
-		}))
-	}
-	let [wishLix, setwishLix] = React.useState([])
-	function AddwishLix(postId) {
-		let upDated
-		if (wishLix.includes(postId)) {
-			upDated = wishLix.filter(id => id != postId)
-		} else {
-			upDated = [...wishLix, postId]
-		}
-		setwishLix(upDated)
-		localStorage.setItem('bookmarks', JSON.stringify(upDated))
-	}
-	let userId = useUserId()
-	let [follow, setFollow] = React.useState(false)
-	useEffect(() => {
-		getUsersFollow(userId)
-	}, [])
-	async function HendlFollow(id) {
-		const currentlyFollowed = FolowUser?.data?.some(
-			e => e.userShortInfo.userId == id
-		)
-		try {
-			if (currentlyFollowed) {
-				await unfollowUser(id)
-				setFollow(true)
-			} else {
-				await Follow(id)
-				setFollow(false)
-			}
+	  let { savePost,  fetchUsers, postById, fetchPostById, deleteComment, addComment, unfollowUser, fetchUserFollows, Follow, FolowUser, } = useUserStore();
+  const [open, setOpen] = React.useState(false);
+  const [isMuted, setIsMuted] = React.useState(false);
+  let [newcomit, setnewComit] = React.useState("");
+  const [likedComments, setLikedComments] = React.useState({});
+  let userId = useUserId();
+  let [follow, setFollow] = React.useState(false);
+  const videoRefs = useRef({});
+  const { i18n } = useTranslation()
+  let cnt = 3;
+  let router = useRouter();
 
-			try {
-				await getUsersFollow(userId)
-			} catch (err) {
-				console.error('Ошибка при getUsersFollow в HendlFollow:', err)
-			}
 
-			const updatedFollow = FolowUser?.data?.some(
-				e => e.userShortInfo.userId == id
-			)
-		} catch (error) {
-			console.error('Ошибка при подписке/отписке:', error)
-		}
-	}
-	const videoRefs = useRef({})
+  useEffect(() => {
+    fetchUsers();
+    fetchUserFollows(userId);
+  }, []);
+
+
+  async function RemoveComit(postCommentId) {
+    await deleteComment(postCommentId);
+  }
+
+
+  const handleOpen = async (id) => {
+    const isFollowed = FolowUser?.data?.some(
+      (e) => e.userShortInfo.userId == postById.data?.userId
+    );
+    await fetchPostById(id);
+    try {
+      await fetchUserFollows(userId);
+    } catch (err) {
+      console.error("Ошибка при обновлении списка подписок в handleOpen:", err);
+    }
+    setFollow(Boolean(isFollowed));
+    setOpen(true);
+  };
+
+
+  const toggleMute = () => {
+    const video = videoRef.current;
+    if (video) {
+      video.muted = !video.muted;
+      setIsMuted(video.muted);
+    }
+  };
+
+
+  const handleAddComment = async () => {
+    if (newcomit.trim() === "") return;
+    await addComment(newcomit, postById.data?.postId);
+    await fetchPostById(postById.data?.postId);
+    setnewComit("");
+  };
+
+
+  const handleLikeComment = (commentId) => {
+    setLikedComments((prev) => ({
+      ...prev,
+      [commentId]: !prev[commentId],
+    }));
+  };
+
+
+  async function hendlFollow(id) {
+    const currentlyFollowed = FolowUser?.data?.some(
+      (e) => e.userShortInfo.userId == id
+    );
+
+    try {
+      if (currentlyFollowed) {
+        await unfollowUser(id);
+        setFollow(true);
+      } else {
+        await Follow(id);
+        setFollow(false);
+      }
+
+      try {
+        await fetchUserFollows(userId);
+      } catch (err) {
+        console.error("Ошибка при fetchUserFollows в hendlFollow:", err);
+      }
+
+      const updatedFollow = FolowUser?.data?.some(
+        (e) => e.userShortInfo.userId == id
+      );
+    } catch (error) {
+      console.error("Ошибка при подписке/отписке:", error);
+    }
+  }
 	let {
 		getUserStories,
 		followUser,
@@ -222,6 +195,7 @@ export default function Main() {
 	const onMouseUp = () => {
 		isDown = false
 	}
+	const videoRef = React.useRef(null)
 	const onMouseMove = e => {
 		if (!isDown) return
 		e.preventDefault()
@@ -248,18 +222,19 @@ export default function Main() {
 	let [commentStop, setCommentStop] = useState(false)
 	let [commentMuted, setCommentMuted] = useState(true)
 	let [Idx, setIdx] = useState('')
-	let {t} = useTranslation()
+	let { t } = useTranslation()
 	return (
 		<div className='flex w-full items-start'>
 			<Modal
 				open={open}
-				onClose={handleClose}
-				className='border-none outline-none'
+				onClose={() => setOpen(false)}
 				aria-labelledby='modal-modal-title'
 				aria-describedby='modal-modal-description'
 			>
 				<Box sx={style}>
-					<div className='flex flex-col lg:flex-row gap-[20px] h-[90vh] bg-[#272727]'>
+					<div
+						className={` flex flex-col lg:flex-row gap-[20px] h-[85vh] bg-[#272727]`}
+					>
 						{postById ? (
 							<div className='lg:flex w-full gap-[20px]'>
 								<div className='lg:w-[47%] '>
@@ -277,12 +252,12 @@ export default function Main() {
 															<X size={30} />
 														</button>
 													</div>
-													{el.endsWith('.mp4' || '.webm' || '.ogg') ? (
+													{el.endsWith('.mp4') ? (
 														<div>
 															<video
 																ref={videoRef}
 																src={mediaUrl}
-																className='w-full lg:h-[90vh] h-[50vh] object-cover'
+																className='w-full lg:h-[85vh] h-[50vh] object-cover'
 																playsInline
 																autoPlay
 																muted={isMuted}
@@ -304,8 +279,9 @@ export default function Main() {
 													) : (
 														<img
 															src={mediaUrl}
+															draggable={false}
 															alt={`Post by ${el.userName}`}
-															className='lg:h-[90vh] h-[50vh]'
+															className='lg:h-[85vh] h-[50vh]'
 															style={mediaStyleModal}
 														/>
 													)}
@@ -336,11 +312,11 @@ export default function Main() {
 											</div>
 											<button
 												className='px-3 py-1 ml-4 text-sm cursor-pointer text-black bg-white rounded-full'
-												onClick={() => HendlFollow(postById.data?.userId)}
+												onClick={() => hendlFollow(postById.data?.userId)}
 											>
 												{postById?.data?.isFollowing
-													? 'Вы подписаны'
-													: 'Подписаться'}
+													? t('exlpore.2')
+													: t('exlpore.1')}
 											</button>
 
 											<button
@@ -483,8 +459,7 @@ export default function Main() {
 											</div>
 											<button
 												onClick={() => {
-													postSaved(postById.data?.postId)
-													// AddwishLix(postById.data?.postId);
+													savePost(postById.data?.postId)
 												}}
 											>
 												<Bookmark
@@ -497,7 +472,8 @@ export default function Main() {
 
 										<div className='mb-2'>
 											<span className='font-bold'>
-												{postById.data?.postLikeCount} отметок "Нравится"
+												{postById.data?.postLikeCount} {t('exlpore.3')}{' '}
+												{t('exlpore.4')}
 											</span>
 										</div>
 
@@ -792,9 +768,7 @@ export default function Main() {
 						))) || (
 						<>
 							{posts?.data?.map((e, i) => {
-								console.log(e)
 								const muted = mutedMap[e.postId] ?? true
-								const stop = stopMap[e.postId] ?? true
 								const comments = commentsMap[e.postId] ?? true
 								const toggleMuted = () => {
 									setMutedMap(prev => ({
@@ -1000,7 +974,7 @@ export default function Main() {
 															return (
 																<div
 																	key={i3}
-																	className='w-[100%] bg-black h-[80vh]'
+																	className='w-[100%] bg-black max-h-[80vh]'
 																>
 																	<Image
 																		key={i3}
@@ -1126,7 +1100,7 @@ export default function Main() {
 												<p>
 													{`${
 														e.postLike ? e.postLikeCount + 1 : e.postLikeCount
-													} ${t("home.likes")}`}
+													} ${t('home.likes')}`}
 												</p>
 											</div>
 											{e.content != null && (
@@ -1218,7 +1192,7 @@ export default function Main() {
 				</div>
 				<div className='w-full flex flex-col'>
 					<p className='block text-[#64748B] text-[14px] font-[500] '>
-						{t("home.Suggested_for_you")}
+						{t('home.Suggested_for_you')}
 					</p>
 					{users?.data?.slice(0, 5).map((e, i) => {
 						return (
@@ -1254,7 +1228,7 @@ export default function Main() {
 									onClick={() => followUser(e.id)}
 									className='px-4 h-[30px] text-[16px] font-[600] text-blue-600 ml-4 text-sm hover:text-blue-500 active:text-blue-400 bg-white rounded-full'
 								>
-									{t("home.follow")}
+									{t('home.follow')}
 								</button>
 							</div>
 						)

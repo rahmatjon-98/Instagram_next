@@ -5,22 +5,10 @@ import { useEffect } from "react";
 import * as React from "react";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
-import {
-	Bookmark,
-	CircleUserRound,
-	Heart,
-	MessageCircleMore,
-	Send,
-	SendHorizontal,
-	Smile,
-	Volume2,
-	VolumeX,
-	X,
-} from "lucide-react";
+import { Bookmark, CircleUserRound, Heart, MessageCircleMore, SendHorizontal, Volume2, VolumeX, X, } from "lucide-react";
 import CommentInput from "@/components/pages/explore/Emogi";
 import { useUserId } from "@/hook/useUserId";
 import { useRouter } from "next/navigation";
-import { useTodoAsyncStore } from "@/store/pages/notification/store";
 import ModalUsers from "@/components/pages/explore/ModalUsers";
 import BasicModal from "@/components/pages/explore/BasicModal";
 import { useTranslation } from "react-i18next";
@@ -31,32 +19,22 @@ const style = {
 	top: "50%",
 	left: "50%",
 	transform: "translate(-50%, -50%)",
-	width: "100%", 
+	width: "100%",
 	maxWidth: 900,
 	color: "white",
-	maxHeight: "90vh", 
-	overflow: "hidden", 
+	maxHeight: "90vh",
+	overflow: "hidden",
 	borderRadius: "5px",
 	"@media (max-width:768px)": {
 		top: 0,
-		transform: "translate(-50%, 0)", 
-		height: "100vh", 
+		transform: "translate(-50%, 0)",
+		height: "100vh",
 		maxHeight: "100vh",
 		borderRadius: 0,
 	},
 };
-
-const mediaStyle = {
-	width: "full",
-	height: "full",
-	objectFit: "cover",
-	borderRadius: "8px",
-	cursor: "pointer",
-	backgroundColor: "#f5f5f5",
-};
 const mediaStyleModal = {
 	width: "100%",
-	// height: '85vh',
 	objectFit: "cover",
 	borderRadius: "2px",
 	cursor: "pointer",
@@ -64,44 +42,39 @@ const mediaStyleModal = {
 };
 
 export default function Explore() {
-	let {
-		postSaved,
-		user,
-		fechUser,
-		postById,
-		getPostById,
-		deletComit,
-		AddComit,
-		unfollowUser,
-		Follow,
-		getUsersFollow,
-		FolowUser,
-		likePost,
-		f,
-	} = useUserStore();
-	console.log(postById);
+	let { savePost, users, fetchUsers, postById, fetchPostById, deleteComment, addComment, unfollowUser, fetchUserFollows, Follow, FolowUser, likePost, } = useUserStore();
 	const [open, setOpen] = React.useState(false);
+	const [isMuted, setIsMuted] = React.useState(false);
+	let [newcomit, setnewComit] = React.useState("");
+	const [likedComments, setLikedComments] = React.useState({});
+	let userId = useUserId();
+	let [follow, setFollow] = React.useState(false);
+	const videoRef = React.useRef(null);
+	const { i18n } = useTranslation();
+	const { t } = useTranslation();
+	const [theme, setTheme] = useDarkSide();
 	let cnt = 3;
 	let router = useRouter();
 
-	async function RemoveComit(postCommentId) {
-		await deletComit(postCommentId);
-	}
 
 	useEffect(() => {
-		fechUser();
-		const saved = JSON.parse(localStorage.getItem("bookmarks")) || [];
-		setwishLix(saved);
+		fetchUsers();
+		fetchUserFollows(userId);
 	}, []);
+
+
+	async function RemoveComit(postCommentId) {
+		await deleteComment(postCommentId);
+	}
+
 
 	const handleOpen = async (id) => {
 		const isFollowed = FolowUser?.data?.some(
 			(e) => e.userShortInfo.userId == postById.data?.userId
 		);
-		console.log(isFollowed);
-		await getPostById(id);
+		await fetchPostById(id);
 		try {
-			await getUsersFollow(userId);
+			await fetchUserFollows(userId);
 		} catch (err) {
 			console.error("Ошибка при обновлении списка подписок в handleOpen:", err);
 		}
@@ -109,11 +82,7 @@ export default function Explore() {
 		setOpen(true);
 	};
 
-	const handleClose = () => {
-		setOpen(false);
-	};
-	const [isMuted, setIsMuted] = React.useState(false);
-	const videoRef = React.useRef(null);
+
 	const toggleMute = () => {
 		const video = videoRef.current;
 		if (video) {
@@ -122,15 +91,14 @@ export default function Explore() {
 		}
 	};
 
-	let [newcomit, setnewComit] = React.useState("");
+
 	const handleAddComment = async () => {
 		if (newcomit.trim() === "") return;
-		await AddComit(newcomit, postById.data?.postId);
-		await getPostById(postById.data?.postId);
+		await addComment(newcomit, postById.data?.postId);
+		await fetchPostById(postById.data?.postId);
 		setnewComit("");
 	};
 
-	const [likedComments, setLikedComments] = React.useState({});
 
 	const handleLikeComment = (commentId) => {
 		setLikedComments((prev) => ({
@@ -139,26 +107,8 @@ export default function Explore() {
 		}));
 	};
 
-	let [wishLix, setwishLix] = React.useState([]);
 
-	function AddwishLix(postId) {
-		let upDated;
-		if (wishLix.includes(postId)) {
-			upDated = wishLix.filter((id) => id != postId);
-		} else {
-			upDated = [...wishLix, postId];
-		}
-		setwishLix(upDated);
-		localStorage.setItem("bookmarks", JSON.stringify(upDated));
-	}
-	let userId = useUserId();
-	let [follow, setFollow] = React.useState(false);
-
-	useEffect(() => {
-		getUsersFollow(userId);
-	}, []);
-
-	async function HendlFollow(id) {
+	async function hendlFollow(id) {
 		const currentlyFollowed = FolowUser?.data?.some(
 			(e) => e.userShortInfo.userId == id
 		);
@@ -173,9 +123,9 @@ export default function Explore() {
 			}
 
 			try {
-				await getUsersFollow(userId);
+				await fetchUserFollows(userId);
 			} catch (err) {
-				console.error("Ошибка при getUsersFollow в HendlFollow:", err);
+				console.error("Ошибка при fetchUserFollows в hendlFollow:", err);
 			}
 
 			const updatedFollow = FolowUser?.data?.some(
@@ -186,9 +136,7 @@ export default function Explore() {
 		}
 	}
 
-	const { i18n } = useTranslation();
-	const { t } = useTranslation();
-	const [theme, setTheme] = useDarkSide();
+
 
 	return (
 		<div>
@@ -197,7 +145,7 @@ export default function Explore() {
 			</div>
 			<Modal
 				open={open}
-				onClose={handleClose}
+				onClose={() => setOpen(false)}
 				aria-labelledby="modal-modal-title"
 				aria-describedby="modal-modal-description"
 			>
@@ -247,7 +195,7 @@ export default function Explore() {
 													) : (
 														<img
 															src={mediaUrl}
-															alt={`Post by ${el.userName}`}
+															draggable={false}
 															className="lg:h-[85vh] h-[50vh]"
 															style={mediaStyleModal}
 														/>
@@ -262,6 +210,7 @@ export default function Explore() {
 											<div className="flex gap-[20px]">
 												<div>
 													<img
+														draggable={false}
 														src={`http://37.27.29.18:8003/images/${postById.data?.userImage}`}
 														className="w-[40px] h-[40px] rounded-full"
 														alt="test"
@@ -279,7 +228,7 @@ export default function Explore() {
 											</div>
 											<button
 												className="px-3 py-1 ml-4 text-sm cursor-pointer text-black bg-white rounded-full"
-												onClick={() => HendlFollow(postById.data?.userId)}
+												onClick={() => hendlFollow(postById.data?.userId)}
 											>
 												{postById?.data?.isFollowing
 													? t("exlpore.2")
@@ -426,8 +375,7 @@ export default function Explore() {
 											</div>
 											<button
 												onClick={() => {
-													postSaved(postById.data?.postId);
-													// AddwishLix(postById.data?.postId);
+													savePost(postById.data?.postId);
 												}}
 											>
 												<Bookmark
@@ -471,7 +419,7 @@ export default function Explore() {
 
 			<div className="flex justify-center lg:pt-0 pt-[50px]">
 				<div className="grid grid-cols-3 gap-0.5  my-[10px] mx-[10px]  max-w-[1240px]">
-					{user?.data?.map((el, i) => {
+					{users?.data?.map((el, i) => {
 						if (i == 15) {
 							cnt = 4;
 						}
@@ -495,6 +443,12 @@ export default function Explore() {
 							isFifth = true;
 						}
 						if (i == 42) {
+							isFifth = true;
+						}
+						if (i == 45) {
+							isFifth = true;
+						}
+						if (i == 52) {
 							isFifth = true;
 						}
 						if ((i + 1) % cnt === 0) {

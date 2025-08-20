@@ -66,8 +66,22 @@ export const useHome = create((set, get) => ({
 		}
 	},
 	LikeStory: async postId => {
+		const prevStories = get().data
+		set(state => ({
+			data: state.data.map(story =>
+				story.id === postId
+					? {
+							...story,
+							likeCount: story.postLike
+								? story.likeCount - 1
+								: story.likeCount + 1,
+					  }
+					: story
+			),
+		}))
 		try {
 			await axiosRequest.post(`/Story/LikeStory?storyId=${postId}`, {})
+			set(state => ({ data: prevStories }))
 		} catch (error) {
 			console.error('Error in Like', error)
 			set({ posts: prevPosts })
