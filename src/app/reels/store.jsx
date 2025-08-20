@@ -316,7 +316,6 @@ export const useRealsStore = create((set, get) => ({
       ],
     });
 
-    console.log("PostFavorite тағйир ёфт:", !prevReel.postFavorite);
 
     try {
       const response = await axiosRequest.post(
