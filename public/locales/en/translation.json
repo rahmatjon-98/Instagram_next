@@ -53,7 +53,6 @@
       "download": "Get the app."
     }
   },
-
   "notice": {
     "week": "This week",
     "comment": "Comments",
@@ -63,7 +62,6 @@
     "unfollow": "Unfollow",
     "followback": "Follow"
   },
-
   "setting": {
     "settings": "Settings",
     "center": "Accounts Center",
@@ -110,7 +108,6 @@
     "for": "Forgot password?",
     "noch": "Night mode"
   },
-
   "exlpore": {
     "1": "Follow",
     "2": "UnFollow",
@@ -121,7 +118,6 @@
     "7": "Add a comment",
     "8": "Search"
   },
-
   "Help": {
     "1": "Help",
     "2": "Help Center",
@@ -146,7 +142,6 @@
     "23": "Allow mentions for people you follow",
     "24": "Disable mentions"
   },
-
   "commentsSettings": {
     "comentSetings": "Comments",
     "saveComents": "Allow comments from",
@@ -214,7 +209,6 @@
     "cancel": "Cancel",
     "messagePlaceholder": "Write your message..."
   },
-
   "profileById": {
     "followers": "followers",
     "followings": "followings",

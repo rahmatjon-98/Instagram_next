@@ -19,35 +19,54 @@ import { useUserId } from '@/hook/useUserId'
 import FollowUser from '@/components/pages/profile/profile-by-id/FollowUser';
 import FollowFollowers from '@/components/pages/profile/profile-by-id/FollowFollowers';
 import FollowFollowings from '@/components/pages/profile/profile-by-id/FollowFollowings';
-import Reel from '../../../public/reelIcon.jpg'
+import Reel from '../../../public/reel.png'
 
 import './style.css'
 import useDarkSide from '@/hook/useDarkSide';
+import throttleByAnimationFrame from 'antd/es/_util/throttleByAnimationFrame';
+import { useTranslation } from 'react-i18next';
 
-const style = {
+const style = (themeMode) => ({
 	position: 'absolute',
 	top: '50%',
 	left: '50%',
 	transform: 'translate(-50%, -50%)',
 	width: 550,
 	height: 400,
-	bgcolor: 'background.paper',
+	bgcolor: themeMode === 'dark' ? '#1e1e1e' : 'background.paper',
+	color: themeMode === 'dark' ? '#f5f5f5' : '#1e1e1e',
 	border: 'none',
 	boxShadow: 24,
 	borderRadius: "20px",
-}
+	'@media (max-width:600px)': { // 📱 для телефонов
+		width: '90%',
+		height: 'auto',
+		borderRadius: "12px",
+	},
+})
 
-const style2 = {
-	width: 600,
+const style2 = (themeMode) => ({
 	position: 'absolute',
 	top: '50%',
 	left: '50%',
 	transform: 'translate(-50%, -50%)',
-	bgcolor: 'background.paper',
+	width: 600,
+	bgcolor: themeMode === 'dark' ? '#1e1e1e' : 'background.paper',
+	color: themeMode === 'dark' ? '#f5f5f5' : '#1e1e1e',
 	border: 'none',
 	boxShadow: 24,
 	borderRadius: "20px",
-}
+	'@media (max-width:600px)': {
+		width: '95%',
+		borderRadius: "12px",
+	},
+})
+
+const skeletonStyle = (theme) => ({
+	bgcolor: theme === 'dark' ? 'grey.900' : 'grey.300',
+	borderRadius: "6px"
+})
+
 
 const ProfileById = ({ children }) => {
 	const userId = useUserId()
@@ -106,6 +125,7 @@ const ProfileById = ({ children }) => {
 			</Stack>
 		</Stack>
 	)
+
 	const SkeletonRow2 = () => (
 		<Stack direction="row" spacing={2} alignItems="center" className="p-3">
 			<Skeleton variant="circular" width={44} height={44} />
@@ -115,6 +135,8 @@ const ProfileById = ({ children }) => {
 			</Stack>
 		</Stack>
 	)
+
+	let { t } = useTranslation()
 
 	useEffect(() => {
 		if (!search.trim()) {
@@ -174,38 +196,33 @@ const ProfileById = ({ children }) => {
 
 	useEffect(() => { if (profileId) getPosts(profileId) }, [profileId, getPosts])
 
-	const video = posts?.data?.map(e => e?.images?.find(media => media.endsWith(".mp4")))
+	const video = posts?.data?.map(e => e?.images?.some(media => media.endsWith(".mp4")))
 
 	return (
 		<div className='md:pl-[8%] p-[10px] md:p-[8%]'>
 			<section className="flex justify-start gap-5 md:gap-20 ">
-				{/* <div className='hidden md:flex overflow-hidden items-center justify-center w-[100px] md:w-[160px] h-[100px] md:h-[160px] rounded-[50%]'>
-					
-				</div> */}
 				{loadings ? (
-					<Skeleton
+					<Skeleton sx={skeletonStyle(theme)}
 						variant="circular"
 						width={160}
 						height={160}
 						animation="wave"
 					/>
 				) : (
-					<img
+					<Image
 						src={
-							user?.image
-								? `http://37.27.29.18:8003/images/${user?.image}`
-								: defaultUser
+							user?.image ? `http://37.27.29.18:8003/images/${user?.image}` : defaultUser
 						}
 						alt="profile picture"
-						// width={150}
-						// height={150}
+						width={150}
+						height={150}
 						className="rounded-full w-[77px] md:w-[150px] object-cover h-[77px] md:h-[150px]"
 					/>
 				)}
 				<div className="flex flex-col gap-[20px]">
 					<div className="flex items-center gap-[40px]">
 						{loadings ? (
-							<Skeleton variant="text" width={120} height={30} />
+							<Skeleton sx={skeletonStyle(theme)} variant="text" width={120} height={30} />
 						) : (
 							<h1
 								onClick={() => setOpenAccountModal(true)}
@@ -226,15 +243,15 @@ const ProfileById = ({ children }) => {
 										<FollowUser />
 										<button
 											onClick={createChat}
-											className={`${theme == 'dark' ? "bg-[#484848] text-white" : "bg-[#F3F4F6]"} text-[12px] md:block hidden md:text-[14px] font-medium py-[7px] px-4 rounded-lg`}
+											className={`${theme == 'dark' ? "bg-[#25292e] text-white" : "bg-[#F3F4F6]"} text-[12px] md:block hidden md:text-[14px] font-medium py-[7px] px-4 rounded-lg`}
 										>
-											Message
+											{t('profileById.message')}
 										</button>
 									</div>
-									
+
 									<button
 										onClick={() => setOpenSuggest(!openSuggest)}
-										className={`${theme == 'dark' ? "bg-[#484848] text-white" : "bg-[#F3F4F6]"} text-[12px] md:text-[14px] font-medium py-[7px] px-4 rounded-lg`}
+										className={`${theme == 'dark' ? "bg-[#25292e] text-white" : "bg-[#F3F4F6]"} text-[12px] md:text-[14px] font-medium py-[7px] px-4 rounded-lg`}
 									>
 										<UserPlusIcon
 											size={18}
@@ -255,7 +272,7 @@ const ProfileById = ({ children }) => {
 								aria-labelledby="keep-mounted-modal-title"
 								aria-describedby="keep-mounted-modal-description"
 							>
-								<Box sx={style}>
+								<Box sx={style(theme)}>
 									<div className="">
 										<div className="flex p-4 pb-2 border-b-1 border-gray-300 items-center justify-between">
 											<div></div>
@@ -271,7 +288,7 @@ const ProfileById = ({ children }) => {
 												value={search}
 												onChange={(e) => setSearch(e.target.value)}
 												placeholder="Search"
-												className={`py-2 w-full rounded-lg bg-[rgb(239,239,239)] pr-10 ${!focused ? 'pl-10' : 'pl-4'}`}
+												className={`py-2 w-full rounded-lg ${theme == 'dark' ? "bg-[#131313]" : "bg-[rgb(239,239,239)]"} pr-10 ${!focused ? 'pl-10' : 'pl-4'}`}
 												onFocus={() => setFocused(true)}
 												onBlur={() => setFocused(false)}
 											/>
@@ -293,10 +310,10 @@ const ProfileById = ({ children }) => {
 										<div className="flex h-[270px] overflow-y-scroll flex-col">
 											{loading ? (
 												Array.from({ length: 5 }).map((_, i) => (
-													<SkeletonRow key={i} className="h-6 w-full rounded" />
+													<SkeletonRow sx={skeletonStyle(theme)} key={i} className="h-6 w-full rounded" />
 												))) : (
 												filteredUsers?.map(e => (
-													<div key={e.id} className='flex items-center justify-between hover:bg-[#eeeeee] rounded p-3'>
+													<div key={e.id} className={`flex items-center justify-between ${theme == 'dark' ? "hover:bg-[#494949]" : "hover:bg-[#eeeeee]"} rounded p-3`}>
 														<div className='flex cursor-pointer items-center gap-5'>
 															<Image src={e?.userShortInfo?.userPhoto ?
 																`http://37.27.29.18:8003/images/${e?.userShortInfo?.userPhoto}` : defaultUser}
@@ -312,7 +329,7 @@ const ProfileById = ({ children }) => {
 											)}
 											{!search && !loading && (
 												followers?.data?.map(e => (
-													<div key={e.id} className='flex items-center justify-between hover:bg-[#eeeeee] rounded p-3'>
+													<div key={e.id} className={`flex items-center justify-between ${theme == 'dark' ? "hover:bg-[#494949]" : "hover:bg-[#eeeeee]"} rounded p-3`}>
 														<div onClick={() => router.push(`${e?.userShortInfo?.userId}`)} className='flex cursor-pointer items-center gap-5'>
 															<Image src={e?.userShortInfo?.userPhoto ?
 																`http://37.27.29.18:8003/images/${e?.userShortInfo?.userPhoto}` : defaultUser}
@@ -339,11 +356,11 @@ const ProfileById = ({ children }) => {
 								aria-labelledby="keep-mounted-modal-title"
 								aria-describedby="keep-mounted-modal-description"
 							>
-								<Box sx={style}>
+								<Box sx={style(theme)}>
 									<div className="">
 										<div className="flex p-4 pb-2 border-b-1 border-gray-300 items-center justify-between">
 											<div></div>
-											<h3 className='font-semibold text-[18px]'>Followings</h3>
+											<h3 className='font-semibold text-[18px]'>{t("profileById.followings")}</h3>
 											<button onClick={() => setOpenFollowings(false)}><X /></button>
 										</div>
 										<div className="relative m-4">
@@ -354,8 +371,8 @@ const ProfileById = ({ children }) => {
 												type="text"
 												value={search2}
 												onChange={(e) => setSearch2(e.target.value)}
-												placeholder="Search"
-												className={`py-2 w-full rounded-lg bg-[rgb(239,239,239)] pr-10 ${!focused2 ? 'pl-10' : 'pl-4'}`}
+												placeholder={`${t("profileById.search")}`}
+												className={`py-2 w-full rounded-lg ${theme == 'dark' ? "bg-[#131313]" : "bg-[rgb(239,239,239)]"} pr-10 ${!focused2 ? 'pl-10' : 'pl-4'}`}
 												onFocus={() => setFocused2(true)}
 												onBlur={() => setFocused2(false)}
 											/>
@@ -380,7 +397,7 @@ const ProfileById = ({ children }) => {
 													<SkeletonRow2 key={i} className="h-6 w-full rounded" />
 												))) : (
 												filteredUsers2?.map(e => (
-													<div key={e.id} className='flex items-center justify-between hover:bg-[#eeeeee] rounded p-3'>
+													<div key={e.id} className={`flex items-center justify-between ${theme == 'dark' ? "hover:bg-[#494949]" : "hover:bg-[#eeeeee]"} rounded p-3`}>
 														<div onClick={() => router.push(`${e?.userShortInfo?.userId}`)} className='flex cursor-pointer items-center gap-5'>
 															<Image src={e?.userShortInfo?.userPhoto ?
 																`http://37.27.29.18:8003/images/${e?.userShortInfo?.userPhoto}` : defaultUser}
@@ -395,7 +412,7 @@ const ProfileById = ({ children }) => {
 											)}
 											{!loading2 && !search2 && (
 												followings?.data?.map(e => (
-													<div key={e.id} className='flex items-center justify-between hover:bg-[#eeeeee] rounded p-3'>
+													<div key={e.id} className={`flex items-center justify-between ${theme == 'dark' ? "hover:bg-[#494949]" : "hover:bg-[#eeeeee]"} rounded p-3`}>
 														<div onClick={() => router.push(`${e?.userShortInfo?.userId}`)} className='flex cursor-pointer items-center gap-5'>
 															<Image src={e?.userShortInfo?.userPhoto ?
 																`http://37.27.29.18:8003/images/${e?.userShortInfo?.userPhoto}` : defaultUser}
@@ -419,8 +436,8 @@ const ProfileById = ({ children }) => {
 							aria-labelledby="keep-mounted-modal-title"
 							aria-describedby="keep-mounted-modal-description"
 						>
-							<Box sx={style2}>
-								<div className='p-4 border-b-1 border-gray-300 justify-center flex'>About this account</div>
+							<Box sx={style2(theme)}>
+								<div className='p-4 border-b-1 border-gray-300 justify-center flex'>{t("profileById.about")}</div>
 								<div className="flex flex-col gap-3 items-center text-center px-10 p-4">
 									<Image
 										src={user?.image ? `http://37.27.29.18:8003/images/${user?.image}` : defaultUser}
@@ -430,7 +447,7 @@ const ProfileById = ({ children }) => {
 										className={`w-[78px] h-[78px] rounded-[200px] overflow-hidden`}
 									/>
 									<h3 className='font-bold text-[18px]'>{user?.userName}</h3>
-									<h4 className='text-[12px]'>To help keep our community authentic, we’re showing information about accounts on Instagram. See why this information is important.</h4>
+									<h4 className='text-[12px]'>{t("profileById.info")}</h4>
 								</div>
 								<div className="flex flex-col p-4 pb-4 gap-[10px]">
 									<div className="flex items-center gap-[10px]">
@@ -453,39 +470,39 @@ const ProfileById = ({ children }) => {
 										</div>
 									</div>
 								</div>
-								<div onClick={() => setOpenAccountModal(false)} className='p-4 border-t-1 border-gray-300 active:bg-[#eeeeee] rounded-b-[20px] justify-center cursor-pointer flex'>Close</div>
+								<div onClick={() => setOpenAccountModal(false)} className='p-4 border-t-1 border-gray-300 active:bg-[#eeeeee] rounded-b-[20px] justify-center cursor-pointer flex'>{t("profileById.close")}</div>
 							</Box>
 						</Modal>
 						{loadings ? (
 							<>
-								<Skeleton width={60} height={20} />
-								<Skeleton width={80} height={20} />
-								<Skeleton width={90} height={20} />
+								<Skeleton sx={skeletonStyle(theme)} width={60} height={20} />
+								<Skeleton sx={skeletonStyle(theme)} width={80} height={20} />
+								<Skeleton sx={skeletonStyle(theme)} width={90} height={20} />
 							</>
 						) : (
 							<>
-								<p className="text-[#1E293B] block md:flex">
+								<p className={`${theme == 'dark' ? "text-[#fff]" : "text-[#1E293B]"} block md:flex`}>
 									{user?.postCount}
-									<span className="text-[#64748B] block md:flex md:ml-[2px]">
-										posts
+									<span className={`${theme == 'dark' ? "text-gray-400" : "text-[#64748B]"} block md:flex md:ml-[2px]`}>
+										{t("profileById.posts")}
 									</span>
 								</p>
 								<p
 									onClick={handleOpen}
-									className="text-[#1E293B] block cursor-pointer md:flex"
+									className={`${theme == 'dark' ? "text-[#fff]" : "text-[#1E293B]"} block cursor-pointer md:flex`}
 								>
 									{user?.subscribersCount}
-									<span className="text-[#64748B] block active:text-[#ccc] md:flex md:ml-[2px]">
-										followers
+									<span className={`${theme == 'dark' ? "text-gray-400" : "text-[#64748B]"} block md:flex md:ml-[2px]`}>
+										{t("profileById.followers")}
 									</span>
 								</p>
 								<p
 									onClick={() => setOpenFollowings(true)}
-									className="text-[#1E293B] block cursor-pointer md:flex"
+									className={`${theme == 'dark' ? "text-[#fff]" : "text-[#1E293B]"} block cursor-pointer md:flex`}
 								>
 									{user?.subscriptionsCount}
-									<span className="text-[#64748B] block active:text-[#ccc] md:flex md:ml-[2px]">
-										following
+									<span className={`${theme == 'dark' ? "text-gray-400" : "text-[#64748B]"} block md:flex md:ml-[2px]`}>
+										{t("profileById.followings")}
 									</span>
 								</p>
 							</>
@@ -494,7 +511,7 @@ const ProfileById = ({ children }) => {
 
 					<div className="flex">
 						{loadings ? (
-							<Skeleton width={140} height={28} />
+							<Skeleton sx={skeletonStyle(theme)} width={140} height={28} />
 						) : (
 							<>
 								<p className="font-bold text-[#1E293B] text-[20px]">
@@ -513,7 +530,7 @@ const ProfileById = ({ children }) => {
 			{openSuggest && (
 				<Suggetions />
 			)}
-			<div className='mt-15 flex justify-center gap-[10px] md:gap-[50px]'>
+			<div className='flex justify-center mt-10 md:justify-around'>
 				<button
 					className='flex items-center gap-[10px] py-[10px]'
 					style={{
@@ -522,8 +539,7 @@ const ProfileById = ({ children }) => {
 					}}
 					onClick={() => router.push(`/${profileId}`)}
 				>
-					<MdOutlineGridOn size={20} />
-					<p className='text-[16px] md:text-[22px]'>Posts</p>
+					<MdOutlineGridOn size={30} />
 				</button>
 				{video && (
 					<button
@@ -535,8 +551,7 @@ const ProfileById = ({ children }) => {
 						}}
 						onClick={() => router.push(`/${profileId}/Reels`)}
 					>
-						<Image src={Reel} alt='reel icon' width={20} height={20} />
-						<p className='text-[16px] md:text-[22px]'>Reels</p>
+						<Image src={Reel} alt='reel icon' width={30} height={30} />
 					</button>
 				)}
 				<button
@@ -548,8 +563,7 @@ const ProfileById = ({ children }) => {
 					}}
 					onClick={() => router.push(`/${profileId}/tagged`)}
 				>
-					<MdOutlinePhotoCameraFront size={20} />
-					<p className='text-[16px] md:text-[22px]'>Tagged</p>
+					<MdOutlinePhotoCameraFront size={30} />
 				</button>
 			</div>
 			<section className='flex justify-center'>{children}</section>
