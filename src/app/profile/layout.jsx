@@ -17,8 +17,6 @@ import { useMediaQuery } from '@mui/material'
 import { useUserId } from '@/hook/useUserId'
 
 import { useProfileByIdStore } from '@/store/pages/profile/profile-by-id/store'
-import { useParams } from 'next/navigation'
-import { useRef } from 'react'
 import Stack from '@mui/material/Stack'
 import Skeleton from '@mui/material/Skeleton'
 import {
@@ -27,15 +25,11 @@ import {
 	Loader,
 	Search,
 	User,
-	UserPlusIcon,
 	X,
 	XCircle,
 } from 'lucide-react'
-import Suggetions from '@/components/pages/profile/profile-by-id/Suggetions'
 import { usegetUserStore } from '@/store/pages/search/store'
 import './style.css'
-import { useRegisterStore } from '@/store/pages/auth/registration/registerStore'
-import FollowUser from '@/components/pages/profile/profile-by-id/FollowUser'
 import FollowFollowers from '@/components/pages/profile/profile-by-id/FollowFollowers'
 import FollowFollowings from '@/components/pages/profile/profile-by-id/FollowFollowings'
 
@@ -153,7 +147,7 @@ const Layout = ({ children }) => {
 
 	let user = users?.data
 
-	const { users: infoUsers, getUsers } = usegetUserStore()
+	// const { getUsers } = usegetUserStore()
 
 	const { getChats, followers, getFollowers, getFollowings, followings } =
 		useProfileByIdStore()
@@ -229,10 +223,10 @@ const Layout = ({ children }) => {
 		}
 	}, [myUserId, getProfileById, getFollowers, getFollowings])
 
-	useEffect(() => {
-		getChats()
-		getUsers()
-	}, [])
+	// useEffect(() => {
+	// 	getChats()
+	// 	getUsers()
+	// }, [])
 
 	return (
 		<div className='pt-[8%]'>
