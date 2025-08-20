@@ -768,9 +768,7 @@ export default function Main() {
 						))) || (
 						<>
 							{posts?.data?.map((e, i) => {
-								console.log(e)
 								const muted = mutedMap[e.postId] ?? true
-								const stop = stopMap[e.postId] ?? true
 								const comments = commentsMap[e.postId] ?? true
 								const toggleMuted = () => {
 									setMutedMap(prev => ({
@@ -976,7 +974,7 @@ export default function Main() {
 															return (
 																<div
 																	key={i3}
-																	className='w-[100%] bg-black h-[80vh]'
+																	className='w-[100%] bg-black max-h-[80vh]'
 																>
 																	<Image
 																		key={i3}

@@ -13,9 +13,10 @@ import endImage from '../../../assets/img/pages/home/image 75.svg'
 import { Heart } from 'lucide-react'
 
 export default function SwiperStories({ indexUser = 0 }) {
-	const { data,LikeStory } = useHome()
+	const { data, LikeStory } = useHome()
 	const [paused, setPaused] = useState(false)
 	const [isMuted, setIsMuted] = useState(true)
+	const [isLiked, setIsLikeed] = useState(false)
 	const [activeIndex, setActiveIndex] = useState(indexUser)
 	const swiperRef = useRef(null)
 	let [theme, setTheme] = useState(
@@ -42,7 +43,6 @@ export default function SwiperStories({ indexUser = 0 }) {
 			.map(user => ({
 				userName: user.userName,
 				stories: user?.stories?.map(stor => {
-					console.log(stor);
 					const isVideo = stor.fileName?.endsWith('.mp4')
 					return {
 						url: `http://37.27.29.18:8003/images/${stor.fileName}`,
@@ -60,18 +60,23 @@ export default function SwiperStories({ indexUser = 0 }) {
 								<input
 									type='text'
 									placeholder='Type your message...'
-									className='border text-white border-white placeholder:text-white  rounded p-1 text-sm w-full'
+									className='border-2 rounded-full px-[10px] text-white border-white placeholder:text-white p-1 text-sm w-full'
 								/>
 								<button
-									onClick={async () => await LikeStory(stor.id)}
-									className='cursor-pointer'
+									onClick={async () => {
+										setIsLikeed(e => !e)
+										await LikeStory(stor.id)
+										close()
+									}}
+									className='flex flex-col gap-2 text-white items-center justify-center cursor-pointer'
 								>
 									<Heart
-										size={24}
+										size={22}
 										color='#ffffff'
-										fill={stor.likeCount > 0 ? 'red' : 'none'}
-										stroke={stor.likeCount > 0 ? 'red' : 'white'}
+										fill={isLiked ? 'red' : 'none'}
+										stroke={isLiked ? 'red' : 'white'}
 									/>
+									<p className='text-white text-sm'>{stor.likeCount}</p>
 								</button>
 							</div>
 						),
