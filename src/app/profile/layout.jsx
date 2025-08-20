@@ -32,6 +32,7 @@ import { usegetUserStore } from '@/store/pages/search/store'
 import './style.css'
 import FollowFollowers from '@/components/pages/profile/profile-by-id/FollowFollowers'
 import FollowFollowings from '@/components/pages/profile/profile-by-id/FollowFollowings'
+import { useTranslation } from 'react-i18next'
 
 const style = {
 	position: 'absolute',
@@ -60,7 +61,7 @@ const style2 = {
 
 const Layout = ({ children }) => {
 	let { user: userer, getProfileData } = useProfileStore()
-	// let { posts, getPosts } = useProfileStore()
+	let { t } = useTranslation()
 
 	let router = useRouter()
 	let pathname = usePathname()
@@ -71,7 +72,6 @@ const Layout = ({ children }) => {
 
 	useEffect(() => {
 		getProfileData()
-		// console.log(myUserId ? myUserId : 'no userId')
 	}, [])
 
 	const [theme, setTheme] = useDarkSide()
@@ -138,7 +138,6 @@ const Layout = ({ children }) => {
 	const [loading2, setLoading2] = useState(false)
 	const [search2, setSearch2] = useState('')
 	const [filteredUsers2, setFilteredUsers2] = useState([])
-	const [openSuggest, setOpenSuggest] = useState(null)
 	const [openAccountModal, setOpenAccountModal] = useState(null)
 	const [openFollowings, setOpenFollowings] = useState(null)
 
@@ -147,7 +146,6 @@ const Layout = ({ children }) => {
 
 	let user = users?.data
 
-	// const { getUsers } = usegetUserStore()
 
 	const { getChats, followers, getFollowers, getFollowings, followings } =
 		useProfileByIdStore()
@@ -223,11 +221,6 @@ const Layout = ({ children }) => {
 		}
 	}, [myUserId, getProfileById, getFollowers, getFollowings])
 
-	// useEffect(() => {
-	// 	getChats()
-	// 	getUsers()
-	// }, [])
-
 	return (
 		<div className='pt-[8%]'>
 			<section className='flex gap-[5%] m-auto lg:w-[80%] justify-center'>
@@ -257,16 +250,14 @@ const Layout = ({ children }) => {
 						</h1>
 						<div className='flex items-center gap-[5px] md:gap-[10px]'>
 							<button
-
 								className={`cursor-pointer text-[10px] md:text-[16px] px-[10px] md:px-[20px] py-[5px] md:py-[10px] rounded-xl md:rounded-2xl active:scale-95 transition-transform duration-100 ease-in ${
 									theme == 'light'
 										? 'bg-[#F0F2F5] text-[#334155] hover:bg-gray-200'
 										: 'bg-[#25292E] text-[#F4F4F4] hover:bg-gray-800'
 								}`}
-
 								onClick={() => router.push('/editprofile')}
 							>
-								Edit profile
+								{t('profile.editProfile')}
 							</button>
 							<button
 								className={`cursor-pointer text-[10px] md:text-[16px] px-[10px] md:px-[20px] py-[5px] md:py-[10px] rounded-xl md:rounded-2xl active:scale-95 transition-transform duration-100 ease-in
@@ -276,7 +267,8 @@ const Layout = ({ children }) => {
 										: 'bg-[#25292E] text-[#F4F4F4] hover:bg-gray-800'
 								}`}
 							>
-								View archive
+								{/* View archive */}
+								{t('profile.View Archive')}
 							</button>
 							<button
 								onClick={handleIOpen}
@@ -295,25 +287,25 @@ const Layout = ({ children }) => {
 							>
 								<Box sx={styleBurgerIcon}>
 									<button className='cursor-pointer p-[12px] bg-white hover:bg-gray-200 w-full text-start'>
-										QR code
+										{t('profile.QR code')}
 									</button>
 									<button
 										className='cursor-pointer p-[12px] bg-white hover:bg-gray-200 w-full text-start'
 										onClick={() => router.push('/notification')}
 									>
-										Notification
+										{t('profile.Notidications')}
 									</button>
 									<button
 										className='cursor-pointer p-[12px] bg-white hover:bg-gray-200 w-full text-start'
 										onClick={() => router.push('/setting/pro')}
 									>
-										Settings and privacy
+										{t('profile.Settings')}
 									</button>
 									<button
 										className='text-[#EF4444] cursor-pointer p-[12px] bg-white hover:bg-gray-200 w-full text-start'
 										onClick={logOut}
 									>
-										Log out
+										{t('profile.Log out')}
 									</button>
 								</Box>
 							</Modal>
@@ -332,7 +324,9 @@ const Layout = ({ children }) => {
 									<div className=''>
 										<div className='flex p-4 pb-2 border-b-1 border-gray-300 items-center justify-between'>
 											<div></div>
-											<h3 className='font-semibold text-[18px]'>Followers</h3>
+											<h3 className='font-semibold text-[18px]'>
+												{t('profile.followers')}
+											</h3>
 											<button onClick={handleClose}>
 												<X />
 											</button>
@@ -461,7 +455,10 @@ const Layout = ({ children }) => {
 									<div className=''>
 										<div className='flex p-4 pb-2 border-b-1 border-gray-300 items-center justify-between'>
 											<div></div>
-											<h3 className='font-semibold text-[18px]'>Followings</h3>
+											<h3 className='font-semibold text-[18px]'>
+												{' '}
+												{t('profile.following')}
+											</h3>
 											<button onClick={() => setOpenFollowings(false)}>
 												<X />
 											</button>
@@ -592,7 +589,7 @@ const Layout = ({ children }) => {
 						>
 							<Box sx={style2}>
 								<div className='p-4 border-b-1 border-gray-300 justify-center flex'>
-									About this account
+									{t('profile.aboutThisAccount')}
 								</div>
 								<div className='flex flex-col gap-3 items-center text-center px-10 p-4'>
 									<Image
@@ -669,8 +666,7 @@ const Layout = ({ children }) => {
 						>
 							{userer?.postCount}
 							<span className='text-[#64748B] block md:flex md:ml-[2px] text-[12px] lg:text-[18px]'>
-								{' '}
-								posts
+								{t('profile.post')}
 							</span>
 						</p>
 						<p
@@ -679,8 +675,7 @@ const Layout = ({ children }) => {
 						>
 							{userer?.subscribersCount}
 							<span className='text-[#64748B] block md:flex md:ml-[2px] text-[12px] lg:text-[18px]'>
-								{' '}
-								followers{' '}
+								{t('profile.followers')}
 							</span>
 						</p>
 						<p
@@ -689,8 +684,7 @@ const Layout = ({ children }) => {
 						>
 							{userer?.subscriptionsCount}
 							<span className='text-[#64748B] block md:flex md:ml-[2px] text-[12px] lg:text-[18px]'>
-								{' '}
-								following
+								{t('profile.following')}
 							</span>
 						</p>
 					</div>
@@ -716,8 +710,8 @@ const Layout = ({ children }) => {
 					}}
 					onClick={() => router.push('/profile')}
 				>
-					<MdOutlineGridOn size={20} />
-					<p className='text-[16px] md:text-[22px]'>Posts</p>
+					<MdOutlineGridOn size={30} />
+					{/* <p className='text-[16px] md:text-[22px]'>{t('profile.Post')}</p> */}
 				</button>
 				<button
 					className='flex items-center gap-[10px] py-[10px] cursor-pointer '
@@ -728,8 +722,8 @@ const Layout = ({ children }) => {
 					}}
 					onClick={() => router.push('/profile/saved')}
 				>
-					<FaRegBookmark size={20} />
-					<p className='text-[16px] md:text-[22px]'>Saved</p>
+					<FaRegBookmark size={30} />
+					{/* <p className='text-[16px] md:text-[22px]'>{t('profile.Saved')}</p> */}
 				</button>
 				<button
 					className='flex items-center gap-[10px] py-[10px] cursor-pointer '
@@ -740,8 +734,8 @@ const Layout = ({ children }) => {
 					}}
 					onClick={() => router.push('/profile/tagged')}
 				>
-					<MdOutlinePhotoCameraFront size={20} />
-					<p className='text-[16px] md:text-[22px]'>Tagged</p>
+					<MdOutlinePhotoCameraFront size={30} />
+					{/* <p className='text-[16px] md:text-[22px]'>{t('profile.Tagged')}</p> */}
 				</button>
 			</div>
 			<section className='w-[95%] md:w-[80%] flex m-auto'>{children}</section>

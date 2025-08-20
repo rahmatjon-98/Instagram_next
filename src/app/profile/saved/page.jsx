@@ -1,7 +1,7 @@
 'use client'
 import { useProfileStore } from '@/store/pages/profile/profile/store'
 import Image from 'next/image'
-import React, { useEffect } from 'react'
+import React, { use, useEffect } from 'react'
 import savedIcon from '@/assets/img/pages/profile/profile/image_78-removebg-preview.png'
 import { BookmarkIcon, Heart } from 'lucide-react'
 import { FaComments } from 'react-icons/fa'
@@ -23,6 +23,7 @@ import CommentInput from '@/components/pages/explore/Emogi'
 import { useUserId } from '@/hook/useUserId'
 import { useRouter } from 'next/navigation'
 import ModalUsers from '@/components/pages/explore/ModalUsers'
+import { useTranslation } from 'react-i18next'
 
 const style = {
 	position: 'absolute',
@@ -63,6 +64,7 @@ const mediaStyleModal = {
 
 const Saved = () => {
 	let { favorites, getFavorites } = useProfileStore()
+	let { getProfileData } = useProfileStore()
 
 	const [theme] = useDarkSide()
 
@@ -74,40 +76,46 @@ const Saved = () => {
 	// modal post
 
 	let {
-		postSaved,
-		fechUser,
+		savePost,
+		users,
+		fetchUsers,
 		postById,
-		getPostById,
-		deletComit,
-		AddComit,
+		fetchPostById,
+		deleteComment,
+		addComment,
 		unfollowUser,
+		fetchUserFollows,
 		Follow,
-		getUsersFollow,
 		FolowUser,
 		likePost,
 	} = useUserStore()
-	console.log(postById)
 	const [open, setOpen] = React.useState(false)
+	const [isMuted, setIsMuted] = React.useState(false)
+	let [newcomit, setnewComit] = React.useState('')
+	const [likedComments, setLikedComments] = React.useState({})
+	let userId = useUserId()
+	let [follow, setFollow] = React.useState(false)
+	const videoRef = React.useRef(null)
+	const { i18n } = useTranslation()
+	const { t } = useTranslation()
 	let router = useRouter()
 
-	async function RemoveComit(postCommentId) {
-		await deletComit(postCommentId)
-	}
-
 	useEffect(() => {
-		fechUser()
-		const saved = JSON.parse(localStorage.getItem('bookmarks')) || []
-		setwishLix(saved)
+		fetchUsers()
+		fetchUserFollows(userId)
 	}, [])
+
+	async function RemoveComit(postCommentId) {
+		await deleteComment(postCommentId)
+	}
 
 	const handleOpen = async id => {
 		const isFollowed = FolowUser?.data?.some(
 			e => e.userShortInfo.userId == postById.data?.userId
 		)
-		console.log(isFollowed)
-		await getPostById(id)
+		await fetchPostById(id)
 		try {
-			await getUsersFollow(userId)
+			await fetchUserFollows(userId)
 		} catch (err) {
 			console.error('Ошибка при обновлении списка подписок в handleOpen:', err)
 		}
@@ -115,11 +123,6 @@ const Saved = () => {
 		setOpen(true)
 	}
 
-	const handleClose = () => {
-		setOpen(false)
-	}
-	const [isMuted, setIsMuted] = React.useState(false)
-	const videoRef = React.useRef(null)
 	const toggleMute = () => {
 		const video = videoRef.current
 		if (video) {
@@ -128,15 +131,12 @@ const Saved = () => {
 		}
 	}
 
-	let [newcomit, setnewComit] = React.useState('')
 	const handleAddComment = async () => {
 		if (newcomit.trim() === '') return
-		await AddComit(newcomit, postById.data?.postId)
-		await getPostById(postById.data?.postId)
+		await addComment(newcomit, postById.data?.postId)
+		await fetchPostById(postById.data?.postId)
 		setnewComit('')
 	}
-
-	const [likedComments, setLikedComments] = React.useState({})
 
 	const handleLikeComment = commentId => {
 		setLikedComments(prev => ({
@@ -145,15 +145,7 @@ const Saved = () => {
 		}))
 	}
 
-	let [wishLix, setwishLix] = React.useState([])
-	let userId = useUserId()
-	let [follow, setFollow] = React.useState(false)
-
-	useEffect(() => {
-		getUsersFollow(userId)
-	}, [])
-
-	async function HendlFollow(id) {
+	async function hendlFollow(id) {
 		const currentlyFollowed = FolowUser?.data?.some(
 			e => e.userShortInfo.userId == id
 		)
@@ -168,9 +160,9 @@ const Saved = () => {
 			}
 
 			try {
-				await getUsersFollow(userId)
+				await fetchUserFollows(userId)
 			} catch (err) {
-				console.error('Ошибка при getUsersFollow в HendlFollow:', err)
+				console.error('Ошибка при fetchUserFollows в hendlFollow:', err)
 			}
 
 			const updatedFollow = FolowUser?.data?.some(
@@ -186,12 +178,14 @@ const Saved = () => {
 		<div className='w-full'>
 			<Modal
 				open={open}
-				onClose={handleClose}
+				onClose={() => setOpen(false)}
 				aria-labelledby='modal-modal-title'
 				aria-describedby='modal-modal-description'
 			>
 				<Box sx={style}>
-					<div className='flex flex-col lg:flex-row gap-[20px] h-[85vh] bg-[#272727]'>
+					<div
+						className={` flex flex-col lg:flex-row gap-[20px] h-[85vh] bg-[#272727]`}
+					>
 						{postById ? (
 							<div className='lg:flex w-full gap-[20px]'>
 								<div className='lg:w-[47%] '>
@@ -236,7 +230,7 @@ const Saved = () => {
 													) : (
 														<img
 															src={mediaUrl}
-															alt={`Post by ${el.userName}`}
+															draggable={false}
 															className='lg:h-[85vh] h-[50vh]'
 															style={mediaStyleModal}
 														/>
@@ -251,6 +245,7 @@ const Saved = () => {
 											<div className='flex gap-[20px]'>
 												<div>
 													<img
+														draggable={false}
 														src={`http://37.27.29.18:8003/images/${postById.data?.userImage}`}
 														className='w-[40px] h-[40px] rounded-full'
 														alt='test'
@@ -268,11 +263,11 @@ const Saved = () => {
 											</div>
 											<button
 												className='px-3 py-1 ml-4 text-sm cursor-pointer text-black bg-white rounded-full'
-												onClick={() => HendlFollow(postById.data?.userId)}
+												onClick={() => hendlFollow(postById.data?.userId)}
 											>
 												{postById?.data?.isFollowing
-													? 'Вы подписаны'
-													: 'Подписаться'}
+													? t('exlpore.2')
+													: t('exlpore.1')}
 											</button>
 
 											<button
@@ -415,8 +410,7 @@ const Saved = () => {
 											</div>
 											<button
 												onClick={() => {
-													postSaved(postById.data?.postId)
-													// AddwishLix(postById.data?.postId);
+													savePost(postById.data?.postId)
 												}}
 											>
 												<Bookmark
@@ -429,7 +423,8 @@ const Saved = () => {
 
 										<div className='mb-2'>
 											<span className='font-bold'>
-												{postById.data?.postLikeCount} отметок "Нравится"
+												{postById.data?.postLikeCount} {t('exlpore.3')}{' '}
+												{t('exlpore.4')}
 											</span>
 										</div>
 
