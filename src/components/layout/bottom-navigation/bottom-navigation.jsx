@@ -59,7 +59,7 @@ export default function BottomNavigation({children}) {
 
           {/* Create Button */}
           <div className={iconClass}>
-            {add}
+            {add} 
           </div>
 
           {/* Chats */}

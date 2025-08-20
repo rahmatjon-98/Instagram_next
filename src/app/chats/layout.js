@@ -15,7 +15,7 @@ import useDarkSide from "@/hook/useDarkSide";
 import { useTranslation } from "react-i18next";
 
 export default function Layout({ children }) {
-  const { t } = useTranslation();
+  const { t, ready } = useTranslation();
   const router = useRouter();
   const userId = useUserId();
 
@@ -50,11 +50,10 @@ export default function Layout({ children }) {
     }
 
     const t = setTimeout(() => {
-      const q = search.toLowerCase();
       const results = allUsers.filter((u) =>
         String(u.userName ?? "")
           .toLowerCase()
-          .includes(q)
+          .includes(search.toLowerCase())
       );
       setFilteredUsers(results);
     }, 500);
@@ -100,6 +99,13 @@ export default function Layout({ children }) {
   }
 
   const [theme] = useDarkSide();
+
+  // if (ready)
+  //   return (
+  //     <div className="flex justify-center items-center h-screen">
+  //       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-900"></div>
+  //     </div>
+  //   );
 
   return (
     <div
@@ -277,7 +283,7 @@ export default function Layout({ children }) {
         <section className="flex items-center justify-between font-medium text-sm px-5 py-3">
           <p className="text-[#64748B]">{t("chat.messages")}</p>
           <button type="button" className="text-[#1780C2]">
-              {t("chat.requests")}
+            {t("chat.requests")}
           </button>
         </section>
 
