@@ -103,7 +103,7 @@ export default function SwiperStories({ indexUser = 0 }) {
       const chat = useDefaultChat
         .getState()
         .chats?.data?.find(e => e.receiveUserId === id || e.sendUserId === id)
-
+ 
       if (chat?.chatId) {
         if (textMessage) {
           const formData = new FormData()
