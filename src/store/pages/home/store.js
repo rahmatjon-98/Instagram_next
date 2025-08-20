@@ -72,7 +72,6 @@ export const useHome = create((set, get) => ({
 				story.id === postId
 					? {
 							...story,
-							postLike: !story.postLike,
 							likeCount: story.postLike
 								? story.likeCount - 1
 								: story.likeCount + 1,
@@ -82,6 +81,7 @@ export const useHome = create((set, get) => ({
 		}))
 		try {
 			await axiosRequest.post(`/Story/LikeStory?storyId=${postId}`, {})
+			set(state => ({ data: prevStories }))
 		} catch (error) {
 			console.error('Error in Like', error)
 			set({ posts: prevPosts })
