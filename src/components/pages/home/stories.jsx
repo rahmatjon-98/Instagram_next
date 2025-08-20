@@ -10,50 +10,74 @@ import Image from 'next/image'
 import Link from 'next/link'
 import userIMG from '../../../assets/img/pages/home/userDefault.png'
 import endImage from '../../../assets/img/pages/home/image 75.svg'
+import { Heart } from 'lucide-react'
 
 export default function SwiperStories({ indexUser = 0 }) {
-	const { data } = useHome()
+	const { data,LikeStory } = useHome()
 	const [paused, setPaused] = useState(false)
 	const [isMuted, setIsMuted] = useState(true)
-	const [activeIndex, setActiveIndex] = useState(indexUser) // активный слайд
+	const [activeIndex, setActiveIndex] = useState(indexUser)
 	const swiperRef = useRef(null)
 	let [theme, setTheme] = useState(
-			typeof window !== 'undefined' ? localStorage.getItem('theme') : ''
-		)
-		useEffect(() => {
-			const handleStorageChange = event => {
-				if (event.key === 'theme') {
-					setTheme(event.newValue)
-				}
+		typeof window !== 'undefined' ? localStorage.getItem('theme') : ''
+	)
+
+	useEffect(() => {
+		const handleStorageChange = event => {
+			if (event.key === 'theme') {
+				setTheme(event.newValue)
 			}
-			window.addEventListener('storage', handleStorageChange)
-			return () => {
-				window.removeEventListener('storage', handleStorageChange)
-			}
-		}, [])
+		}
+		window.addEventListener('storage', handleStorageChange)
+		return () => {
+			window.removeEventListener('storage', handleStorageChange)
+		}
+	}, [])
 
 	const storiesData = useMemo(() => {
-		
 		if (!data) return []
 
-		return data?.filter(e => e?.stories?.length > 0).map(user => ({
-			userName: user.userName,
-			stories: user?.stories?.map(stor => {
-				const isVideo = stor.fileName?.endsWith('.mp4')
-				return {
-					url: `http://37.27.29.18:8003/images/${stor.fileName}`,
-					type: isVideo ? 'video' : 'image',
-					muted: isVideo ? isMuted : undefined,
-					duration: isVideo ? 0 : 3000,
-					header: {
-						heading: user.userName,
-						profileImage: user.userImage
-							? `http://37.27.29.18:8003/images/${user.userImage}`
-							: userIMG.src,
-					},
-				}
-			}),
-		}))
+		return data
+			?.filter(e => e?.stories?.length > 0)
+			.map(user => ({
+				userName: user.userName,
+				stories: user?.stories?.map(stor => {
+					console.log(stor);
+					const isVideo = stor.fileName?.endsWith('.mp4')
+					return {
+						url: `http://37.27.29.18:8003/images/${stor.fileName}`,
+						type: isVideo ? 'video' : 'image',
+						muted: isVideo ? isMuted : undefined,
+						duration: isVideo ? 0 : 4000,
+						header: {
+							heading: user.userName,
+							profileImage: user.userImage
+								? `http://37.27.29.18:8003/images/${user.userImage}`
+								: userIMG.src,
+						},
+						seeMore: ({ close }) => (
+							<div className='p-2 flex relative top-[545px]  gap-2 rounded-md shadow-md w-[95%] m-auto'>
+								<input
+									type='text'
+									placeholder='Type your message...'
+									className='border text-white border-white placeholder:text-white  rounded p-1 text-sm w-full'
+								/>
+								<button
+									onClick={async () => await LikeStory(stor.id)}
+									className='cursor-pointer'
+								>
+									<Heart
+										size={24}
+										color='#ffffff'
+										fill={stor.likeCount > 0 ? 'red' : 'none'}
+										stroke={stor.likeCount > 0 ? 'red' : 'white'}
+									/>
+								</button>
+							</div>
+						),
+					}
+				}),
+			}))
 	}, [data, isMuted])
 
 	if (!storiesData.length) return null
@@ -65,12 +89,8 @@ export default function SwiperStories({ indexUser = 0 }) {
 		}
 	}, [indexUser])
 
-	console.log(storiesData);
-	
 	return (
-		<div
-			className='w-full h-[600px] flex justify-center items-center relative'
-		>
+		<div className='w-full h-[600px] flex justify-center items-center relative'>
 			<Swiper
 				effect='cube'
 				cubeEffect={{ shadow: false, slideShadows: false }}
@@ -86,7 +106,7 @@ export default function SwiperStories({ indexUser = 0 }) {
 							<Stories
 								stories={user.stories}
 								width={320}
-								height={600}	
+								height={600}
 								loop={false}
 								isPaused={paused}
 								onAllStoriesEnd={() => {
@@ -96,7 +116,7 @@ export default function SwiperStories({ indexUser = 0 }) {
 								}}
 							/>
 						) : (
-							<div className="w-[320px] h-[600px] bg-black" />
+							<div className='w-[320px] h-[600px] bg-black' />
 						)}
 					</SwiperSlide>
 				))}
