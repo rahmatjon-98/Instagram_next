@@ -110,9 +110,9 @@ const Editprofile = () => {
 					Profile
 					<span className='text-[#1E293B]'>{' > '} Edit profile</span>
 				</h1>
-				<div className=' rounded-2xl p-[20px] gap-y-[5vh] flex flex-col md:flex-row items-center justify-between border border-gray-300'>
+				<div className=' rounded-2xl p-[15px] gap-y-[5vh] flex flex-col lg:flex-row items-center justify-between border border-gray-300'>
 					<aside className='flex items-center gap-[10px]'>
-						<div className='overflow-hidden flex items-center justify-center w-[100px] md:w-[160px] h-[100px] md:h-[160px] rounded-[50%]'>
+						<div className='overflow-hidden flex items-center justify-center w-[100px] md:w-[140px] h-[100px] md:h-[140px] rounded-[50%]'>
 							<Image
 								src={`http://37.27.29.18:8003/images/${user.image}`}
 								alt='profile picture'
@@ -125,20 +125,20 @@ const Editprofile = () => {
 								alt='default user'
 								className={`${
 									user.image ? 'hidden' : 'flex'
-								} w-[100px] md:w-[160px] h-[100px] md:h-[160px] rounded-[50%]`}
+								} w-[100px] md:w-[140px] h-[100px] md:h-[140px] rounded-[50%]`}
 							/>
 						</div>
 						<div>
 							<div>
 								<h1
-									className='font-bold text-[#1E293B] text-[22px] w-[150px] 
+									className='font-bold text-[#1E293B] text-[22px] w-[110px] 
 								overflow-hidden text-ellipsis whitespace-nowrap '
 								>
 									{user.userName}
 								</h1>
 							</div>
 							<div>
-								<p className='font-normal text-[#64748B] text-[20px] w-[130px] overflow-hidden text-ellipsis whitespace-nowrap '>
+								<p className='font-normal text-[#64748B] text-[20px] w-[100px] overflow-hidden text-ellipsis whitespace-nowrap '>
 									{user.firstName}
 								</p>
 								{user.lastName && (
@@ -149,16 +149,16 @@ const Editprofile = () => {
 							</div>
 						</div>
 					</aside>
-					<aside className='flex gap-[20px] text-[#FFFFFF]'>
+					<aside className='flex gap-[15px] lg:gap-[10px] text-[#FFFFFF]'>
 						<button
-							className=' rounded-[10px] px-[10px] py-[5px] text-[14px] lg:text-[16px] lg:py-[10px] items-center bg-red-500 active:scale-95 transition-transform duration-100 ease-in'
+							className=' rounded-[10px] px-[10px] py-[5px] text-[13px] lg:py-[10px] items-center bg-red-500 active:scale-95 transition-transform duration-100 ease-in'
 							style={{ display: user.image ? 'flex' : 'none' }}
 							onClick={handleOpen}
 						>
 							Delete photo
 						</button>
 						<button
-							className=' rounded-[10px] px-[10px] py-[5px] text-[14px] lg:text-[16px] lg:py-[10px] bg-blue-500 active:scale-95 transition-transform duration-100 ease-in'
+							className=' rounded-[10px] px-[10px] py-[5px] text-[13px] lg:py-[10px] bg-blue-500 active:scale-95 transition-transform duration-100 ease-in'
 							onClick={handleOpenEdit}
 						>
 							Change photo
