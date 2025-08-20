@@ -135,7 +135,7 @@ export default function Explore() {
 			console.error("Ошибка при подписке/отписке:", error);
 		}
 	}
-	
+
 
 
 	return (
@@ -195,7 +195,7 @@ export default function Explore() {
 													) : (
 														<img
 															src={mediaUrl}
-															alt={`Post by ${el.userName}`}
+															draggable={false}
 															className="lg:h-[85vh] h-[50vh]"
 															style={mediaStyleModal}
 														/>
@@ -210,6 +210,7 @@ export default function Explore() {
 											<div className="flex gap-[20px]">
 												<div>
 													<img
+														draggable={false}
 														src={`http://37.27.29.18:8003/images/${postById.data?.userImage}`}
 														className="w-[40px] h-[40px] rounded-full"
 														alt="test"
@@ -445,6 +446,9 @@ export default function Explore() {
 							isFifth = true;
 						}
 						if (i == 45) {
+							isFifth = true;
+						}
+						if (i == 52) {
 							isFifth = true;
 						}
 						if ((i + 1) % cnt === 0) {
