@@ -119,21 +119,16 @@ export default function ChatById() {
 
   const [inpMessage, setinpMessage] = useState("");
   const [inpFile, setinpFile] = useState(null);
-  const [openImg, setOpenImg] = useState(null);
+  const [previewFile, setPreviewFile] = useState(null);
   const [openIsVideo, setOpenIsVideo] = useState(false);
   const [openIsAudio, setOpenIsAudio] = useState(false);
   const [delMesModal, setdelMesModal] = useState(null);
 
-  const [recording, setRecording] = useState(false);
-  const [mediaRecorder, setMediaRecorder] = useState(null);
-  const [audioChunks, setAudioChunks] = useState([]);
-  const [mediaStream, setMediaStream] = useState(null);
-
   useEffect(() => {
     return () => {
-      if (openImg && openImg.startsWith("blob:")) {
+      if (previewFile && previewFile.startsWith("blob:")) {
         try {
-          URL.revokeObjectURL(openImg);
+          URL.revokeObjectURL(previewFile);
         } catch {}
       }
       stopPolling();
@@ -146,18 +141,17 @@ export default function ChatById() {
     const date = new Date(dateString);
     const hours = String(date.getHours()).padStart(2, "0");
     const minutes = String(date.getMinutes()).padStart(2, "0");
-    const day = String(date.getDay());
+    const day = date.getDay(); // 0-6
     const week = {
-      1: "Sun",
-      2: "Mon",
-      3: "Tue",
-      4: "Wed",
-      5: "Thu",
-      6: "Fri",
-      7: "Sat",
+      0: "Sun",
+      1: "Mon",
+      2: "Tue",
+      3: "Wed",
+      4: "Thu",
+      5: "Fri",
+      6: "Sat",
     };
-
-    return ` ${hours}:${minutes}`;
+    return `${week[day]} ${hours}:${minutes}`;
   }
 
   async function handleDelChat(chatId) {
@@ -184,15 +178,15 @@ export default function ChatById() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (openImg && openImg.startsWith("blob:")) {
+    if (previewFile && previewFile.startsWith("blob:")) {
       try {
-        URL.revokeObjectURL(openImg);
+        URL.revokeObjectURL(previewFile);
       } catch {}
     }
 
     setinpFile(file);
     const objectUrl = URL.createObjectURL(file);
-    setOpenImg(objectUrl);
+    setPreviewFile(objectUrl);
     setOpenIsVideo(isVideoFileName(file.name));
     setOpenIsAudio(isAudioFileName(file.name));
   };
@@ -214,7 +208,7 @@ export default function ChatById() {
       await getChatById(id);
       setinpMessage("");
       setinpFile(null);
-      setOpenImg(null);
+      setPreviewFile(null);
       setOpenIsVideo(false);
       setOpenEmoji(false);
     } catch (err) {
@@ -242,7 +236,7 @@ export default function ChatById() {
 
   const closePreview = () => {
     setinpFile(null);
-    setOpenImg(null);
+    setPreviewFile(null);
     setOpenIsVideo(false);
   };
 
@@ -254,50 +248,60 @@ export default function ChatById() {
 
   let userData = chats?.data?.find((e) => e.chatId == id);
 
+  const [recording, setRecording] = useState(false);
+  const [mediaRecorder, setMediaRecorder] = useState(null);
+  const [mediaStream, setMediaStream] = useState(null);
+
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      setMediaStream(stream);
+
+      if (previewFile && previewFile.startsWith("blob:")) {
+        try {
+          URL.revokeObjectURL(previewFile);
+        } catch {}
+      }
 
       const recorder = new MediaRecorder(stream);
       const chunks = [];
 
       recorder.ondataavailable = (e) => {
-        if (e.data.size > 0) {
-          chunks.push(e.data);
-        }
+        if (e.data && e.data.size) chunks.push(e.data);
       };
 
       recorder.onstop = () => {
-        const audioBlob = new Blob(chunks, { type: "audio/webm" });
-        const audioFile = new File([audioBlob], "recording.webm", {
-          type: "audio/webm",
-        });
+        const blob = new Blob(chunks, { type: "audio/webm" });
+        const file = new File([blob], "recording.webm", { type: "audio/webm" });
 
-        setinpFile(audioFile);
-        setOpenImg(URL.createObjectURL(audioBlob));
+        setinpFile(file);
+        setPreviewFile(URL.createObjectURL(blob));
         setOpenIsAudio(true);
 
-        stream.getTracks().forEach((track) => track.stop());
+        stream.getTracks().forEach((t) => t.stop());
         setMediaStream(null);
+        setMediaRecorder(null);
       };
 
       recorder.start();
+      setMediaStream(stream);
       setMediaRecorder(recorder);
-      setAudioChunks(chunks);
       setRecording(true);
     } catch (err) {
-      console.error("Ошибка доступа к микрофону:", err);
+      console.error(err);
     }
   };
 
   const stopRecording = () => {
     if (mediaRecorder) {
-      mediaRecorder.stop();
+      try {
+        if (mediaRecorder.state !== "inactive") mediaRecorder.stop();
+      } catch (e) {
+        console.warn(e);
+      }
       setRecording(false);
 
       if (mediaStream) {
-        mediaStream.getTracks().forEach((track) => track.stop());
+        mediaStream.getTracks().forEach((t) => t.stop());
         setMediaStream(null);
       }
     }
@@ -318,59 +322,6 @@ export default function ChatById() {
     </Stack>
   );
 
-  const SkeletonChat = () => (
-    <div>
-      <Stack direction="row" spacing={2} alignItems="center" className="p-3">
-        <Stack spacing={0.5} flex={1}>
-          <Skeleton variant="text" width="60%" height={14} />
-          <Skeleton variant="text" width="50%" height={14} />
-        </Stack>
-      </Stack>
-      <Stack direction="row" spacing={2} alignItems="center" className="p-3 ">
-        <Stack spacing={0.5} flex={1} className="flex flex-col items-end">
-          <Skeleton variant="text" width="60%" height={14} />
-          <Skeleton variant="text" width="50%" height={14} />
-        </Stack>
-      </Stack>
-      <Stack direction="row" spacing={2} alignItems="center" className="p-3">
-        <Stack spacing={0.5} flex={1}>
-          <Skeleton variant="text" width="60%" height={14} />
-          <Skeleton variant="text" width="50%" height={14} />
-        </Stack>
-      </Stack>
-      <Stack direction="row" spacing={2} alignItems="center" className="p-3 ">
-        <Stack spacing={0.5} flex={1} className="flex flex-col items-end">
-          <Skeleton variant="text" width="60%" height={14} />
-          <Skeleton variant="text" width="50%" height={14} />
-        </Stack>
-      </Stack>
-      <Stack direction="row" spacing={2} alignItems="center" className="p-3">
-        <Stack spacing={0.5} flex={1}>
-          <Skeleton variant="text" width="60%" height={14} />
-          <Skeleton variant="text" width="50%" height={14} />
-        </Stack>
-      </Stack>
-      <Stack direction="row" spacing={2} alignItems="center" className="p-3 ">
-        <Stack spacing={0.5} flex={1} className="flex flex-col items-end">
-          <Skeleton variant="text" width="60%" height={14} />
-          <Skeleton variant="text" width="50%" height={14} />
-        </Stack>
-      </Stack>
-      <Stack direction="row" spacing={2} alignItems="center" className="p-3">
-        <Stack spacing={0.5} flex={1}>
-          <Skeleton variant="text" width="60%" height={14} />
-          <Skeleton variant="text" width="50%" height={14} />
-        </Stack>
-      </Stack>
-      <Stack direction="row" spacing={2} alignItems="center" className="p-3 ">
-        <Stack spacing={0.5} flex={1} className="flex flex-col items-end">
-          <Skeleton variant="text" width="60%" height={14} />
-          <Skeleton variant="text" width="50%" height={14} />
-        </Stack>
-      </Stack>
-    </div>
-  );
-
   function linkToProfile(id) {
     router.push(`/${id}`);
   }
@@ -381,7 +332,7 @@ export default function ChatById() {
   return (
     <div className="w-full">
       <div className="relative shadow w-[100%] z-10 p-2 flex justify-between items-center">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 w-full">
           <Link href={`/chats`} className="lg:hidden block">
             <button>
               <ArrowLeft />
@@ -389,9 +340,11 @@ export default function ChatById() {
           </Link>
 
           {loadingChat ? (
-            <SkeletonRow />
+            <div className="w-1/2">
+              <SkeletonRow />
+            </div>
           ) : (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 ">
               {userData ? (
                 <div className="flex items-center gap-2">
                   {!userData.receiveUserImage ? (
@@ -475,197 +428,193 @@ export default function ChatById() {
         ref={messagesContainerRef}
         className="flex flex-col gap-2 overflow-y-auto h-[76vh]"
       >
-        {loadingDelChat ? (
-          <SkeletonChat />
-        ) : (
-          <div>
-            <div className="flex items-center gap-2 p-5">
-              {userData ? (
-                <div className="flex items-center gap-2 w-full justify-center flex-col">
-                  {!userData.receiveUserImage ? (
-                    <Image
-                      src={img}
-                      width={500}
-                      height={500}
-                      alt="avatar"
-                      className="w-12 h-12 rounded-full object-cover"
-                    />
-                  ) : (
-                    <Image
-                      src={`http://37.27.29.18:8003/images/${
-                        userData.receiveUserId === userId
-                          ? userData.sendUserImage
-                          : userData.receiveUserImage
-                      }`}
-                      width={500}
-                      height={500}
-                      alt="avatar"
-                      className="w-25 h-25 rounded-full object-cover"
-                    />
-                  )}
-
-                  <div>
-                    <p className="text-gray-500">
-                      {userData.receiveUserId === userId
-                        ? userData.sendUserName
-                        : userData.receiveUserName}
-                      - Instagram
-                    </p>
-                  </div>
-
-                  <button
-                    onClick={() =>
-                      linkToProfile(
-                        `${
-                          userData.receiveUserId === userId
-                            ? userData.sendUserId
-                            : userData.receiveUserId
-                        }`
-                      )
-                    }
-                    className={`cursor-pointer font-medium rounded px-5 py-1 ${
-                      theme == "dark"
-                        ? "bg-[rgb(80,80,80)] text-white"
-                        : "bg-gray-100 text-black"
+        <div>
+          <div className="flex items-center gap-2 p-5">
+            {userData ? (
+              <div className="flex items-center gap-2 w-full justify-center flex-col">
+                {!userData.receiveUserImage ? (
+                  <Image
+                    src={img}
+                    width={500}
+                    height={500}
+                    alt="avatar"
+                    className="w-12 h-12 rounded-full object-cover"
+                  />
+                ) : (
+                  <Image
+                    src={`http://37.27.29.18:8003/images/${
+                      userData.receiveUserId === userId
+                        ? userData.sendUserImage
+                        : userData.receiveUserImage
                     }`}
-                  >
-                    {t("chat.seeProfile")}
-                  </button>
+                    width={500}
+                    height={500}
+                    alt="avatar"
+                    className="w-25 h-25 rounded-full object-cover"
+                  />
+                )}
+
+                <div>
+                  <p className="text-gray-500">
+                    {userData.receiveUserId === userId
+                      ? userData.sendUserName
+                      : userData.receiveUserName}
+                    - Instagram
+                  </p>
                 </div>
-              ) : (
-                <SkeletonRow />
-              )}
-            </div>
-            <div ref={messagesContainerRef} className=" flex flex-col">
-              {messages &&
-                [...messages].reverse().map((e) => {
-                  const isCurrentUser = e.userId === userId;
 
-                  console.log(e.messageText);
-                  return (
-                    <section key={e.messageId}>
-                      <p className={`text-[10px] text-center  `}>
-                        {formatMessageTime(e.sendMassageDate)}
-                      </p>
+                <button
+                  onClick={() =>
+                    linkToProfile(
+                      `${
+                        userData.receiveUserId === userId
+                          ? userData.sendUserId
+                          : userData.receiveUserId
+                      }`
+                    )
+                  }
+                  className={`cursor-pointer font-medium rounded px-5 py-1 ${
+                    theme == "dark"
+                      ? "bg-[rgb(80,80,80)] text-white"
+                      : "bg-gray-100 text-black"
+                  }`}
+                >
+                  {t("chat.seeProfile")}
+                </button>
+              </div>
+            ) : (
+              <SkeletonRow />
+            )}
+          </div>
 
+          <div ref={messagesContainerRef} className=" flex flex-col">
+            {messages &&
+              [...messages].reverse().map((e) => {
+                const isCurrentUser = e.userId === userId;
+
+                console.log(e.messageText);
+                return (
+                  <section key={e.messageId}>
+                    <p className={`text-[10px] text-center  `}>
+                      {formatMessageTime(e.sendMassageDate)}
+                    </p>
+
+                    <div
+                      className={`flex items-center gap-3  p-3 rounded-lg group w-full ${
+                        isCurrentUser
+                          ? " self-end rounded-tr-none flex-row-reverse"
+                          : " self-start rounded-tl-none "
+                      }`}
+                    >
                       <div
-                        className={`flex items-center gap-3  p-3 rounded-lg group w-full ${
-                          isCurrentUser
-                            ? " self-end rounded-tr-none flex-row-reverse"
-                            : " self-start rounded-tl-none "
+                        className={`flex flex-col max-w-7/10  ${
+                          isCurrentUser ? " self-end" : " self-start"
                         }`}
                       >
-                        <div
-                          className={`flex flex-col max-w-7/10  ${
-                            isCurrentUser ? " self-end" : " self-start"
-                          }`}
-                        >
-                          {e.file && isVideoFileName(e.file) ? (
-                            <video
-                              src={`http://37.27.29.18:8003/images/${e.file}`}
-                              controls
-                              className="pb-2 rounded-xl  max-w-xs"
-                            />
-                          ) : e.file && isAudioFileName(e.file) ? (
-                            <audio
-                              src={`http://37.27.29.18:8003/images/${e.file}`}
-                              controls
-                              className="pb-2  max-w-xs"
-                            />
-                          ) : e.file ? (
-                            <Image
-                              src={`http://37.27.29.18:8003/images/${e.file}`}
-                              alt="image"
-                              width={1000}
-                              height={1000}
-                              className="pb-2 rounded-xl  max-w-xs"
-                            />
+                        {e.file && isVideoFileName(e.file) ? (
+                          <video
+                            src={`http://37.27.29.18:8003/images/${e.file}`}
+                            controls
+                            className="pb-2 rounded-xl  max-w-xs"
+                          />
+                        ) : e.file && isAudioFileName(e.file) ? (
+                          <audio
+                            src={`http://37.27.29.18:8003/images/${e.file}`}
+                            controls
+                            className="pb-2  max-w-xs"
+                          />
+                        ) : e.file ? (
+                          <Image
+                            src={`http://37.27.29.18:8003/images/${e.file}`}
+                            alt="image"
+                            width={1000}
+                            height={1000}
+                            className="pb-2 rounded-xl  max-w-xs"
+                          />
+                        ) : (
+                          ""
+                        )}
+
+                        {e.messageText &&
+                          (isVideoFileName(e.messageText) ? (
+                            <div>
+                              <video
+                                src={`http://37.27.29.18:8003/images/${e.messageText}`}
+                                controls
+                                className="pb-2 rounded-xl max-w-xs"
+                              />
+                            </div>
+                          ) : e.messageText &&
+                            isImageFileName(e.messageText) ? (
+                            <div>
+                              <img
+                                src={`http://37.27.29.18:8003/images/${e.messageText}`}
+                                alt="media"
+                                className="pb-2 rounded-xl max-w-xs"
+                              />
+                            </div>
                           ) : (
-                            ""
-                          )}
-
-                          {e.messageText &&
-                            (isVideoFileName(e.messageText) ? (
-                              <div>
-                                <video
-                                  src={`http://37.27.29.18:8003/images/${e.messageText}`}
-                                  controls
-                                  className="pb-2 rounded-xl max-w-xs"
-                                />
-                              </div>
-                            ) : e.messageText &&
-                              isImageFileName(e.messageText) ? (
-                              <div>
-                                <img
-                                  src={`http://37.27.29.18:8003/images/${e.messageText}`}
-                                  alt="media"
-                                  className="pb-2 rounded-xl max-w-xs"
-                                />
-                              </div>
-                            ) : (
-                              <div
-                                className={`rounded-lg  ${
-                                  isCurrentUser
-                                    ? "bg-blue-500 text-white self-end rounded-tr-none p-1.5 px-3"
-                                    : "bg-gray-100 text-[#475569] self-start rounded-tl-none p-1.5 px-3"
-                                }`}
-                              >
-                                <p>{e.messageText}</p>
-                              </div>
-                            ))}
-                        </div>
-
-                        <div className="relative">
-                          <button
-                            type="button"
-                            onClick={() => toggleDelModal(e.messageId)}
-                            className={` ${
-                              delMesModal === e.messageId ? "block" : ""
-                            }`}
-                          >
-                            <EllipsisVertical size={15} />
-                          </button>
-
-                          {delMesModal === e.messageId && (
                             <div
-                              className={`absolute flex flex-col justify-center items-center gap-2 shadow rounded bg-white w-[200px] ${
+                              className={`rounded-lg  ${
                                 isCurrentUser
-                                  ? "lg:-ml-60 lg:-mt-30 -mx-20 -mt-32 "
-                                  : "lg:ml-5 lg:-mt-30  -mx-10 -mt-32"
+                                  ? "bg-blue-500 text-white self-end rounded-tr-none p-1.5 px-3"
+                                  : "bg-gray-100 text-[#475569] self-start rounded-tl-none p-1.5 px-3"
                               }`}
                             >
-                              <button
-                                type="button"
-                                onClick={() => handleDelMessage(e.messageId)}
-                                className="text-red-500 p-2 rounded"
-                              >
-                                {loading ? (
-                                  <Loader2 className="animate-spin w-5 h-5" />
-                                ) : (
-                                  <p className="flex items-center gap-2">
-                                    {t("chat.deleteMessage")}{" "}
-                                    <Trash size={18} />
-                                  </p>
-                                )}
-                              </button>
-
-                              <button
-                                type="button"
-                                onClick={() => setdelMesModal(null)}
-                                className="p-2"
-                              >
-                                {t("chat.cancel")}
-                              </button>
+                              <p>{e.messageText}</p>
                             </div>
-                          )}
-                        </div>
+                          ))}
                       </div>
-                    </section>
-                  );
-                })}
-            </div>
+
+                      <div className="relative">
+                        <button
+                          type="button"
+                          onClick={() => toggleDelModal(e.messageId)}
+                          className={` ${
+                            delMesModal === e.messageId ? "block" : ""
+                          }`}
+                        >
+                          <EllipsisVertical size={15} />
+                        </button>
+
+                        {delMesModal === e.messageId && (
+                          <div
+                            className={`absolute flex flex-col justify-center items-center gap-2 shadow rounded bg-white w-[200px] ${
+                              isCurrentUser
+                                ? "lg:-ml-60 lg:-mt-30 -mx-20 -mt-32 "
+                                : "lg:ml-5 lg:-mt-30  -mx-10 -mt-32"
+                            }`}
+                          >
+                            <button
+                              type="button"
+                              onClick={() => handleDelMessage(e.messageId)}
+                              className="text-red-500 p-2 rounded"
+                            >
+                              {loading ? (
+                                <Loader2 className="animate-spin w-5 h-5" />
+                              ) : (
+                                <p className="flex items-center gap-2">
+                                  {t("chat.deleteMessage")} <Trash size={18} />
+                                </p>
+                              )}
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => setdelMesModal(null)}
+                              className="p-2"
+                            >
+                              {t("chat.cancel")}
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </section>
+                );
+              })}
           </div>
-        )}
+        </div>
       </div>
 
       <div className="border-2 min-h-12 max-h-12 m-4 p-2 rounded-xl border-[#E2E8F0] flex justify-between gap-1 items-center">
@@ -757,7 +706,7 @@ export default function ChatById() {
           )}
         </form>
 
-        {openImg && (
+        {previewFile && (
           <div
             style={{ backdropFilter: "blur(6px)" }}
             className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.3)]"
@@ -765,15 +714,15 @@ export default function ChatById() {
             <div className="w-[400px] bg-white rounded-xl shadow p-5">
               {openIsVideo ? (
                 <video
-                  src={openImg}
+                  src={previewFile}
                   controls
                   className="max-h-64 mx-auto mb-4"
                 />
               ) : openIsAudio ? (
-                <audio src={openImg} controls className="w-full mb-4" />
+                <audio src={previewFile} controls className="w-full mb-4" />
               ) : (
                 <img
-                  src={openImg}
+                  src={previewFile}
                   alt="preview"
                   className="max-h-64 mx-auto mb-4"
                 />

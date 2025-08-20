@@ -1,4 +1,5 @@
 "use client"
+import useDarkSide from '@/hook/useDarkSide'
 import { useUserId } from '@/hook/useUserId'
 import { useProfileByIdStore } from '@/store/pages/profile/profile-by-id/store'
 import { Loader } from 'lucide-react'
@@ -41,12 +42,13 @@ const FollowFollowers = ({ id, checkMyFollowings = true }) => {
         }
     }
 
+    const [theme] = useDarkSide()
+
     return (
         <button
             onClick={handleFollow}
             disabled={isLoading}
-            className={`${changeFollow ? "bg-[#F3F4F6]" : "bg-[#4a5df9] text-white"} py-[7px] px-4 rounded-lg`}
-        >
+            className={`${changeFollow ? theme == 'dark' ? "bg-[#25292e] text-white" : "bg-[#F3F4F6]" : "bg-[#4a5df9] text-white"} py-[6px] px-4 rounded-lg`}>
             {isLoading ? (
                 <Loader className="animate-spin w-4 h-4" />
             ) : changeFollow ? (
