@@ -222,5 +222,17 @@
     "message": "Message",
     "Suggested": "Suggested for you",
     "See": "See All"
+  },
+  "profile": {
+    "post": "posts",
+    "followers": "followers",
+    "following": "following",
+    "editProfile": "Edit profile",
+    "View Archive": "View archive",
+    "QR code": "QR code",
+    "Notification": "Notification",
+    "Settings": "Settings and privacy",
+    "Log out": "Log out",
+    "aboutThisAccount": "About this account"
   }
 }

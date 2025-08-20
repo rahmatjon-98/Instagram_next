@@ -223,5 +223,17 @@
     "message": "Сообщения",
     "Suggested": "Рекомендации для вас",
     "See": "Смотреть все"
+  },
+  "profile": {
+    "post": "публикации",
+    "followers": "подписчики",
+    "following": "подписки",
+    "editProfile": "Редактировать профиль",
+    "View Archive": "Просмотреть архив",
+    "QR code": "QR-код",
+    "Notification": "Уведомления",
+    "Settings": "Настройки и конфиденциальность",
+    "Log out": "Выйти",
+    "aboutThisAccount": "Об этом аккаунте"
   }
 }

@@ -228,5 +228,17 @@
     "message": "Паём",
     "Suggested": "Ба шумо пешниҳод шудааст",
     "See": "Ҳамаи онҳоро бинед"
+  },
+  "profile": {
+    "post": "паёмҳо",
+    "followers": "пайравон",
+    "following": "пайгирӣ",
+    "editProfile": "Таҳрири профил",
+    "View Archive": "Намоиши бойгонӣ",
+    "QR code": "Рамзи QR",
+    "Notification": "Огоҳӣ",
+    "Settings": "Танзимот ва махфият",
+    "Log out": "Баромад",
+    "aboutThisAccount": "Дар бораи ин ҳисоб"
   }
 }
