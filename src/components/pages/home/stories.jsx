@@ -16,6 +16,7 @@ export default function SwiperStories({ indexUser = 0 }) {
 	const { data, LikeStory } = useHome()
 	const [paused, setPaused] = useState(false)
 	const [isMuted, setIsMuted] = useState(true)
+	const [isLiked, setIsLikeed] = useState(false)
 	const [activeIndex, setActiveIndex] = useState(indexUser)
 	const swiperRef = useRef(null)
 	let [theme, setTheme] = useState(
@@ -63,6 +64,7 @@ export default function SwiperStories({ indexUser = 0 }) {
 								/>
 								<button
 									onClick={async () => {
+										setIsLikeed(e => !e)
 										await LikeStory(stor.id)
 										close()
 									}}
@@ -71,8 +73,8 @@ export default function SwiperStories({ indexUser = 0 }) {
 									<Heart
 										size={22}
 										color='#ffffff'
-										fill={stor.likeCount > 0 ? 'red' : 'none'}
-										stroke={stor.likeCount > 0 ? 'red' : 'white'}
+										fill={isLiked ? 'red' : 'none'}
+										stroke={isLiked ? 'red' : 'white'}
 									/>
 									<p className='text-white text-sm'>{stor.likeCount}</p>
 								</button>
