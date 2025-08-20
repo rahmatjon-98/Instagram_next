@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { Heart, MessageCircle, SendHorizontal, Play, Pause, Volume2, VolumeX, X, Bookmark } from "lucide-react";
-import { useRealsStore } from "./store";
+import { useRealsStore } from "../../store/pages/reels/store";
 import Skeleton from "@mui/material/Skeleton";
 import Stack from "@mui/material/Stack";
 import Modal from "@mui/material/Modal";
