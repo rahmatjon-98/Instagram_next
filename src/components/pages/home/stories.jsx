@@ -140,9 +140,9 @@ export default function SwiperStories({ indexUser = 0 }) {
 
     return data
       .filter(e => e?.stories?.length > 0)
-      .map(user => ({
+      .map((user,i) => ({
         userName: user.userName,
-        stories: user?.stories?.map(stor => {
+        stories: user?.stories?.map((stor) => {
           const isVideo = stor.fileName?.endsWith('.mp4')
           return {
             url: `http://37.27.29.18:8003/images/${stor.fileName}`,
@@ -153,7 +153,8 @@ export default function SwiperStories({ indexUser = 0 }) {
               heading: user.userName,
               profileImage: user.userImage ? `http://37.27.29.18:8003/images/${user.userImage}` : userIMG.src,
             },
-            seeMore: () => (
+            seeMore: i !== 0
+						? () => (
               <SeeMoreInline
                 userId={user.userId}
                 storId={stor.id}
@@ -161,7 +162,7 @@ export default function SwiperStories({ indexUser = 0 }) {
                 liked={!!likedMap[stor.id]}
                 onToggleLike={() => toggleLike(stor.id)}
               />
-            ),
+            ) : undefined
           }
         }),
       }))
