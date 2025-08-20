@@ -4,12 +4,13 @@ import React, { useEffect, useRef, useState } from 'react'
 import defaultUser from '@/assets/img/pages/profile/profile/instauser (2).jpg'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
+import { useTranslation } from 'react-i18next'
 
 const Suggetions = () => {
     let { users, getUsers } = usegetUserStore()
     let randomUsers = users?.data?.slice(0, 12)
-    // const [openSuggest, setOpenSuggest] = useState(null)
     let router = useRouter()
+    let { t } = useTranslation()
 
     const containerRef = useRef(null)
     let width = 320
@@ -27,8 +28,8 @@ const Suggetions = () => {
     return (
         <section className="mt-15">
             <div className="flex mb-5 justify-between">
-                <h3 className="font-semibold">Suggested for you</h3>
-                <button className="text-[#4262ff]">See all</button>
+                <h3 className="font-semibold">{t('profileById.Suggested')}</h3>
+                <button className="text-[#4262ff]">{t('profileById.See')}</button>
             </div>
             <div className="flex items-center gap-5">
                 <button onClick={scrollLeft}><ArrowLeft /></button>
@@ -41,7 +42,7 @@ const Suggetions = () => {
                                 <p className='text-[14px]'>{e.fullName}</p>
                             </div>
                             <div className="border-1 border-gray-300 rounded-b border-t-0 flex justify-center p-3">
-                                <button>Follow </button>
+                                <button>{t('profileById.follow')}</button>
                             </div>
                         </div>
                     ))}

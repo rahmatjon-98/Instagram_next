@@ -6,13 +6,11 @@ let api = 'http://37.27.29.18:8003/'
 export const useProfileByIdStore = create((set, get) => ({
     users: [],
     chats: [],
-    loadings: false,
     posts: [],
     followers: [],
     followings: [],
     getProfileById: async (id) => {
         try {
-            set({ loading: true })
             let { data } = await axiosRequest.get(`${api}UserProfile/get-user-profile-by-id?id=${id}`)
             set({ users: data })
         } catch (error) {
@@ -71,6 +69,15 @@ export const useProfileByIdStore = create((set, get) => ({
         try {
             await axiosRequest.delete(`FollowingRelationShip/delete-following-relation-ship?followingUserId=${id}`)
             await get().getProfileById(id)
+        } catch (error) {
+            console.error(error)
+        }
+    },
+    addPostFavorite: async (postId) => {
+        const userId = get().user?.id
+        try {
+            await axiosRequest.post('Post/add-post-favorite', { userId, postId })
+            await get().getPosts()
         } catch (error) {
             console.error(error)
         }
