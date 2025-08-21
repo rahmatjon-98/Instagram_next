@@ -10,6 +10,7 @@ export const useProfileStore = create((set, get) => ({
 	favorites: {},
 	posts: {},
 	userById: {},
+	stories: {},
 	// decodeToken: {},
 	// jwtDecode: () => {
 	// 	try {
@@ -116,6 +117,14 @@ export const useProfileStore = create((set, get) => ({
 			await get().getPosts()
 		} catch (error) {
 			console.error('Could not delete post', error)
+		}
+	},
+	getStories: async () => {
+		try {
+			let data = await axiosRequest.get(`${api}/Story/get-my-stories`)
+			set({ stories: data })
+		} catch (error) {
+			console.error(error)
 		}
 	},
 }))
