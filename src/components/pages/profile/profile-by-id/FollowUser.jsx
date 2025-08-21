@@ -60,7 +60,7 @@ const FollowUser = () => {
         <button
             onClick={handleFollow}
             disabled={isLoading}
-            className={`${changeFollow ? theme == 'dark' ? "bg-[#25292e] text-white" : "bg-[#F3F4F6]" : "bg-[#4a5df9] text-white"} py-[6px] px-4 rounded-lg`}
+            className={`text-[12px] ${changeFollow ? theme == 'dark' ? "bg-[#25292e] text-white" : "bg-[#F3F4F6]" : "bg-[#4a5df9] text-white"} py-[6px] px-4 rounded-lg`}
         >
             {isLoading ? (
                 <Loader className="animate-spin w-4 h-4" />

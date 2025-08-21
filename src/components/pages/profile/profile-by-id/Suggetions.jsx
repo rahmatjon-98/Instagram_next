@@ -26,7 +26,7 @@ const Suggetions = () => {
     useEffect(() => { getUsers() }, [])
 
     return (
-        <section className="mt-15">
+        <section className="mt-15  w-[100%]">
             <div className="flex mb-5 justify-between">
                 <h3 className="font-semibold">{t('profileById.Suggested')}</h3>
                 <button className="text-[#4262ff]">{t('profileById.See')}</button>
