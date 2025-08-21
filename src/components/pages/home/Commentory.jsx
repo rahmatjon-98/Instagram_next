@@ -108,7 +108,7 @@ export default function Commentory({ UserId, setClose }) {
 					className='px-3 py-1 rounded-xl border border-gray-300 hover:bg-gray-50 disabled:opacity-50'
 					disabled={!file && !previewUrl}
 				>
-					<X/>
+					Clear
 				</button>
 			</div>
 

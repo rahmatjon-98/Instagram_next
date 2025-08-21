@@ -15,7 +15,7 @@ import { Bookmark, Camera, CircleUserRound, Copy, EllipsisVertical, Heart, Loade
 import CommentInput from "@/components/pages/explore/Emogi"
 import { useUserId } from "@/hook/useUserId"
 import Reel from '../../../public/reel.png'
-import { useRealsStore } from '../reels/store';
+import { useRealsStore } from '../../store/pages/reels/store';
 import useDarkSide from '@/hook/useDarkSide';
 import DoubleClick from '@/components/pages/profile/profile-by-id/DoubleClick';
 import ModalUsers from '@/components/pages/explore/ModalUsers';

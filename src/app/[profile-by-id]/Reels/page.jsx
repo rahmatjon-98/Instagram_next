@@ -15,7 +15,7 @@ import { Bookmark, CircleUserRound, Heart, Loader, MessageCircle, MessageCircleM
 import CommentInput from "@/components/pages/explore/Emogi"
 import { useUserId } from "@/hook/useUserId"
 import Reel from '../../../../public/reel.png'
-import { useRealsStore } from '@/app/reels/store';
+import { useRealsStore } from '@/store/pages/reels/store';
 import useDarkSide from '@/hook/useDarkSide';
 import ProfileEmoji from '@/components/pages/profile/profile-by-id/ProfileEmoji';
 import { LikeButton } from '@/components/pages/profile/profile-by-id/LikeButton';
