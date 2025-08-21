@@ -60,7 +60,7 @@ export default function Login() {
 					<div className='flex flex-col items-center mb-6'>
 						<Image src={frame168} alt='Instagram' />
 					</div>
-
+	
 					<form onSubmit={handleSubmit(onSubmit)} className='space-y-3'>
 						<input
 							type='text'

@@ -465,13 +465,17 @@ const Saved = () => {
 								<BookmarkIcon className='text-white w-5 h-5' />{' '}
 							</div>
 							{e.images[0].endsWith('.mp4') ? (
-								<video src={`http://37.27.29.18:8003/images/${e.images[0]}`} />
+								<video
+									src={`http://37.27.29.18:8003/images/${e.images[0]}`}
+									className='w-full'
+								/>
 							) : (
 								<Image
 									src={`http://37.27.29.18:8003/images/${e.images[0]}`}
 									alt='post'
 									width={300}
 									height={300}
+									className='w-full'
 								/>
 							)}
 							<div className='absolute inset-0 bg-black opacity-0 group-hover:opacity-50 transition-opacity duration-300'></div>

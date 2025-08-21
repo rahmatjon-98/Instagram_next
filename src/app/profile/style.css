@@ -3,6 +3,6 @@
 	scrollbar-width: none;
 }
 
-.hide-scrollbar::-webkit-scrollbar {
+.hidscrol::-webkit-scrollbar {
 	display: none;
 }

@@ -1,70 +1,44 @@
 'use client'
-import React, { useState } from 'react'
-import { useProfileStore } from '@/store/pages/profile/profile/store'
-import Image from 'next/image'
-import { useEffect } from 'react'
-import defaultUser from '../../assets/img/pages/profile/profile/instauser (2).jpg'
-import { RxHamburgerMenu } from 'react-icons/rx'
-import { usePathname, useRouter } from 'next/navigation'
-import { MdOutlineGridOn } from 'react-icons/md'
-import { FaRegBookmark } from 'react-icons/fa'
-import { MdOutlinePhotoCameraFront } from 'react-icons/md'
 import useDarkSide from '@/hook/useDarkSide'
+import { useUserId } from '@/hook/useUserId'
+import { useProfileStore } from '@/store/pages/profile/profile/store'
+import { useMediaQuery } from '@mui/material'
 import Box from '@mui/material/Box'
 import Modal from '@mui/material/Modal'
+import Image from 'next/image'
+import { usePathname, useRouter } from 'next/navigation'
+import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import { useMediaQuery } from '@mui/material'
-import { useUserId } from '@/hook/useUserId'
+import { FaRegBookmark } from 'react-icons/fa'
+import { MdOutlineGridOn, MdOutlinePhotoCameraFront } from 'react-icons/md'
+import { RxHamburgerMenu } from 'react-icons/rx'
+import defaultUser from '../../assets/img/pages/profile/profile/instauser (2).jpg'
 
+import FollowFollowers from '@/components/pages/profile/profile-by-id/FollowFollowers'
+import FollowFollowings from '@/components/pages/profile/profile-by-id/FollowFollowings'
 import { useProfileByIdStore } from '@/store/pages/profile/profile-by-id/store'
-import Stack from '@mui/material/Stack'
 import Skeleton from '@mui/material/Skeleton'
+import Stack from '@mui/material/Stack'
 import {
 	ArrowRight,
 	Calendar,
 	Loader,
 	Search,
 	User,
+	Video,
 	X,
 	XCircle,
 } from 'lucide-react'
-import { usegetUserStore } from '@/store/pages/search/store'
-import './style.css'
-import FollowFollowers from '@/components/pages/profile/profile-by-id/FollowFollowers'
-import FollowFollowings from '@/components/pages/profile/profile-by-id/FollowFollowings'
 import { useTranslation } from 'react-i18next'
-
-const style = {
-	position: 'absolute',
-	top: '50%',
-	left: '50%',
-	transform: 'translate(-50%, -50%)',
-	width: 550,
-	height: 400,
-	bgcolor: 'background.paper',
-	border: 'none',
-	boxShadow: 24,
-	borderRadius: '20px',
-}
-
-const style2 = {
-	width: 600,
-	position: 'absolute',
-	top: '50%',
-	left: '50%',
-	transform: 'translate(-50%, -50%)',
-	bgcolor: 'background.paper',
-	border: 'none',
-	boxShadow: 24,
-	borderRadius: '20px',
-}
+import './style.css'
 
 const Layout = ({ children }) => {
-	let { user: userer, getProfileData } = useProfileStore()
+	let { user: userer, getProfileData, stories, getStories } = useProfileStore()
 	let { t } = useTranslation()
 
 	let router = useRouter()
 	let pathname = usePathname()
+
 
 	const isMobile = useMediaQuery('(max-width:768px)')
 
@@ -72,7 +46,9 @@ const Layout = ({ children }) => {
 
 	useEffect(() => {
 		getProfileData()
+		getStories()
 	}, [])
+	console.log(stories ? stories?.data?.data?.stories : '')
 
 	const [theme, setTheme] = useDarkSide()
 
@@ -146,8 +122,7 @@ const Layout = ({ children }) => {
 
 	let user = users?.data
 
-
-	const { getChats, followers, getFollowers, getFollowings, followings } =
+	const { followers, getFollowers, getFollowings, followings } =
 		useProfileByIdStore()
 
 	const SkeletonRow = () => (
@@ -223,7 +198,7 @@ const Layout = ({ children }) => {
 
 	return (
 		<div className='pt-[8%]'>
-			<section className='flex gap-[5%] m-auto lg:w-[80%] justify-center'>
+			<section className='flex gap-[10%] m-auto lg:w-[80%] justify-center'>
 				<div className='hidden md:flex overflow-hidden items-center justify-center w-[100px] md:w-[160px] h-[100px] md:h-[160px] rounded-[50%] bg-gray-200'>
 					<Image
 						src={`http://37.27.29.18:8003/images/${userer.image}`}
@@ -267,7 +242,6 @@ const Layout = ({ children }) => {
 										: 'bg-[#25292E] text-[#F4F4F4] hover:bg-gray-800'
 								}`}
 							>
-								{/* View archive */}
 								{t('profile.View Archive')}
 							</button>
 							<button
@@ -293,7 +267,7 @@ const Layout = ({ children }) => {
 										className='cursor-pointer p-[12px] bg-white hover:bg-gray-200 w-full text-start'
 										onClick={() => router.push('/notification')}
 									>
-										{t('profile.Notidications')}
+										{t('profile.Notification')}
 									</button>
 									<button
 										className='cursor-pointer p-[12px] bg-white hover:bg-gray-200 w-full text-start'
@@ -700,7 +674,36 @@ const Layout = ({ children }) => {
 					</div>
 				</div>
 			</section>
-			<section className='h-[70px] md:h-[100px] w-[95%] md:w-[80%] overflow-x-hidden flex m-auto'></section>
+			<section className='h-[70px] md:h-[100px] sm:w-[95%] md:w-[80%] my-[3vh] flex m-auto items-center px-[9%] gap-[2%] overflow-x-scroll hidscrol'>
+				{stories?.data?.data?.stories?.map((e, i) => {
+					return (
+						<div
+							key={i}
+							className='w-[75px] h-[75px] rounded-[50%] flex items-center justify-center'
+							style={{
+								background: `linear-gradient(#f9ce34, #ee2a7b, #6228d7)`,
+							}}
+						>
+							<div className='w-[70px] h-[70px] rounded-[50%] bg-white flex items-center justify-center overflow-hidden'>
+								{e.fileName.endsWith('.mp4') ? (
+									<div>
+										<video
+											src={`http://37.27.29.18:8003/images/${e.fileName}`}
+										/>
+									</div>
+								) : (
+									<Image
+										src={`http://37.27.29.18:8003/images/${e.fileName}`}
+										width={50}
+										height={50}
+										alt='my story'
+									/>
+								)}
+							</div>
+						</div>
+					)
+				})}
+			</section>
 			<div className='border-t-[#E2E8F0] border-t w-[95%] md:w-[80%] flex justify-center gap-[30px] md:gap-[150px] m-auto'>
 				<button
 					className='flex items-center gap-[10px] py-[10px] cursor-pointer '
