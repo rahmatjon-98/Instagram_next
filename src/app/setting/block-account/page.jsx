@@ -12,8 +12,8 @@ const AccountBlock = () => {
       <div
         className={`flex items-center justify-between p-6 rounded-2xl transition-all duration-300 cursor-pointer ${
           isPrivate
-            ? 'border border-blue-500 bg-blue-50 hover:bg-blue-100'
-            : 'border border-gray-300 hover:bg-gray-100'
+            ? 'border border-blue-500'
+            : 'border border-gray-300'
         }`}
         onClick={() => setIsPrivate(!isPrivate)}
       >
@@ -22,7 +22,7 @@ const AccountBlock = () => {
           checked={isPrivate}
           onChange={setIsPrivate}
           size="default"
-          className="bg-gray-300"
+          
         />
       </div>
 

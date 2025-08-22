@@ -218,7 +218,7 @@ const Layout = ({ children }) => {
 				<div className='flex flex-col gap-[20px]'>
 					<div className='flex items-center md:gap-[40px]'>
 						<h1
-							className='font-bold text-[#1E293B] text-[20px] w-[120px] md:w-[130px] overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer'
+							className='font-bold  text-[20px] w-[120px] md:w-[130px] overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer'
 							onClick={() => setOpenAccountModal(true)}
 						>
 							{userer.userName}
@@ -635,7 +635,7 @@ const Layout = ({ children }) => {
 							/>
 						</div>
 						<p
-							className='text-[#1E293B] block md:flex cursor-pointer items-baseline'
+							className=' block md:flex cursor-pointer items-baseline'
 							onClick={() => router.push('/profile')}
 						>
 							{userer?.postCount}
@@ -644,7 +644,7 @@ const Layout = ({ children }) => {
 							</span>
 						</p>
 						<p
-							className='text-[#1E293B] block md:flex cursor-pointer items-baseline'
+							className=' block md:flex cursor-pointer items-baseline'
 							onClick={handleOpen}
 						>
 							{userer?.subscribersCount}
@@ -653,7 +653,7 @@ const Layout = ({ children }) => {
 							</span>
 						</p>
 						<p
-							className='text-[#1E293B] block md:flex cursor-pointer items-baseline'
+							className=' block md:flex cursor-pointer items-baseline'
 							onClick={() => setOpenFollowings(true)}
 						>
 							{userer?.subscriptionsCount}
@@ -663,11 +663,11 @@ const Layout = ({ children }) => {
 						</p>
 					</div>
 					<div className='flex'>
-						<p className='font-bold text-[#1E293B] text-[20px]'>
+						<p className='font-bold  text-[20px]'>
 							{userer.firstName}
 						</p>
 						{userer.lastName && (
-							<p className='font-bold text-[#1E293B] text-[20px]'>
+							<p className='font-bold  text-[20px]'>
 								{userer.userName}
 							</p>
 						)}

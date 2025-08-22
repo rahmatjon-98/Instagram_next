@@ -80,7 +80,7 @@ const MiniSideBar = ({ children }) => {
   const [openPost, setOpenPost] = useState(false);
   const handleOpenPost = () => setOpenPost(true);
   const handleClosePost = () => (setOpenPost(false), setFile([]));
-  
+
   let { addPost } = useProfileStore();
 
   let [title, setTitle] = useState("");
@@ -123,10 +123,7 @@ const MiniSideBar = ({ children }) => {
       }`}
     >
       <Toaster />
-      <section
-        className="flex fixed
-       justify-center w-[50px] border-r-[2px] border-[#eee] h-[100vh]"
-      >
+      <section className="flex justify-center w-[50px] border-r-[2px] border-[#eee] h-[100vh]">
         <div className="sideBar h-full pb-[100px]">
           <div className="m-auto flex justify-center pb-[10px] mt-[20px]">
             {instagramMiniLogo}
@@ -190,9 +187,11 @@ const MiniSideBar = ({ children }) => {
                 placement="right"
                 arrow
               >
-                <div className="flex items-center super-svg gap-4 w-[90%] rounded-[8px] h-[52px] px-0 justify-center">
-                  {renderIcon("/notification", likeActive, like)}
-                </div>
+                <Link href="/notification" passHref>
+                  <div className="flex items-center super-svg gap-4 w-[90%] rounded-[8px] h-[52px] px-0 justify-center">
+                    {renderIcon("/notification", likeActive, like)}
+                  </div>
+                </Link>
               </LightTooltip>
 
               <LightTooltip title={t("layout.create")} placement="right" arrow>

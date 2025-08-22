@@ -35,7 +35,7 @@ const Language = () => {
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         placeholder="Поиск"
-        className="w-full px-4 py-2 mb-4 border rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="w-full px-4 py-2 mb-4 border rounded-lg  focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
 
       <div className="space-y-3">
@@ -44,13 +44,13 @@ const Language = () => {
             <button
               key={lang.code}
               onClick={() => handleChange(lang.code)}
-              className={`w-full flex justify-between items-center px-4 py-3 rounded-lg border hover:bg-gray-50 transition ${
+              className={`w-full flex justify-between items-center px-4 py-3 rounded-lg border hover:bg-neutral-300 transition ${
                 i18n.language === lang.code
                   ? "border-blue-500 text-blue-600 font-medium"
-                  : "border-gray-200 text-gray-700"
+                  : "border-gray-200 text-gray-500"
               }`}
             >
-              <span>{lang.label}</span>
+              <span className="">{lang.label}</span>
               {i18n.language === lang.code && (
                 <span className="w-5 h-5 flex items-center justify-center rounded-full bg-blue-500 text-white text-xs">
                   ✓

@@ -231,7 +231,7 @@ const ProfileById = ({ children }) => {
   );
 
   return (
-    <div className="md:pl-[8%] p-5 mt-5">
+    <div className="md:pl-[8%] p-5 pt-5 min-h-[100vh]">
       <section className="flex justify-center items-center gap-5 md:gap-20 ">
         {loadings ? (
           <Skeleton
@@ -266,7 +266,7 @@ const ProfileById = ({ children }) => {
             ) : (
               <h1
                 onClick={() => setOpenAccountModal(true)}
-                className="font-bold cursor-pointer text-[#1E293B] text-[20px]"
+                className="font-bold cursor-pointer  text-[20px]"
               >
                 {user?.userName}
               </h1>
@@ -713,11 +713,11 @@ const ProfileById = ({ children }) => {
               <Skeleton sx={skeletonStyle(theme)} width={140} height={28} />
             ) : (
               <>
-                <p className="font-bold text-[#1E293B] text-[20px]">
+                <p className="font-bold text-[20px]">
                   {user?.firstName}
                 </p>
                 {user?.lastName && (
-                  <p className="font-bold text-[#1E293B] text-[20px]">
+                  <p className="font-bold text-[20px]">
                     {user?.userName}
                   </p>
                 )}
