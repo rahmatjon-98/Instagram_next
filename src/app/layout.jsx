@@ -1,6 +1,5 @@
 import "./globals.css";
 
-
 import TranslatorProvider from "@/components/providers/translator-provider";
 import ThemeWrapper from "@/components/providers/theme-provider";
 import ResponsiveBarWrapper from "@/components/layout/ResponsiveBarWrapper";
@@ -10,6 +9,7 @@ export default function RootLayout({ children }) {
     <TranslatorProvider>
       <html lang="en">
         <body className="h-full">
+          <title>Instagram Rahmatjon</title>
           <ThemeWrapper>
             <ResponsiveBarWrapper>{children}</ResponsiveBarWrapper>
           </ThemeWrapper>
