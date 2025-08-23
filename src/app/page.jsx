@@ -302,7 +302,9 @@ export default function Main() {
                     <div className="flex  w-full justify-between pb-[20px]  items-center">
                       <div className="flex gap-[20px]">
                         <div>
-                          <img
+                          <Image
+                            width={200}
+                            height={200}
                             src={`http://37.27.29.18:8003/images/${postById.data?.userImage}`}
                             className="w-[40px] h-[40px] rounded-full"
                             alt="test"
@@ -344,7 +346,9 @@ export default function Main() {
                           >
                             <div className="flex  gap-3 items-center flex-1 min-w-0">
                               {comment.userImage ? (
-                                <img
+                                <Image
+                                  width={200}
+                                  height={200}
                                   src={
                                     comment.userImage
                                       ? `http://37.27.29.18:8003/images/${comment.userImage}`
@@ -384,7 +388,7 @@ export default function Main() {
                                 )}
                               </div>
                             </div>
-                            {comment.userId == useUserId() ? (
+                            {comment.userId == userId ? (
                               <div className="flex gap-[10px]">
                                 <button
                                   className="cursor-pointer hover:text-red-500"
@@ -1247,7 +1251,7 @@ export default function Main() {
                   </div>
                 </Link>
                 <button
-                  onClick={() => followUser(e.id)}
+                  // onClick={() => followUser(e.id)}
                   className="px-4 h-[30px] text-[16px] font-[600] text-blue-600 ml-4 text-sm hover:text-blue-500 active:text-blue-400 bg-white rounded-full"
                 >
                   {t("home.follow")}

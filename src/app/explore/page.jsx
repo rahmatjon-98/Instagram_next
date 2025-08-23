@@ -208,7 +208,9 @@ export default function Explore() {
                               </div>
                             </div>
                           ) : (
-                            <img
+                            <Image
+                              width={200}
+                              height={200}
                               src={mediaUrl}
                               draggable={false}
                               className="lg:h-[85vh] h-[50vh]"
@@ -224,7 +226,9 @@ export default function Explore() {
                     <div className="flex  w-full justify-between pb-[20px]  items-center">
                       <div className="flex gap-[20px]">
                         <div>
-                          <img
+                          <Image
+                            width={200}
+                            height={200}
                             draggable={false}
                             src={`http://37.27.29.18:8003/images/${postById.data?.userImage}`}
                             className="w-[40px] h-[40px] rounded-full"
@@ -266,7 +270,9 @@ export default function Explore() {
                           >
                             <div className="flex  gap-3 items-center flex-1 min-w-0">
                               {comment.userImage ? (
-                                <img
+                                <Image
+                                  width={200}
+                                  height={200}
                                   src={
                                     comment.userImage
                                       ? `http://37.27.29.18:8003/images/${comment.userImage}`
@@ -306,7 +312,7 @@ export default function Explore() {
                                 )}
                               </div>
                             </div>
-                            {comment.userId == useUserId() ? (
+                            {comment.userId == userId ? (
                               <div className="flex gap-[10px]">
                                 <button
                                   className="cursor-pointer hover:text-red-500"

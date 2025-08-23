@@ -547,7 +547,9 @@ export default function ChatById() {
                           ) : e.messageText &&
                             isImageFileName(e.messageText) ? (
                             <div>
-                              <img
+                              <Image
+                                width={200}
+                                height={200}
                                 src={`http://37.27.29.18:8003/images/${e.messageText}`}
                                 alt="media"
                                 className="pb-2 rounded-xl max-w-xs"
@@ -721,7 +723,9 @@ export default function ChatById() {
               ) : openIsAudio ? (
                 <audio src={previewFile} controls className="w-full mb-4" />
               ) : (
-                <img
+                <Image
+                  width={200}
+                  height={200}
                   src={previewFile}
                   alt="preview"
                   className="max-h-64 mx-auto mb-4"

@@ -1,6 +1,22 @@
 "use client";
-import React, { useEffect, useState, useRef, useCallback, useMemo } from "react";
-import { Heart, MessageCircle, SendHorizontal, Play, Pause, Volume2, VolumeX, X, Bookmark } from "lucide-react";
+import React, {
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
+import {
+  Heart,
+  MessageCircle,
+  SendHorizontal,
+  Play,
+  Pause,
+  Volume2,
+  VolumeX,
+  X,
+  Bookmark,
+} from "lucide-react";
 import { useRealsStore } from "../../store/pages/reels/store";
 import Skeleton from "@mui/material/Skeleton";
 import Stack from "@mui/material/Stack";
@@ -9,7 +25,7 @@ import Box from "@mui/material/Box";
 import { Typography } from "@mui/material";
 import Link from "next/link";
 import ModalUsers from "@/components/pages/explore/ModalUsers";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 
 const Reels = () => {
   let [rellIdx, setRellIdx] = useState(0);
@@ -18,7 +34,7 @@ const Reels = () => {
   let [isMuted, setIsMuted] = useState(true);
   let [open, setOpen] = useState(false);
   let [newComment, setNewComment] = useState("");
-  let [isMobile, setIsMobile] = useState(false); 
+  let [isMobile, setIsMobile] = useState(false);
   let videoRef = useRef(null);
 
   let {
@@ -33,7 +49,7 @@ const Reels = () => {
     currentUserId,
   } = useRealsStore();
 
-  let {t} = useTranslation()
+  let { t } = useTranslation();
 
   let currentReel = useMemo(() => rels[rellIdx] || {}, [rels, rellIdx]);
 
@@ -41,7 +57,7 @@ const Reels = () => {
     () => ({
       position: "absolute",
       top: "50%",
-      left: isMobile ? "50%" : "88%", 
+      left: isMobile ? "50%" : "88%",
       transform: "translate(-50%, -50%)",
       width: isMobile ? "90%" : 330,
       bgcolor: "white",
@@ -54,18 +70,16 @@ const Reels = () => {
     [isMobile]
   );
 
-
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 640); 
+      setIsMobile(window.innerWidth < 640);
     };
 
-    handleResize(); 
+    handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  
   useEffect(() => {
     if (rels.length === 0) {
       getRels();
@@ -121,7 +135,6 @@ const Reels = () => {
       return !prev;
     });
   }, []);
-  
 
   const toggleMute = useCallback(() => {
     const video = videoRef.current;
@@ -131,26 +144,21 @@ const Reels = () => {
       console.log("Mute тағйир ёфт:", video.muted);
     }
   }, []);
-  
 
   const truncateText = useCallback((text, maxlength) => {
     if (!text || text.length <= maxlength) return text || "";
     return text.slice(0, maxlength) + "...";
   }, []);
-  
 
   const toggleFullText = useCallback((postId) => {
     setFullText((prev) => ({ ...prev, [postId]: !prev[postId] }));
   }, []);
-  
 
   const handleOpen = useCallback(() => setOpen(true), []);
   const handleClose = useCallback(() => {
     setOpen(false);
     setNewComment("");
   }, []);
-
-  
 
   const handleAddComment = useCallback(async () => {
     if (newComment.trim() && currentReel.postId) {
@@ -171,16 +179,26 @@ const Reels = () => {
       <Modal open={open} onClose={handleClose}>
         <Box sx={modalStyle}>
           <div className="flex items-center justify-between p-4 border-b border-gray-200">
-            <Typography className="text-lg font-semibold text-gray-800">{t("rells.comments rels")}</Typography>
-            <button onClick={handleClose} className="text-gray-500 hover:text-gray-700">
+            <Typography className="text-lg font-semibold text-gray-800">
+              {t("rells.comments rels")}
+            </Typography>
+            <button
+              onClick={handleClose}
+              className="text-gray-500 hover:text-gray-700"
+            >
               <X />
             </button>
           </div>
           <div className="flex-1 p-4 space-y-4 overflow-y-auto">
             {currentReel?.comments?.length > 0 ? (
               currentReel.comments.map((comment) => (
-                <div key={comment.postCommentId} className="flex items-start gap-3">
-                  <img
+                <div
+                  key={comment.postCommentId}
+                  className="flex items-start gap-3"
+                >
+                  <Image
+                    width={200}
+                    height={200}
                     src={
                       comment.userImage
                         ? `http://37.27.29.18:8003/images/${comment.userImage}`
@@ -192,26 +210,37 @@ const Reels = () => {
                   <div className="flex-1">
                     <div className="flex justify-between">
                       <div>
-                        <h4 className="text-sm font-semibold">{comment.userName}</h4>
+                        <h4 className="text-sm font-semibold">
+                          {comment.userName}
+                        </h4>
                         <p className="text-xs text-gray-500">
                           {new Date(comment.dateCommented).toLocaleString()}
                         </p>
                       </div>
                       {String(comment.userId) === String(currentUserId) && (
                         <button
-                          onClick={() => deleteComment(currentReel.postId, comment.postCommentId)}
+                          onClick={() =>
+                            deleteComment(
+                              currentReel.postId,
+                              comment.postCommentId
+                            )
+                          }
                           className="text-gray-400 hover:text-red-500"
                         >
                           <X size={16} />
                         </button>
                       )}
                     </div>
-                    <p className="mt-1 text-sm text-gray-800">{comment.comment}</p>
+                    <p className="mt-1 text-sm text-gray-800">
+                      {comment.comment}
+                    </p>
                   </div>
                 </div>
               ))
             ) : (
-              <Typography className="text-sm text-gray-500">{t("rells.no coment rels")}</Typography>
+              <Typography className="text-sm text-gray-500">
+                {t("rells.no coment rels")}
+              </Typography>
             )}
           </div>
           <div className="p-3 border-t border-gray-200">
@@ -259,7 +288,10 @@ const Reels = () => {
 
           <div className="absolute top-[50%] flex flex-col gap-[20px] items-center text-white left-[92%] z-30">
             <div className="flex flex-col items-center text-center">
-              <button onClick={() => likeReals(currentReel.postId)} className="cursor-pointer">
+              <button
+                onClick={() => likeReals(currentReel.postId)}
+                className="cursor-pointer"
+              >
                 <Heart
                   fill={currentReel.isLiked ? "red" : "none"}
                   stroke={currentReel.isLiked ? "red" : "white"}
@@ -274,9 +306,7 @@ const Reels = () => {
               <span>{currentReel.commentCount}</span>
             </div>
             <div className="flex flex-col items-center">
-            <ModalUsers
-                            media={currentReel.images}
-              />
+              <ModalUsers media={currentReel.images} />
             </div>
             <div className="flex flex-col items-center">
               <button
@@ -302,7 +332,9 @@ const Reels = () => {
           <div className="absolute bottom-15 sm:bottom-4 left-5 text-white z-10 w-[90%] flex flex-col items-start gap-[10px]">
             <div className="flex items-center mb-2">
               <Link href={`/${currentReel.userId}`}>
-                <img
+                <Image
+                  width={200}
+                  height={200}
                   src={
                     currentReel.userImage
                       ? `http://37.27.29.18:8003/images/${currentReel.userImage}`
@@ -313,15 +345,21 @@ const Reels = () => {
                 />
               </Link>
               <Link href={`/${currentReel.userId}`}>
-                <span className="font-semibold cursor-pointer">{currentReel.userName}</span>
+                <span className="font-semibold cursor-pointer">
+                  {currentReel.userName}
+                </span>
               </Link>
               <button
                 onClick={() =>
-                  currentReel.isSubscriber ? unfollowUser(currentReel.userId) : followUser(currentReel.userId)
+                  currentReel.isSubscriber
+                    ? unfollowUser(currentReel.userId)
+                    : followUser(currentReel.userId)
                 }
                 className="px-3 py-1 ml-4 text-sm text-black bg-white rounded-full"
               >
-                {currentReel.isSubscriber ? t("rells.Unfollow Rels") : t("rells.Subcribe Rels")}
+                {currentReel.isSubscriber
+                  ? t("rells.Unfollow Rels")
+                  : t("rells.Subcribe Rels")}
               </button>
             </div>
             {currentReel.content && (
@@ -336,15 +374,21 @@ const Reels = () => {
                     className="ml-2 text-sm text-gray-300 underline"
                     onClick={() => toggleFullText(currentReel.postId)}
                   >
-                    {fullText[currentReel.postId] ? t("rells.menshe") : t("rells.ewe")}
+                    {fullText[currentReel.postId]
+                      ? t("rells.menshe")
+                      : t("rells.ewe")}
                   </button>
                 )}
               </div>
             )}
             <div className="flex items-center gap-[15px]">
-              <span className="font-[500]">🎵 {currentReel.userName} {t("rells.original audio")}</span>
+              <span className="font-[500]">
+                🎵 {currentReel.userName} {t("rells.original audio")}
+              </span>
               <div className="flex mt-[5px] flex-col items-center">
-                <button onClick={toggleMute}>{isMuted ? <VolumeX /> : <Volume2 />}</button>
+                <button onClick={toggleMute}>
+                  {isMuted ? <VolumeX /> : <Volume2 />}
+                </button>
               </div>
             </div>
           </div>

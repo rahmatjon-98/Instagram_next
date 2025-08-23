@@ -7,7 +7,7 @@ import userIMG from "../../../assets/img/pages/home/userDefault.png";
 import { X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-export default function Commentory({ UserId, setClose,setComments }) {
+export default function Commentory({ UserId, setClose, setComments }) {
   let { getUserStories, postStory } = useHome();
   const [theme, setTheme] = useState(
     typeof window !== "undefined" ? localStorage.getItem("theme") || "" : ""
@@ -87,7 +87,7 @@ export default function Commentory({ UserId, setClose,setComments }) {
       setMessage(`Ошибка при сохранении: ${err.message}`);
     } finally {
       setSaving(false);
-	  setComments(false)
+      setComments(false);
     }
   };
 
@@ -138,7 +138,9 @@ export default function Commentory({ UserId, setClose,setComments }) {
 
         <div className="w-full max-w-[520px] aspect-video relative overflow-hidden rounded-2xl flex items-center justify-center bg-gray-50">
           {previewUrl ? (
-            <img
+            <Image
+              width={200}
+              height={200}
               src={previewUrl}
               alt="Предпросмотр"
               className="object-contain w-full h-full"

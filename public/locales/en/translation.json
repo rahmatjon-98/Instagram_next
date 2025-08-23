@@ -49,7 +49,7 @@
       "or": "or",
       "facebook": " Log in with Facebook",
       "forgot": "forgot password?",
-      "noAccount": "Don't have an account? Sign up",
+      "noAccount": "Don&apos;t have an account? Sign up",
       "download": "Get the app."
     }
   },
@@ -183,7 +183,7 @@
     "skritiy akaunt": "Hidden accounts",
     "net skritix polzovateley": "There are no hidden users.",
     "nastroyka kontenta": "Content settings",
-    "kontent iz akauntov": "Content from accounts you don't follow",
+    "kontent iz akauntov": "Content from accounts you Don&apos;t follow",
     "potensialno nepriemlimiy content": "Potentially inappropriate content"
   },
   "home": {
